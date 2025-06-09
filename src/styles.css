@@ -1,0 +1,241 @@
+/* V2R Voice Assistant Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+#app {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Voice Assistant Container */
+.voice-assistant {
+    max-width: 800px;
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+/* Header */
+.assistant-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.assistant-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.assistant-subtitle {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+/* Voice Button */
+.voice-button {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    margin: 0 auto 1rem;
+    display: block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.voice-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.voice-button:active {
+    transform: translateY(0);
+}
+
+.voice-button.listening {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Status Text */
+.voice-status {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+/* Chat History */
+.chat-history {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.message.user {
+    background: #667eea;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.message.assistant {
+    background: white;
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+
+/* Requirements List */
+.requirements-section {
+    margin-top: 2rem;
+}
+
+.requirements-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.requirements-list {
+    list-style: none;
+}
+
+.requirement-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.requirement-type {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+}
+
+.requirement-type.functional {
+    background: #3498db;
+    color: white;
+}
+
+.requirement-type.non-functional {
+    background: #f39c12;
+    color: white;
+}
+
+.requirement-type.constraint {
+    background: #e74c3c;
+    color: white;
+}
+
+.requirement-priority {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.requirement-priority.high {
+    background: #e74c3c;
+    color: white;
+}
+
+.requirement-priority.medium {
+    background: #f39c12;
+    color: white;
+}
+
+.requirement-priority.low {
+    background: #27ae60;
+    color: white;
+}
+
+/* Export Button */
+.export-button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.3s ease;
+}
+
+.export-button:hover {
+    background: #219a52;
+}
+
+.export-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .voice-assistant {
+        padding: 1rem;
+        margin: 10px;
+    }
+    
+    .assistant-title {
+        font-size: 1.5rem;
+    }
+    
+    .voice-button {
+        width: 100px;
+        height: 100px;
+        font-size: 1.5rem;
+    }
+    
+    .message {
+        max-width: 90%;
+    }
+}

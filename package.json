@@ -1,0 +1,29 @@
+{
+  "name": "v2r-voice-assistant",
+  "version": "1.0.0",
+  "description": "Browser-based voice assistant for converting meeting discussions into Jira user stories",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "keywords": [
+    "voice-assistant",
+    "product-management",
+    "jira",
+    "requirements",
+    "ai",
+    "speech-recognition"
+  ],
+  "author": "V2R Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "openai": "^4.0.0"
+  }
+}

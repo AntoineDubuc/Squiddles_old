@@ -269,30 +269,101 @@ When creating stories, fill out these sections:
 
 ---
 
-## 📋 **Phase 8: Testing & Debugging**
+## 📋 **Phase 8: Automated Voice Testing Framework**
 
-### 8.1 Voice Interface Testing
-- [ ] Test voice recognition accuracy
-- [ ] Test intent detection with various phrases
-- [ ] Test audio playback and WebRTC connectivity
-- [ ] Test browser compatibility (Chrome, Safari, Firefox)
-- [ ] Test microphone permissions handling
+### 8.1 Test Audio Generation System
+- [ ] Setup OpenAI TTS for test file generation:
+  - [ ] Install TTS dependencies and configure API
+  - [ ] Create test scenario library (50+ voice commands)
+  - [ ] Generate audio files with different voices (alloy, echo, nova, etc.)
+  - [ ] Create variations: fast/slow speech, background noise, accents
+  - [ ] Test file naming convention: `{scenario}_{voice}_{speed}_{background}.wav`
+- [ ] Create test audio generation script:
+  ```bash
+  npm run generate-test-audio
+  ```
+- [ ] Test scenarios include:
+  - [ ] "Create a user story for login functionality"
+  - [ ] "Add acceptance criteria for payment processing"
+  - [ ] "Generate epic for mobile app redesign"
+  - [ ] Short commands: "Create story", "Save draft"
+  - [ ] Long complex commands with technical terms
+  - [ ] Edge cases: interruptions, corrections, unclear speech
 
-### 8.2 Integration Testing
+### 8.2 Automated Testing Framework
+- [ ] Setup Jest + Puppeteer for browser automation
+- [ ] Create voice testing utilities:
+  - [ ] Mock MediaDevices.getUserMedia for test audio
+  - [ ] Audio playback simulation in headless browser
+  - [ ] Transcription accuracy measurement
+  - [ ] Response time benchmarking
+- [ ] Test runner for voice scenarios:
+  ```javascript
+  describe('Voice Interface Tests', () => {
+    test('recognizes create story command', async () => {
+      await playTestAudio('create_story_alloy_1.0_clean.wav');
+      expect(transcription).toContain('create');
+      expect(transcription).toContain('story');
+    });
+  });
+  ```
+- [ ] Regression test suite for voice accuracy
+- [ ] Performance benchmarking dashboard
+
+### 8.3 Voice Testing Tools & Utilities
+- [ ] Developer testing panel in UI:
+  - [ ] "Run Voice Tests" button
+  - [ ] Real-time test results display
+  - [ ] Accuracy metrics and failure analysis
+  - [ ] Audio file playback for debugging
+- [ ] Voice command recording tool:
+  - [ ] Record new test scenarios easily
+  - [ ] Export recorded audio as test files
+  - [ ] Batch processing for test generation
+- [ ] Testing configuration management:
+  - [ ] Test suite configuration files
+  - [ ] Custom test scenarios per feature
+  - [ ] CI/CD integration settings
+
+### 8.4 Continuous Integration Testing
+- [ ] GitHub Actions workflow for voice tests:
+  ```yaml
+  name: Voice Interface Tests
+  on: [push, pull_request]
+  jobs:
+    voice-tests:
+      - name: Generate test audio files
+      - name: Run voice recognition tests
+      - name: Upload test results
+  ```
+- [ ] Automated regression testing on code changes
+- [ ] Performance benchmarking in CI pipeline
+- [ ] Test result artifacts and reporting
+- [ ] Slack/email notifications for test failures
+
+### 8.5 Manual Testing & Quality Assurance
+- [ ] Voice recognition accuracy testing
+- [ ] Intent detection with various phrases
+- [ ] Audio playback and WebRTC connectivity
+- [ ] Browser compatibility (Chrome, Safari, Firefox)
+- [ ] Microphone permissions handling
+- [ ] Real user testing with Antoine Dubuc
+
+### 8.6 Integration Testing
 - [ ] Test Pinecone search with various queries
 - [ ] Test Jira ticket creation end-to-end
 - [ ] Test template system with different configurations
 - [ ] Test error handling and recovery
 - [ ] Test session timeout and reconnection
 
-### 8.3 UI/UX Testing
+### 8.7 UI/UX Testing
 - [ ] Test glass theme styling across browsers
 - [ ] Test responsive design on different screen sizes
 - [ ] Test accessibility with screen readers
 - [ ] Test keyboard navigation
 - [ ] Test touch interactions on mobile
 
-### 8.4 Performance Testing
+### 8.8 Performance Testing
 - [ ] Test with large conversation histories
 - [ ] Test WebRTC latency and quality
 - [ ] Test Pinecone search response times
@@ -364,8 +435,11 @@ When creating stories, fill out these sections:
 - [ ] Antoine can create complete user stories using only voice
 - [ ] Template sections fill automatically with AI assistance
 - [ ] Related tickets appear in context panel during creation
-- [ ] Voice recognition accuracy >85% for technical terms
+- [ ] Voice recognition accuracy >90% for technical terms (measured via automated tests)
 - [ ] End-to-end story creation in <5 minutes
+- [ ] Automated test suite covers >95% of voice command scenarios
+- [ ] Regression tests catch voice accuracy issues before deployment
+- [ ] Voice test generation completes in <2 minutes for full suite
 
 ### Critical Dependencies
 - OpenAI Realtime API availability and performance
@@ -378,5 +452,6 @@ When creating stories, fill out these sections:
 
 **Document Status**: Master Implementation Checklist  
 **Target Developer**: Junior Developer (Claude Code)  
-**Estimated Effort**: 8-12 weeks for complete implementation  
+**Estimated Effort**: 8-12 weeks for complete implementation
+**Testing Framework**: Adds 2-3 weeks but saves 4-6 weeks in manual testing and debugging  
 **Priority Order**: Phases 1-6 for MVP, Phases 7-10 for production-ready system

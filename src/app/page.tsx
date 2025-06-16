@@ -101,12 +101,50 @@ export default function Home() {
   const startSession = async () => {
     if (sessionStatus !== "DISCONNECTED") return;
     setSessionStatus("CONNECTING");
+    console.log("🎤 Starting session...");
 
     try {
-      const EPHEMERAL_KEY = await fetchEphemeralKey();
-      if (!EPHEMERAL_KEY) return;
+      // Request microphone permissions first with optimal audio constraints
+      console.log("🎤 Requesting microphone permissions...");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 24000, // OpenAI Realtime API requirement
+            channelCount: 1,    // Mono audio
+          }
+        });
+        console.log("✅ Microphone permission granted", stream.getAudioTracks());
+        stream.getTracks().forEach(track => track.stop()); // Clean up test stream
+      } catch (permissionError) {
+        console.error("❌ Microphone permission denied:", permissionError);
+        addEvent({
+          id: uuidv4(),
+          type: 'error.microphone_permission_denied',
+          timestamp: new Date().toISOString(),
+          data: { error: permissionError },
+          source: 'client'
+        });
+        setSessionStatus("DISCONNECTED");
+        alert("Microphone access is required for voice functionality. Please allow microphone access and try again.");
+        return;
+      }
 
+      console.log("🔑 Fetching ephemeral key...");
+      const EPHEMERAL_KEY = await fetchEphemeralKey();
+      if (!EPHEMERAL_KEY) {
+        console.error("❌ Failed to get ephemeral key");
+        return;
+      }
+      console.log("✅ Got ephemeral key:", EPHEMERAL_KEY.slice(0, 10) + "...");
+
+      console.log("🤖 Setting up agents...");
       const agents = allAgentSets[selectedAgentSet];
+      console.log("🤖 Selected agents:", agents.map(a => a.name));
+      
+      console.log("🔌 Creating RealtimeClient...");
       const client = new RealtimeClient({
         getEphemeralKey: async () => EPHEMERAL_KEY,
         initialAgents: agents,
@@ -119,6 +157,7 @@ export default function Home() {
       clientRef.current = client;
 
       client.on("connection_change", (status) => {
+        console.log("🔌 Connection status changed:", status);
         if (status === "connected") setSessionStatus("CONNECTED");
         else if (status === "connecting") setSessionStatus("CONNECTING");
         else setSessionStatus("DISCONNECTED");
@@ -203,19 +242,34 @@ export default function Home() {
       });
 
       client.on("history_added", (item) => {
-        if (item.content) {
-          const content = Array.isArray(item.content) ? item.content[0] : item.content;
-          const text = content?.text || content?.transcript || content || '';
-          if (text && item.itemId) {
-            addTranscriptMessage(item.itemId, item.role === 'user' ? 'user' : 'assistant', text);
+        // Handle different item types from OpenAI Realtime API
+        if (item.itemId) {
+          let text = '';
+          let role: 'user' | 'assistant' = 'assistant';
+          
+          if ('content' in item && item.content) {
+            const content = Array.isArray(item.content) ? item.content[0] : item.content;
+            text = (content as any)?.text || (content as any)?.transcript || '';
+          } else if ('output' in item && item.output) {
+            text = item.output;
+          }
+          
+          if ('role' in item && item.role === 'user') {
+            role = 'user';
+          }
+          
+          if (text) {
+            addTranscriptMessage(item.itemId, role, text);
           }
         }
       });
 
+      console.log("🚀 Connecting to OpenAI Realtime API...");
       await client.connect();
+      console.log("✅ Successfully connected to OpenAI Realtime API!");
       
     } catch (error) {
-      console.error("Failed to start session:", error);
+      console.error("❌ Failed to start session:", error);
       setSessionStatus("DISCONNECTED");
     }
   };
@@ -234,11 +288,26 @@ export default function Home() {
 
   // Toggle listening - simplified since WebRTC handles audio automatically
   const toggleListening = async () => {
-    if (!clientRef.current || sessionStatus !== "CONNECTED") return;
+    console.log("🎤 Toggle listening clicked. Current state:", isListening);
+    console.log("🎤 Client exists:", !!clientRef.current);
+    console.log("🎤 Session status:", sessionStatus);
+    
+    if (!clientRef.current || sessionStatus !== "CONNECTED") {
+      console.log("❌ Cannot toggle listening - not connected");
+      return;
+    }
     
     // With WebRTC, listening is always active when connected
     // This button now just indicates if we're actively in a conversation
-    setIsListening(!isListening);
+    const newState = !isListening;
+    console.log("🎤 Setting listening state to:", newState);
+    setIsListening(newState);
+    
+    if (newState) {
+      console.log("🎤 Starting to listen...");
+    } else {
+      console.log("🎤 Stopping listening...");
+    }
   };
 
   return (

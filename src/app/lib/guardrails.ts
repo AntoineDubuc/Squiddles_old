@@ -42,7 +42,17 @@ Please analyze this message and provide your classification and rationale.`
     }
 
     const data = await response.json();
-    return GuardrailOutputZod.parse(data.output_parsed);
+    
+    // Parse the structured response from OpenAI
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(data.content || '{}');
+    } catch (parseError) {
+      console.error('Failed to parse guardrail response content:', data.content);
+      throw new Error('Invalid JSON response from guardrails API');
+    }
+    
+    return GuardrailOutputZod.parse(parsedContent);
   } catch (error) {
     console.error('Guardrail classification failed:', error);
     // Fail open - return NONE if classification fails

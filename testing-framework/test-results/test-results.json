@@ -1,0 +1,253 @@
+{
+  "config": {
+    "configFile": "/Users/antoinedubuc/Squiddles/testing-framework/playwright.config.ts",
+    "rootDir": "/Users/antoinedubuc/Squiddles/testing-framework/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/test-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/antoinedubuc/Squiddles/testing-framework/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-voice",
+        "name": "chromium-voice",
+        "testDir": "/Users/antoinedubuc/Squiddles/testing-framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.53.0",
+    "workers": 1,
+    "webServer": {
+      "command": "cd .. && npm run dev",
+      "port": 3000,
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "basic-connectivity.test.ts",
+      "file": "basic-connectivity.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Squiddles Basic Connectivity",
+          "file": "basic-connectivity.test.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should load Squiddles app successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-voice",
+                  "projectName": "chromium-voice",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1689,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🌐 Testing basic app connectivity...\n"
+                        },
+                        {
+                          "text": "✅ App loaded successfully\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-13T15:20:18.818Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c387ffbac0ae834c02dc-6f7be5270c3d7c1e0fd4",
+              "file": "basic-connectivity.test.ts",
+              "line": 12,
+              "column": 7
+            },
+            {
+              "title": "should show start session button",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-voice",
+                  "projectName": "chromium-voice",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 302,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Start session button found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-13T15:20:20.711Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c387ffbac0ae834c02dc-a9b8a9fe6e80c5a39bbb",
+              "file": "basic-connectivity.test.ts",
+              "line": 28,
+              "column": 7
+            },
+            {
+              "title": "should connect to voice session",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-voice",
+                  "projectName": "chromium-voice",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3167,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Voice session connected successfully\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-13T15:20:21.014Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c387ffbac0ae834c02dc-9a71bbb560f1289e8bfe",
+              "file": "basic-connectivity.test.ts",
+              "line": 39,
+              "column": 7
+            },
+            {
+              "title": "should show transcript and events panels",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-voice",
+                  "projectName": "chromium-voice",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 340,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ UI panels found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-13T15:20:24.183Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c387ffbac0ae834c02dc-107e3bf98c217f91c856",
+              "file": "basic-connectivity.test.ts",
+              "line": 65,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-06-13T15:20:17.727Z",
+    "duration": 6844.693,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

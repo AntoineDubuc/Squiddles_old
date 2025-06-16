@@ -1,6 +1,12 @@
-# Squiddles - Voice-Activated Multi-Agent System
+<div align="center">
+  <img src="squiddles_logo.png" alt="Squiddles Logo" width="200"/>
+  
+  # 🦑 Squiddles - Voice-Activated Multi-Agent System
+</div>
 
 Squiddles is a voice-activated multi-agent web system that provides a unified project management interface through natural voice conversation. Built with Next.js 15 and OpenAI's Realtime API, it targets technical product managers and software development teams.
+
+Each "tentacle" represents a specialized AI agent that can handle different aspects of project management - from Jira ticket management to Slack communications, all controlled through natural voice commands.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -93,6 +99,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
   1. Go to [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
   2. Create a new API token
   3. Use your Atlassian email and the generated token
+  4. **Note**: Both `JIRA_HOST`/`JIRA_EMAIL` and `JIRA_BASE_URL`/`JIRA_USER_EMAIL` naming conventions are supported
 
 ## Running the Application
 
@@ -100,7 +107,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```bash
 npm run dev
 ```
-The application will be available at [http://localhost:3000](http://localhost:3000)
+The application will be available at [http://localhost:8888](http://localhost:8888)
+
+**Note:** Uses port 8888 to avoid conflicts with other projects.
 
 ### Production Build
 ```bash
@@ -183,6 +192,9 @@ npm run typecheck
 
 # Run tests (when available)
 npm test
+
+# Test Pinecone connection
+npm run test:pinecone
 
 # Format code (if prettier is configured)
 npm run format

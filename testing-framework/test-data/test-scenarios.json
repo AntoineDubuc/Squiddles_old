@@ -1,0 +1,100 @@
+{
+  "voiceConversationScenarios": [
+    {
+      "id": "basic-greeting",
+      "name": "Basic Greeting Test",
+      "description": "Test basic voice recognition and AI response",
+      "audioFile": "hello.wav", 
+      "expectedUserTranscript": "Hello, can you help me?",
+      "expectedAIResponsePatterns": [
+        "hello",
+        "help",
+        "how can I",
+        "assist"
+      ],
+      "timeoutMs": 10000
+    },
+    {
+      "id": "create-user-story",
+      "name": "Product Manager User Story Creation",
+      "description": "Test voice-driven user story creation workflow",
+      "audioFile": "create-user-story.wav",
+      "expectedUserTranscript": "I need to create a user story for a login feature",
+      "expectedAIResponsePatterns": [
+        "user story",
+        "login",
+        "feature"
+      ],
+      "expectedToolCalls": ["createUserStory"],
+      "timeoutMs": 15000
+    },
+    {
+      "id": "agent-handoff-jira",
+      "name": "Agent Handoff to Jira",
+      "description": "Test handoff from Product Manager to Jira agent",
+      "audioFile": "jira-handoff.wav",
+      "expectedUserTranscript": "Please create a Jira ticket for this",
+      "expectedAIResponsePatterns": [
+        "jira",
+        "ticket",
+        "transfer"
+      ],
+      "expectedAgentHandoff": "jira",
+      "timeoutMs": 20000
+    },
+    {
+      "id": "multi-turn-conversation",
+      "name": "Multi-turn Conversation",
+      "description": "Test complex conversation with multiple exchanges",
+      "steps": [
+        {
+          "audioFile": "greeting.wav",
+          "expectedResponse": ["hello", "help"]
+        },
+        {
+          "audioFile": "ask-for-story.wav", 
+          "expectedResponse": ["user story", "feature"]
+        },
+        {
+          "audioFile": "provide-details.wav",
+          "expectedResponse": ["details", "requirements"]
+        }
+      ],
+      "timeoutMs": 30000
+    }
+  ],
+  "performanceScenarios": [
+    {
+      "id": "response-latency",
+      "name": "Voice Response Latency Test",
+      "description": "Measure time from speech end to AI response start",
+      "audioFile": "quick-question.wav",
+      "maxLatencyMs": 3000,
+      "measurements": ["speechEndTime", "responseStartTime", "audioPlaybackTime"]
+    },
+    {
+      "id": "streaming-performance", 
+      "name": "Real-time Streaming Performance",
+      "description": "Test streaming delta updates during long AI responses",
+      "audioFile": "complex-request.wav",
+      "expectedStreamingDeltas": 10,
+      "maxDeltaIntervalMs": 500
+    }
+  ],
+  "errorScenarios": [
+    {
+      "id": "unclear-speech",
+      "name": "Unclear Speech Handling",
+      "description": "Test handling of unclear or garbled speech",
+      "audioFile": "unclear-speech.wav",
+      "expectedBehavior": "clarification_request"
+    },
+    {
+      "id": "connection-recovery",
+      "name": "Connection Recovery Test",
+      "description": "Test recovery from connection interruption",
+      "simulateDisconnection": true,
+      "audioFile": "after-reconnect.wav"
+    }
+  ]
+}

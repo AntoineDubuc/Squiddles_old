@@ -1,4 +1,8 @@
-# 🐙 Squiddles: Your Voice-Powered AI Workforce
+<div align="center">
+  <img src="squiddles_logo.png" alt="Squiddles Logo" width="300"/>
+  
+  # 🐙 Squiddles: Your Voice-Powered AI Workforce
+</div>
 
 ## The Vision: Extensible Intelligence That Speaks Your Language
 

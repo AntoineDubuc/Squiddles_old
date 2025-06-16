@@ -17,11 +17,19 @@ export async function POST(req: NextRequest) {
 
 async function structuredResponse(openai: OpenAI, body: any) {
   try {
-    const response = await openai.responses.parse({
-      ...body,
+    const response = await openai.chat.completions.create({
+      model: body.model,
+      messages: body.input,
+      response_format: body.text?.format,
+      tools: body.tools,
       stream: false,
     });
-    return NextResponse.json(response);
+    
+    const message = response.choices[0]?.message;
+    return NextResponse.json({
+      content: message?.content || '',
+      finish_reason: response.choices[0]?.finish_reason,
+    });
   } catch (err) {
     console.error('responses proxy error', err);
     return NextResponse.json({ error: 'failed' }, { status: 500 }); 

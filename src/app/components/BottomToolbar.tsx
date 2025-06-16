@@ -23,9 +23,9 @@ export default function BottomToolbar({
   agentSets
 }: BottomToolbarProps) {
   
-  const canStartSession = sessionStatus === "disconnected";
-  const canEndSession = sessionStatus === "connected";
-  const canToggleListening = sessionStatus === "connected";
+  const canStartSession = sessionStatus === "DISCONNECTED";
+  const canEndSession = sessionStatus === "CONNECTED";
+  const canToggleListening = sessionStatus === "CONNECTED";
 
   return (
     <div className="bg-white border-t px-6 py-4">
@@ -41,7 +41,7 @@ export default function BottomToolbar({
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {sessionStatus === "connecting" ? "Connecting..." : "Start Session"}
+            {sessionStatus === "CONNECTING" ? "Connecting..." : "Start Session"}
           </button>
           
           <button
@@ -79,7 +79,7 @@ export default function BottomToolbar({
               {isListening ? 'Listening...' : 'Click to speak'}
             </div>
             <div className="text-xs text-gray-500">
-              {sessionStatus === "connected" ? 'Ready' : 'Not connected'}
+              {sessionStatus === "CONNECTED" ? 'Ready' : 'Not connected'}
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function BottomToolbar({
       </div>
       
       {/* Quick help */}
-      {sessionStatus === "connected" && (
+      {sessionStatus === "CONNECTED" && (
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <div className="text-sm text-blue-800">
             <strong>Try saying:</strong> "Create a user story for user authentication" or "Create a Jira ticket for this story"

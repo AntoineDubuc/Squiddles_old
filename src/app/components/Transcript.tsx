@@ -21,24 +21,18 @@ export default function Transcript({ items }: TranscriptProps) {
     return new Date(timestamp).toLocaleTimeString();
   };
 
-  const getRoleIcon = (type: TranscriptItem['type']) => {
-    switch (type) {
+  const getRoleIcon = (role?: TranscriptItem['role']) => {
+    switch (role) {
       case 'user': return '👤';
       case 'assistant': return '🤖';
-      case 'system': return '⚙️';
-      case 'tool_call': return '🔧';
-      case 'tool_result': return '📊';
       default: return '💬';
     }
   };
 
-  const getRoleColor = (type: TranscriptItem['type']) => {
-    switch (type) {
+  const getRoleColor = (role?: TranscriptItem['role']) => {
+    switch (role) {
       case 'user': return 'bg-blue-50 border-blue-200';
       case 'assistant': return 'bg-green-50 border-green-200';
-      case 'system': return 'bg-gray-50 border-gray-200';
-      case 'tool_call': return 'bg-orange-50 border-orange-200';
-      case 'tool_result': return 'bg-purple-50 border-purple-200';
       default: return 'bg-gray-50 border-gray-200';
     }
   };
@@ -58,16 +52,15 @@ export default function Transcript({ items }: TranscriptProps) {
       ) : (
         items.map((item) => (
           <div
-            key={item.id}
-            className={`border rounded-lg p-4 ${getRoleColor(item.type)}`}
+            key={item.itemId}
+            className={`border rounded-lg p-4 ${getRoleColor(item.role)}`}
           >
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center space-x-2">
-                <span className="text-lg">{getRoleIcon(item.type)}</span>
+                <span className="text-lg">{getRoleIcon(item.role)}</span>
                 <span className="font-medium text-sm capitalize">
-                  {item.type.replace('_', ' ')}
-                  {item.agent && ` (${item.agent})`}
-                  {item.toolName && ` - ${item.toolName}`}
+                  {item.role || item.type}
+                  {item.title && ` - ${item.title}`}
                 </span>
               </div>
               <span className="text-xs text-gray-500">
@@ -76,25 +69,9 @@ export default function Transcript({ items }: TranscriptProps) {
             </div>
             
             <div className="text-gray-800">
-              {item.type === 'tool_call' || item.type === 'tool_result' ? (
-                <pre className="whitespace-pre-wrap font-mono text-sm bg-white p-2 rounded border">
-                  {typeof item.content === 'object' 
-                    ? JSON.stringify(item.content, null, 2)
-                    : item.content
-                  }
-                </pre>
-              ) : (
-                <p className="whitespace-pre-wrap">{item.content}</p>
-              )}
-              
-              {item.formatted?.transcript && item.formatted.transcript !== item.content && (
-                <div className="mt-2 p-2 bg-white rounded border">
-                  <span className="text-xs text-gray-500">Transcript:</span>
-                  <p className="text-sm" data-testid="transcription">
-                    {item.formatted.transcript}
-                  </p>
-                </div>
-              )}
+              <p className="whitespace-pre-wrap">
+                {item.data?.content || item.data?.text || JSON.stringify(item.data, null, 2)}
+              </p>
             </div>
           </div>
         ))

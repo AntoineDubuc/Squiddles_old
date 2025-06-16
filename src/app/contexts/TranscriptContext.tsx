@@ -32,8 +32,15 @@ export const TranscriptProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const addTranscriptMessage: TranscriptContextValue["addTranscriptMessage"] = (itemId, role, text = "", isHidden = false) => {
     setTranscriptItems((prev) => {
-      if (prev.some((log) => log.itemId === itemId && log.type === "MESSAGE")) {
-        console.warn(`[addTranscriptMessage] skipping; message already exists for itemId=${itemId}, role=${role}, text=${text}`);
+      // Check if message already exists
+      const existingItem = prev.find((log) => log.itemId === itemId && log.type === "MESSAGE");
+      if (existingItem) {
+        // If it exists and we're trying to add the same content, skip
+        if (existingItem.title === text) {
+          console.warn(`[addTranscriptMessage] skipping; identical message already exists for itemId=${itemId}`);
+          return prev;
+        }
+        // If it exists but content is different, this might be an update, skip but don't warn
         return prev;
       }
 

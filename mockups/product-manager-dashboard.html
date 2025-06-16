@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - Product Manager Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0A;
+            color: #FFFFFF;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-role {
+            font-size: 0.875rem;
+            color: #A1A1AA;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFFFFF, #A1A1AA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.25rem;
+            color: #A1A1AA;
+            margin-bottom: 2rem;
+        }
+
+        /* Voice Hero */
+        .voice-hero {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3B82F6, #8B5CF6, transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .hero-voice-button {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            box-shadow: 0 8px 40px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .hero-voice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 60px rgba(59, 130, 246, 0.6);
+        }
+
+        .hero-voice-button.listening {
+            animation: hero-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes hero-pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 40px rgba(139, 92, 246, 0.4);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 12px 60px rgba(139, 92, 246, 0.8);
+            }
+        }
+
+        .voice-prompt {
+            font-size: 1.125rem;
+            color: #A1A1AA;
+            margin-bottom: 1rem;
+        }
+
+        .voice-suggestions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3B82F6;
+            transform: translateY(-2px);
+        }
+
+        /* Quick Actions Grid */
+        .quick-actions {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            border-color: #3B82F6;
+        }
+
+        .action-card:hover::after {
+            opacity: 1;
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-description {
+            color: #A1A1AA;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .activity-panel {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-all {
+            color: #3B82F6;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .view-all:hover {
+            color: #8B5CF6;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .activity-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            font-size: 0.75rem;
+            color: #A1A1AA;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+
+        .status-badge.in-progress {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3B82F6;
+        }
+
+        .status-badge.completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+
+        .status-badge.draft {
+            background: rgba(251, 191, 36, 0.2);
+            color: #FBD024;
+        }
+
+        /* Metrics Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #A1A1AA;
+            margin-top: 0.25rem;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .metric-change.positive {
+            color: #10B981;
+        }
+
+        .metric-change.negative {
+            color: #EF4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .activity-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">Squiddles</div>
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name">Jordan Kim</div>
+                    <div class="user-role">Product Manager</div>
+                </div>
+                <div class="user-avatar">JK</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome back, Jordan</h1>
+                <p class="welcome-subtitle">Your AI-powered product management assistant is ready</p>
+            </div>
+
+            <!-- Voice Hero -->
+            <div class="voice-hero">
+                <div class="hero-voice-button" id="heroVoiceButton">
+                    🎙️
+                </div>
+                <p class="voice-prompt">How can I help you today?</p>
+                <div class="voice-suggestions">
+                    <div class="suggestion-chip" onclick="handleSuggestion('Create a new user story')">Create a new user story</div>
+                    <div class="suggestion-chip" onclick="handleSuggestion('Show sprint progress')">Show sprint progress</div>
+                    <div class="suggestion-chip" onclick="handleSuggestion('Find checkout stories')">Find checkout stories</div>
+                    <div class="suggestion-chip" onclick="handleSuggestion('Weekly status report')">Weekly status report</div>
+                </div>
+            </div>
+
+            <!-- Metrics Overview -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">12</div>
+                    <div class="metric-label">Stories This Sprint</div>
+                    <div class="metric-change positive">↑ 20% from last sprint</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">68%</div>
+                    <div class="metric-label">Sprint Progress</div>
+                    <div class="metric-change positive">On track</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Pending Reviews</div>
+                    <div class="metric-change negative">Need attention</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">94%</div>
+                    <div class="metric-label">Team Velocity</div>
+                    <div class="metric-change positive">↑ 8% improvement</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2 class="section-title">
+                    <span>⚡</span>
+                    <span>Quick Actions</span>
+                </h2>
+                <div class="actions-grid">
+                    <div class="action-card" onclick="window.location.href='product-manager-story-builder.html'">
+                        <span class="action-icon">📝</span>
+                        <h3 class="action-title">Create User Story</h3>
+                        <p class="action-description">Start a new user story with AI assistance and smart templates</p>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='product-manager-template-manager.html'">
+                        <span class="action-icon">📋</span>
+                        <h3 class="action-title">Manage Templates</h3>
+                        <p class="action-description">Customize your story templates for different scenarios</p>
+                    </div>
+                    <div class="action-card">
+                        <span class="action-icon">🔍</span>
+                        <h3 class="action-title">Search & Analyze</h3>
+                        <p class="action-description">Find related stories and analyze project patterns</p>
+                    </div>
+                    <div class="action-card">
+                        <span class="action-icon">📊</span>
+                        <h3 class="action-title">Sprint Dashboard</h3>
+                        <p class="action-description">View current sprint progress and team metrics</p>
+                    </div>
+                    <div class="action-card">
+                        <span class="action-icon">🤝</span>
+                        <h3 class="action-title">Team Collaboration</h3>
+                        <p class="action-description">Share stories and get feedback from your team</p>
+                    </div>
+                    <div class="action-card">
+                        <span class="action-icon">📈</span>
+                        <h3 class="action-title">Reports & Insights</h3>
+                        <p class="action-description">Generate executive summaries and trend analysis</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <!-- Recent Stories -->
+                <div class="activity-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <span>📄</span>
+                            <span>Recent Stories</span>
+                        </h3>
+                        <span class="view-all">View all →</span>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-title">Checkout Flow Optimization</div>
+                            <div class="activity-meta">
+                                <span>Updated 2 hours ago</span>
+                                <span>Sprint 42</span>
+                                <span class="status-badge in-progress">In Progress</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-title">Payment Gateway Integration</div>
+                            <div class="activity-meta">
+                                <span>Created yesterday</span>
+                                <span>Sprint 42</span>
+                                <span class="status-badge draft">Draft</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-title">Mobile App Authentication</div>
+                            <div class="activity-meta">
+                                <span>Completed 3 days ago</span>
+                                <span>Sprint 41</span>
+                                <span class="status-badge completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-title">User Profile Enhancement</div>
+                            <div class="activity-meta">
+                                <span>Updated 4 days ago</span>
+                                <span>Sprint 42</span>
+                                <span class="status-badge in-progress">In Progress</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Updates -->
+                <div class="activity-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <span>💬</span>
+                            <span>Team Updates</span>
+                        </h3>
+                        <span class="view-all">View all →</span>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-title">Sarah R: Checkout API ready for testing</div>
+                            <div class="activity-meta">
+                                <span>30 minutes ago</span>
+                                <span>#product-updates</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-title">Alex C: Question about payment flow requirements</div>
+                            <div class="activity-meta">
+                                <span>1 hour ago</span>
+                                <span>PROD-234 comment</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-title">Design team shared new checkout mockups</div>
+                            <div class="activity-meta">
+                                <span>3 hours ago</span>
+                                <span>#design-reviews</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-title">Sprint planning meeting scheduled for tomorrow</div>
+                            <div class="activity-meta">
+                                <span>Yesterday</span>
+                                <span>Calendar invite</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Voice button interaction
+        const heroVoiceButton = document.getElementById('heroVoiceButton');
+        let isListening = false;
+        
+        heroVoiceButton.addEventListener('click', () => {
+            isListening = !isListening;
+            
+            if (isListening) {
+                heroVoiceButton.classList.add('listening');
+                // Simulate listening state
+                setTimeout(() => {
+                    heroVoiceButton.classList.remove('listening');
+                    isListening = false;
+                    // Redirect to story builder after "hearing" a command
+                    window.location.href = 'product-manager-story-builder.html';
+                }, 3000);
+            } else {
+                heroVoiceButton.classList.remove('listening');
+            }
+        });
+        
+        // Handle suggestion clicks
+        function handleSuggestion(command) {
+            // Animate the voice button
+            heroVoiceButton.classList.add('listening');
+            
+            // Simulate processing
+            setTimeout(() => {
+                if (command.includes('Create a new user story')) {
+                    window.location.href = 'product-manager-story-builder.html';
+                } else {
+                    // For other commands, just show the animation
+                    heroVoiceButton.classList.remove('listening');
+                }
+            }, 1500);
+        }
+        
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                heroVoiceButton.click();
+            }
+        });
+        
+        // Add hover effects to cards
+        document.querySelectorAll('.action-card, .activity-item').forEach(card => {
+            card.addEventListener('mouseenter', (e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+            });
+            
+            card.addEventListener('mouseleave', (e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Animate metrics on load
+        window.addEventListener('load', () => {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach((metric, index) => {
+                metric.style.opacity = '0';
+                metric.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    metric.style.transition = 'all 0.5s ease-out';
+                    metric.style.opacity = '1';
+                    metric.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

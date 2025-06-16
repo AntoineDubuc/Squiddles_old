@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - Voice Interaction States</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0A;
+            color: #FFFFFF;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #A1A1AA;
+            margin-bottom: 3rem;
+        }
+
+        /* State Grid */
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .state-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .state-description {
+            color: #A1A1AA;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Voice Button States */
+        .voice-button {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        /* Idle State */
+        .state-idle .voice-button {
+            animation: idle-float 3s ease-in-out infinite;
+        }
+
+        @keyframes idle-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Ready State */
+        .state-ready .voice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Listening State */
+        .state-listening .voice-button {
+            animation: listening-pulse 1.5s ease-in-out infinite;
+        }
+
+        .state-listening .voice-button::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: ripple 1.5s ease-out infinite;
+        }
+
+        @keyframes listening-pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 6px 40px rgba(139, 92, 246, 0.8);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Processing State */
+        .state-processing .voice-button {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            animation: processing-rotate 2s linear infinite;
+        }
+
+        .state-processing .voice-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes processing-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .state-success .voice-button {
+            background: linear-gradient(135deg, #10B981, #34D399);
+            animation: success-bounce 0.6s ease-out;
+        }
+
+        @keyframes success-bounce {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.2); }
+            60% { transform: scale(0.95); }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Error State */
+        .state-error .voice-button {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            animation: error-shake 0.5s ease-in-out;
+        }
+
+        @keyframes error-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Voice Input Display */
+        .voice-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.875rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Waveform Animation */
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 40px;
+        }
+
+        .wave-bar {
+            width: 4px;
+            background: linear-gradient(to top, #3B82F6, #8B5CF6);
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) { animation-delay: 0s; height: 20px; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; height: 30px; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; height: 25px; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; height: 35px; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; height: 28px; }
+        .wave-bar:nth-child(6) { animation-delay: 0.5s; height: 33px; }
+        .wave-bar:nth-child(7) { animation-delay: 0.6s; height: 22px; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1); }
+        }
+
+        /* Interactive Demo */
+        .demo-section {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .demo-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .demo-voice-button {
+            width: 100px;
+            height: 100px;
+            margin: 2rem auto;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .demo-status {
+            font-size: 1.125rem;
+            color: #A1A1AA;
+            margin-bottom: 1rem;
+        }
+
+        .demo-transcript {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            min-height: 100px;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.875rem;
+            text-align: left;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-color: transparent;
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 0.875rem;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Interaction States</h1>
+        <p class="subtitle">Visual guide to all voice interaction states in the Squiddles Product Manager interface</p>
+
+        <!-- State Examples -->
+        <div class="states-grid">
+            <!-- Idle State -->
+            <div class="state-card state-idle">
+                <h3 class="state-title">Idle State</h3>
+                <p class="state-description">System is ready but not actively listening. Gentle floating animation indicates availability.</p>
+                <div class="voice-button">🎙️</div>
+                <div class="voice-display">Click microphone or press SPACE to start</div>
+            </div>
+
+            <!-- Ready State -->
+            <div class="state-card state-ready">
+                <h3 class="state-title">Ready State</h3>
+                <p class="state-description">Hover state showing the system is ready to receive voice input.</p>
+                <div class="voice-button">🎙️</div>
+                <div class="voice-display">Ready to listen...</div>
+            </div>
+
+            <!-- Listening State -->
+            <div class="state-card state-listening">
+                <h3 class="state-title">Listening State</h3>
+                <p class="state-description">Actively recording voice input with pulsing animation and ripple effect.</p>
+                <div class="voice-button">🎤</div>
+                <div class="voice-display">
+                    <div class="waveform">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processing State -->
+            <div class="state-card state-processing">
+                <h3 class="state-title">Processing State</h3>
+                <p class="state-description">AI is processing the voice input and generating a response.</p>
+                <div class="voice-button">⚡</div>
+                <div class="voice-display">Processing your request...</div>
+            </div>
+
+            <!-- Success State -->
+            <div class="state-card state-success">
+                <h3 class="state-title">Success State</h3>
+                <p class="state-description">Voice command successfully processed and executed.</p>
+                <div class="voice-button">✓</div>
+                <div class="voice-display">Command executed successfully!</div>
+            </div>
+
+            <!-- Error State -->
+            <div class="state-card state-error">
+                <h3 class="state-title">Error State</h3>
+                <p class="state-description">Voice recognition failed or command couldn't be processed.</p>
+                <div class="voice-button">⚠️</div>
+                <div class="voice-display">Sorry, I didn't catch that. Try again?</div>
+            </div>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="demo-section">
+            <h2 class="demo-title">Interactive Voice Demo</h2>
+            <p class="demo-status" id="demoStatus">Click the microphone to see the states in action</p>
+            
+            <div class="tooltip">
+                <div class="demo-voice-button" id="demoButton">🎙️</div>
+                <span class="tooltip-text">Click me or press SPACE</span>
+            </div>
+
+            <div class="demo-transcript" id="demoTranscript">
+                <div style="color: #A1A1AA;">Transcript will appear here...</div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" onclick="simulateSuccess()">Simulate Success</button>
+                <button class="control-btn" onclick="simulateError()">Simulate Error</button>
+                <button class="control-btn" onclick="resetDemo()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Voice Command Examples -->
+        <div class="demo-section" style="margin-top: 2rem;">
+            <h2 class="demo-title">Voice Command Examples</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; text-align: left; max-width: 800px; margin: 2rem auto;">
+                <div>
+                    <h4 style="color: #3B82F6; margin-bottom: 0.5rem;">Story Creation</h4>
+                    <ul style="list-style: none; color: #A1A1AA; font-size: 0.875rem; line-height: 1.8;">
+                        <li>• "Create a new user story"</li>
+                        <li>• "Add acceptance criteria"</li>
+                        <li>• "Set priority to high"</li>
+                        <li>• "Use spike template"</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #8B5CF6; margin-bottom: 0.5rem;">Search & Context</h4>
+                    <ul style="list-style: none; color: #A1A1AA; font-size: 0.875rem; line-height: 1.8;">
+                        <li>• "Find similar stories"</li>
+                        <li>• "Show checkout tickets"</li>
+                        <li>• "What's the context?"</li>
+                        <li>• "Search for payment bugs"</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #EC4899; margin-bottom: 0.5rem;">Actions</h4>
+                    <ul style="list-style: none; color: #A1A1AA; font-size: 0.875rem; line-height: 1.8;">
+                        <li>• "Create Jira ticket"</li>
+                        <li>• "Share with team"</li>
+                        <li>• "Save as template"</li>
+                        <li>• "Export to Confluence"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const demoButton = document.getElementById('demoButton');
+        const demoStatus = document.getElementById('demoStatus');
+        const demoTranscript = document.getElementById('demoTranscript');
+        
+        let isListening = false;
+        let currentState = 'idle';
+        
+        // State management
+        function setState(state) {
+            currentState = state;
+            demoButton.className = 'demo-voice-button';
+            
+            switch(state) {
+                case 'idle':
+                    demoButton.style.background = 'linear-gradient(135deg, #3B82F6, #8B5CF6)';
+                    demoButton.innerHTML = '🎙️';
+                    demoButton.style.animation = 'idle-float 3s ease-in-out infinite';
+                    demoStatus.textContent = 'Click the microphone to start';
+                    break;
+                    
+                case 'listening':
+                    demoButton.style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+                    demoButton.innerHTML = '🎤';
+                    demoButton.style.animation = 'listening-pulse 1.5s ease-in-out infinite';
+                    demoStatus.textContent = 'Listening... (speak now)';
+                    break;
+                    
+                case 'processing':
+                    demoButton.style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+                    demoButton.innerHTML = '⚡';
+                    demoButton.style.animation = 'processing-rotate 2s linear infinite';
+                    demoStatus.textContent = 'Processing your request...';
+                    break;
+                    
+                case 'success':
+                    demoButton.style.background = 'linear-gradient(135deg, #10B981, #34D399)';
+                    demoButton.innerHTML = '✓';
+                    demoButton.style.animation = 'success-bounce 0.6s ease-out';
+                    demoStatus.textContent = 'Success! Command executed';
+                    break;
+                    
+                case 'error':
+                    demoButton.style.background = 'linear-gradient(135deg, #EF4444, #DC2626)';
+                    demoButton.innerHTML = '⚠️';
+                    demoButton.style.animation = 'error-shake 0.5s ease-in-out';
+                    demoStatus.textContent = 'Error: Could not process command';
+                    break;
+            }
+        }
+        
+        // Demo button click handler
+        demoButton.addEventListener('click', () => {
+            if (currentState === 'idle' || currentState === 'success' || currentState === 'error') {
+                startListening();
+            }
+        });
+        
+        function startListening() {
+            setState('listening');
+            demoTranscript.innerHTML = '<div style="color: #8B5CF6;">🎤 Listening...</div>';
+            
+            // Simulate voice input after 2 seconds
+            setTimeout(() => {
+                demoTranscript.innerHTML = '<div style="color: #3B82F6;">"Create a user story for mobile checkout optimization"</div>';
+                setState('processing');
+                
+                // Simulate processing
+                setTimeout(() => {
+                    setState('success');
+                    demoTranscript.innerHTML += '<div style="color: #10B981; margin-top: 0.5rem;">✓ Created new story: "Mobile Checkout Optimization"</div>';
+                    demoTranscript.innerHTML += '<div style="color: #A1A1AA; margin-top: 0.5rem;">→ Added to your current sprint</div>';
+                    
+                    // Return to idle after 3 seconds
+                    setTimeout(() => {
+                        setState('idle');
+                    }, 3000);
+                }, 1500);
+            }, 2000);
+        }
+        
+        function simulateSuccess() {
+            setState('processing');
+            demoTranscript.innerHTML = '<div style="color: #8B5CF6;">⚡ Processing command...</div>';
+            
+            setTimeout(() => {
+                setState('success');
+                demoTranscript.innerHTML = '<div style="color: #10B981;">✓ Command executed successfully!</div>';
+                
+                setTimeout(() => {
+                    setState('idle');
+                }, 2000);
+            }, 1000);
+        }
+        
+        function simulateError() {
+            setState('processing');
+            demoTranscript.innerHTML = '<div style="color: #8B5CF6;">⚡ Processing command...</div>';
+            
+            setTimeout(() => {
+                setState('error');
+                demoTranscript.innerHTML = '<div style="color: #EF4444;">⚠️ Sorry, I couldn\'t understand that command.</div>';
+                demoTranscript.innerHTML += '<div style="color: #A1A1AA; margin-top: 0.5rem;">Try saying it differently or check your microphone.</div>';
+                
+                setTimeout(() => {
+                    setState('idle');
+                }, 3000);
+            }, 1000);
+        }
+        
+        function resetDemo() {
+            setState('idle');
+            demoTranscript.innerHTML = '<div style="color: #A1A1AA;">Transcript will appear here...</div>';
+        }
+        
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+                demoButton.click();
+            }
+        });
+        
+        // Initialize
+        setState('idle');
+    </script>
+</body>
+</html>

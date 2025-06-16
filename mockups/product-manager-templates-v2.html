@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - Templates</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0A;
+            color: #FFFFFF;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Unified Header - Same as Dashboard */
+        .header {
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-weight: 500;
+            color: #A1A1AA;
+        }
+
+        .nav-item:hover {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            color: #FFFFFF;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 1.25rem;
+            right: 1.25rem;
+            height: 2px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+        }
+
+        /* Header Right */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .global-voice-button {
+            width: 40px;
+            height: 40px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.25rem;
+        }
+
+        .global-voice-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3B82F6;
+        }
+
+        .global-voice-button.listening {
+            animation: global-pulse 1.5s ease-in-out infinite;
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8B5CF6;
+        }
+
+        @keyframes global-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-menu:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .new-template-button {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .new-template-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #A1A1AA;
+            position: relative;
+        }
+
+        .filter-tab:hover {
+            color: #FFFFFF;
+        }
+
+        .filter-tab.active {
+            color: #3B82F6;
+        }
+
+        .filter-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #3B82F6;
+        }
+
+        /* Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .template-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .template-card.story::before {
+            background: linear-gradient(90deg, #3B82F6, #60A5FA);
+        }
+
+        .template-card.task::before {
+            background: linear-gradient(90deg, #8B5CF6, #A78BFA);
+        }
+
+        .template-card.bug::before {
+            background: linear-gradient(90deg, #EF4444, #F87171);
+        }
+
+        .template-card.spike::before {
+            background: linear-gradient(90deg, #FBD024, #FDE047);
+        }
+
+        .template-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .template-card:hover::before {
+            opacity: 1;
+        }
+
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .template-icon {
+            font-size: 2rem;
+        }
+
+        .template-type-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .template-type-badge.story {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3B82F6;
+        }
+
+        .template-type-badge.task {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #8B5CF6;
+        }
+
+        .template-type-badge.bug {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+        }
+
+        .template-type-badge.spike {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #FBD024;
+        }
+
+        .template-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-description {
+            font-size: 0.875rem;
+            color: #A1A1AA;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .template-sections {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-list {
+            list-style: none;
+            font-size: 0.813rem;
+            color: #A1A1AA;
+        }
+
+        .section-list li {
+            padding: 0.25rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .section-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #3B82F6;
+        }
+
+        .template-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .template-usage {
+            font-size: 0.75rem;
+            color: #A1A1AA;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.813rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn.primary {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3B82F6;
+        }
+
+        .action-btn.primary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Default Badge */
+        .default-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Voice Command Area */
+        .voice-command-area {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #A1A1AA;
+        }
+
+        .voice-command-area.active {
+            border-color: #3B82F6;
+            color: #3B82F6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: #A1A1AA;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <div class="container">
+        <!-- Unified Header - Same as Dashboard -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo" onclick="window.location.href='product-manager-dashboard-v2.html'">Squiddles</div>
+                    <nav class="nav">
+                        <div class="nav-item" onclick="window.location.href='product-manager-dashboard-v2.html'">Dashboard</div>
+                        <div class="nav-item" onclick="window.location.href='product-manager-create-v2.html'">Create</div>
+                        <div class="nav-item">Search</div>
+                        <div class="nav-item active">Templates</div>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <div class="global-voice-button" id="globalVoiceButton" title="Press Space to activate voice">
+                        🎙️
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-avatar">JK</div>
+                        <span>Jordan Kim</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Voice Command Area -->
+            <div class="voice-command-area" id="voiceCommandArea">
+                🎙️ "Show me bug templates" or "Create a new story template"
+            </div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Your Templates</h1>
+                <button class="new-template-button">
+                    <span>+</span>
+                    <span>New Template</span>
+                </button>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <div class="filter-tab active" data-filter="all">All Templates</div>
+                <div class="filter-tab" data-filter="story">Stories</div>
+                <div class="filter-tab" data-filter="task">Tasks</div>
+                <div class="filter-tab" data-filter="bug">Bugs</div>
+                <div class="filter-tab" data-filter="spike">Spikes</div>
+                <div class="filter-tab" data-filter="custom">Custom</div>
+            </div>
+
+            <!-- Template Grid -->
+            <div class="template-grid">
+                <!-- User Story Template -->
+                <div class="template-card story">
+                    <div class="default-badge">Default</div>
+                    <div class="template-header">
+                        <div class="template-icon">📖</div>
+                        <div class="template-type-badge story">Story</div>
+                    </div>
+                    <h3 class="template-name">User Story</h3>
+                    <p class="template-description">Standard template for feature development with user-focused approach</p>
+                    
+                    <div class="template-sections">
+                        <ul class="section-list">
+                            <li>User Story (As a... I want... So that...)</li>
+                            <li>Business Value</li>
+                            <li>Acceptance Criteria</li>
+                            <li>Technical Notes</li>
+                        </ul>
+                    </div>
+
+                    <div class="template-footer">
+                        <span class="template-usage">Used 45 times</span>
+                        <div class="template-actions">
+                            <button class="action-btn primary">Use</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bug Report Template -->
+                <div class="template-card bug">
+                    <div class="template-header">
+                        <div class="template-icon">🐛</div>
+                        <div class="template-type-badge bug">Bug</div>
+                    </div>
+                    <h3 class="template-name">Bug Report</h3>
+                    <p class="template-description">Comprehensive bug reporting with reproduction steps and environment details</p>
+                    
+                    <div class="template-sections">
+                        <ul class="section-list">
+                            <li>Problem Description</li>
+                            <li>Steps to Reproduce</li>
+                            <li>Expected vs Actual Behavior</li>
+                            <li>Environment & Browser</li>
+                            <li>Screenshots/Videos</li>
+                        </ul>
+                    </div>
+
+                    <div class="template-footer">
+                        <span class="template-usage">Used 23 times</span>
+                        <div class="template-actions">
+                            <button class="action-btn primary">Use</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Spike Template -->
+                <div class="template-card spike">
+                    <div class="template-header">
+                        <div class="template-icon">🔬</div>
+                        <div class="template-type-badge spike">Spike</div>
+                    </div>
+                    <h3 class="template-name">Technical Spike</h3>
+                    <p class="template-description">Research and exploration template with time-boxed investigation</p>
+                    
+                    <div class="template-sections">
+                        <ul class="section-list">
+                            <li>Research Goal</li>
+                            <li>Key Questions</li>
+                            <li>Time Box (Duration)</li>
+                            <li>Expected Deliverables</li>
+                            <li>Success Criteria</li>
+                        </ul>
+                    </div>
+
+                    <div class="template-footer">
+                        <span class="template-usage">Used 12 times</span>
+                        <div class="template-actions">
+                            <button class="action-btn primary">Use</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Template -->
+                <div class="template-card task">
+                    <div class="template-header">
+                        <div class="template-icon">✓</div>
+                        <div class="template-type-badge task">Task</div>
+                    </div>
+                    <h3 class="template-name">Development Task</h3>
+                    <p class="template-description">Simple task template for implementation work and technical debt</p>
+                    
+                    <div class="template-sections">
+                        <ul class="section-list">
+                            <li>Task Description</li>
+                            <li>Implementation Details</li>
+                            <li>Definition of Done</li>
+                            <li>Testing Requirements</li>
+                        </ul>
+                    </div>
+
+                    <div class="template-footer">
+                        <span class="template-usage">Used 67 times</span>
+                        <div class="template-actions">
+                            <button class="action-btn primary">Use</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Release Template -->
+                <div class="template-card story">
+                    <div class="template-header">
+                        <div class="template-icon">🚀</div>
+                        <div class="template-type-badge story">Story</div>
+                    </div>
+                    <h3 class="template-name">Feature Release</h3>
+                    <p class="template-description">Comprehensive template for planning feature releases with rollout strategy</p>
+                    
+                    <div class="template-sections">
+                        <ul class="section-list">
+                            <li>Feature Overview</li>
+                            <li>Target Users & Impact</li>
+                            <li>Rollout Strategy</li>
+                            <li>Success Metrics</li>
+                            <li>Communication Plan</li>
+                            <li>Rollback Plan</li>
+                        </ul>
+                    </div>
+
+                    <div class="template-footer">
+                        <span class="template-usage">Used 8 times</span>
+                        <div class="template-actions">
+                            <button class="action-btn primary">Use</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A/B Test Template -->
+                <div class="template-card spike">
+                    <div class="template-header">
+                        <div class="template-icon">⚡</div>
+                        <div class="template-type-badge spike">Spike</div>
+                    </div>
+                    <h3 class="template-name">A/B Test Plan</h3>
+                    <p class="template-description">Experiment design template for testing hypotheses with data</p>
+                    
+                    <div class="template-sections">
+                        <ul class="section-list">
+                            <li>Hypothesis Statement</li>
+                            <li>Test Variants</li>
+                            <li>Success Metrics</li>
+                            <li>Sample Size & Duration</li>
+                            <li>Analysis Plan</li>
+                        </ul>
+                    </div>
+
+                    <div class="template-footer">
+                        <span class="template-usage">Used 15 times</span>
+                        <div class="template-actions">
+                            <button class="action-btn primary">Use</button>
+                            <button class="action-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global voice button
+        const globalVoiceButton = document.getElementById('globalVoiceButton');
+        const voiceCommandArea = document.getElementById('voiceCommandArea');
+        let isListening = false;
+        
+        globalVoiceButton.addEventListener('click', toggleVoice);
+        
+        function toggleVoice() {
+            isListening = !isListening;
+            
+            if (isListening) {
+                globalVoiceButton.classList.add('listening');
+                voiceCommandArea.classList.add('active');
+                voiceCommandArea.textContent = '🎤 Listening...';
+                
+                // Simulate voice command
+                setTimeout(() => {
+                    voiceCommandArea.textContent = '"Show me bug templates"';
+                    
+                    // Filter to bug templates
+                    setTimeout(() => {
+                        filterTemplates('bug');
+                        globalVoiceButton.classList.remove('listening');
+                        voiceCommandArea.classList.remove('active');
+                        voiceCommandArea.textContent = '✓ Showing bug templates';
+                        isListening = false;
+                        
+                        setTimeout(() => {
+                            voiceCommandArea.textContent = '🎙️ "Show me bug templates" or "Create a new story template"';
+                        }, 2000);
+                    }, 1500);
+                }, 2000);
+            } else {
+                globalVoiceButton.classList.remove('listening');
+                voiceCommandArea.classList.remove('active');
+            }
+        }
+        
+        // Filter functionality
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const templateCards = document.querySelectorAll('.template-card');
+        
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const filter = tab.dataset.filter;
+                filterTemplates(filter);
+            });
+        });
+        
+        function filterTemplates(filter) {
+            // Update active tab
+            filterTabs.forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            // Filter cards
+            templateCards.forEach(card => {
+                if (filter === 'all' || card.classList.contains(filter)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                toggleVoice();
+            }
+        });
+        
+        // Template card interactions
+        document.querySelectorAll('.action-btn.primary').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Navigate to create page with template
+                window.location.href = 'product-manager-create-v2.html';
+            });
+        });
+    </script>
+</body>
+</html>

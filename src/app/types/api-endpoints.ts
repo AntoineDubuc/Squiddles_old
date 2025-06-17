@@ -16,10 +16,27 @@ import {
   DashboardMetrics,
   TicketCreationForm,
   VoiceSettingsForm,
-  IntegrationSetupForm,
-  ApiResponse,
-  PaginatedResponse 
+  IntegrationSetupForm
 } from './ui-models';
+
+// ==== SHARED API TYPES ====
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+  timestamp: Date;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
 
 // ==== AUTHENTICATION & USER MANAGEMENT ====
 

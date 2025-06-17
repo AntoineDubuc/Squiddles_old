@@ -3,10 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-// UI components
-import Transcript from "./components/Transcript";
-import Events from "./components/Events";
-import BottomToolbar from "./components/BottomToolbar";
+// Main components
+import Dashboard from "./components/Dashboard";
+import VoiceInterface from "./components/VoiceInterface";
 
 // Types
 import { SessionStatus, TranscriptItem } from "./types";
@@ -18,12 +17,17 @@ import { useEvent } from "./contexts/EventContext";
 
 // Utilities
 import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
+import { getCurrentUser } from "../lib/auth";
 
 // Agent configs - Following OpenAI Advanced Agent Example pattern
 import { allAgentSets, defaultAgentSetKey } from "../agents";
 
 export default function Home() {
-  // Session state
+  // App state
+  const [currentView, setCurrentView] = useState<'dashboard' | 'voice' | 'tickets' | 'loading'>('loading');
+  const [user, setUser] = useState<any>(null);
+  
+  // Session state (for voice interface)
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>("DISCONNECTED");
   const [selectedAgentSet, setSelectedAgentSet] = useState<string>(defaultAgentSetKey);
   const [isListening, setIsListening] = useState(false);
@@ -37,6 +41,31 @@ export default function Home() {
     updateTranscriptItem
   } = useTranscript();
   const { events, addEvent, clearEvents } = useEvent();
+
+  // Check authentication on mount
+  useEffect(() => {
+    // For now, default directly to dashboard to show the new UI
+    // Users can log in later or we can add authentication flow
+    setCurrentView('dashboard');
+    setUser({
+      id: 'user_001',
+      name: 'Test User',
+      email: 'test@squiddles.dev',
+      role: 'pm'
+    });
+  }, []);
+
+  // Safety fallback - never stay in loading state for more than 5 seconds
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (currentView === 'loading') {
+        console.log('⚠️ Fallback: Still in loading state after 5s, defaulting to voice');
+        setCurrentView('voice');
+      }
+    }, 5000);
+    
+    return () => clearTimeout(timeout);
+  }, [currentView]);
   
   // Refs
   const clientRef = useRef<RealtimeClient | null>(null);
@@ -310,78 +339,82 @@ export default function Home() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">🦑 Squiddles</h1>
-              <span className="text-sm text-gray-500">Voice AI Interface</span>
-            </div>
-            
-            {/* Agent Set Selector */}
-            <div className="flex items-center space-x-4">
-              <select
-                value={selectedAgentSet}
-                onChange={(e) => setSelectedAgentSet(e.target.value)}
-                disabled={sessionStatus === "CONNECTED"}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm"
-              >
-                {Object.keys(allAgentSets).map((key) => (
-                  <option key={key} value={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </option>
-                ))}
-              </select>
-              
-              {/* Session Status */}
-              <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  sessionStatus === "CONNECTED" ? "bg-green-500" :
-                  sessionStatus === "CONNECTING" ? "bg-yellow-500" : "bg-red-500"
-                }`} />
-                <span className="text-sm text-gray-600">{sessionStatus}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+  // Navigation handlers
+  const handleNavigateToVoice = () => {
+    console.log('🎙️ Navigating to voice interface');
+    setCurrentView('voice');
+  };
 
-      {/* Main Content */}
-      <main className="flex-1 flex">
-        {/* Left Panel - Transcript */}
-        <div className="flex-1 flex flex-col">
-          <div className="bg-white border-b px-6 py-3">
-            <h2 className="text-lg font-semibold text-gray-900">Conversation</h2>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <Transcript items={transcriptItems} />
-          </div>
-        </div>
+  const handleNavigateToTickets = () => {
+    console.log('🎫 Navigating to tickets');
+    setCurrentView('tickets');
+  };
 
-        {/* Right Panel - Events */}
-        <div className="w-96 bg-gray-50 border-l flex flex-col">
-          <div className="bg-white border-b px-6 py-3">
-            <h2 className="text-lg font-semibold text-gray-900">Events</h2>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <Events events={events} />
-          </div>
-        </div>
-      </main>
+  const handleNavigateToDashboard = () => {
+    console.log('📊 Navigating to dashboard');
+    setCurrentView('dashboard');
+  };
 
-      {/* Bottom Toolbar */}
-      <BottomToolbar
+  // Render based on current view
+  if (currentView === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="text-gray-600">Initializing Squiddles...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === 'dashboard') {
+    return (
+      <Dashboard 
+        onNavigateToVoice={handleNavigateToVoice}
+        onNavigateToTickets={handleNavigateToTickets}
+      />
+    );
+  }
+
+  if (currentView === 'voice') {
+    return (
+      <VoiceInterface
         sessionStatus={sessionStatus}
+        selectedAgentSet={selectedAgentSet}
+        setSelectedAgentSet={setSelectedAgentSet}
         isListening={isListening}
+        transcriptItems={transcriptItems}
+        events={events}
         onStartSession={startSession}
         onEndSession={endSession}
         onToggleListening={toggleListening}
-        selectedAgentSet={selectedAgentSet}
-        agentSets={allAgentSets}
+        onNavigateToDashboard={handleNavigateToDashboard}
       />
-    </div>
+    );
+  }
+
+  if (currentView === 'tickets') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Tickets View</h2>
+          <p className="text-gray-600 mb-6">This view is not yet implemented</p>
+          <button
+            onClick={handleNavigateToDashboard}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback
+  return (
+    <Dashboard 
+      onNavigateToVoice={handleNavigateToVoice}
+      onNavigateToTickets={handleNavigateToTickets}
+    />
   );
 }

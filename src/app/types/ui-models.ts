@@ -343,24 +343,6 @@ export interface DashboardMetrics {
   };
 }
 
-// ==== API RESPONSE TYPES ====
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  timestamp: Date;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-}
 
 // ==== FORM TYPES FOR UI ====
 

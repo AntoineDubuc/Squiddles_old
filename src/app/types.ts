@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Re-export all UI and API types
+export * from './types/ui-models';
+export * from './types/api-endpoints';
+
 // Define the allowed moderation categories only once
 export const MODERATION_CATEGORIES = [
   "OFFENSIVE",

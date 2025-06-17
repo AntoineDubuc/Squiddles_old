@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - User Onboarding Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .onboarding-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Progress Header */
+        .progress-header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-bar {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 40px;
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #00f5ff 0%, #667eea 100%);
+            width: 20%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .step-counter {
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .step-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(35, 35, 35, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .step-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .step-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .step-description {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00f5ff 0%, #667eea 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 245, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ccc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+        }
+
+        /* Voice Test Area */
+        .voice-test-area {
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(25, 25, 25, 0.9));
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .voice-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00f5ff 0%, #667eea 100%);
+            border: none;
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 16px auto;
+            display: block;
+            box-shadow: 0 8px 32px rgba(0, 245, 255, 0.3);
+        }
+
+        .voice-button:hover {
+            transform: scale(1.05);
+        }
+
+        .voice-button.listening {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .voice-feedback {
+            font-size: 14px;
+            color: #888;
+            margin-top: 16px;
+        }
+
+        .voice-feedback.success {
+            color: #10b981;
+        }
+
+        .voice-feedback.error {
+            color: #ef4444;
+        }
+
+        /* Integration Setup */
+        .integration-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .integration-card {
+            background: linear-gradient(135deg, rgba(35, 35, 35, 0.8), rgba(45, 45, 45, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .integration-card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .integration-card.selected {
+            border-color: #00f5ff;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(102, 126, 234, 0.1));
+        }
+
+        .integration-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .integration-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .jira-icon { background: linear-gradient(135deg, #0052cc, #2684ff); }
+        .slack-icon { background: linear-gradient(135deg, #4a154b, #611f69); }
+        .pinecone-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .confluence-icon { background: linear-gradient(135deg, #0052cc, #2684ff); }
+
+        .integration-title {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .integration-description {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.4;
+        }
+
+        .integration-status {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #10b981;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin: 16px 0;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(25, 25, 25, 0.9));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        /* Navigation */
+        .step-navigation {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: #ccc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .nav-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Success States */
+        .success-checkmark {
+            color: #10b981;
+            font-size: 24px;
+            margin-left: 8px;
+        }
+
+        /* Step-specific styles */
+        .step-1 .step-icon { background: linear-gradient(135deg, #00f5ff 0%, #667eea 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .step-2 .step-icon { background: linear-gradient(135deg, #10b981 0%, #059669 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .step-3 .step-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .step-4 .step-icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .step-5 .step-icon { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <!-- Progress Header -->
+        <div class="progress-header">
+            <div class="logo">
+                <img src="../squiddles_logo_nobg.png" alt="Squiddles Logo">
+                <span class="logo-text">Squiddles</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="step-counter" id="stepCounter">Step 1 of 5</div>
+        </div>
+
+        <!-- Step Content -->
+        <div class="step-content">
+            <!-- Step 1: Welcome -->
+            <div class="step-card step-1" id="step1">
+                <div class="step-icon">🦑</div>
+                <h2 class="step-title">Welcome to Squiddles!</h2>
+                <p class="step-description">
+                    Your AI-powered voice assistant for product management. Let's get you set up in just a few minutes 
+                    so you can start creating user stories, managing tickets, and collaborating with your team through natural voice commands.
+                </p>
+                <div class="step-actions">
+                    <button class="btn-primary" onclick="nextStep()">Let's Get Started</button>
+                    <button class="btn-secondary" onclick="skipOnboarding()">Skip Setup</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Voice Setup -->
+            <div class="step-card step-2" id="step2" style="display: none;">
+                <div class="step-icon">🎙️</div>
+                <h2 class="step-title">Voice Setup & Testing</h2>
+                <p class="step-description">
+                    Let's make sure your microphone is working properly and calibrate voice recognition for the best experience.
+                </p>
+                
+                <div class="voice-test-area">
+                    <button class="voice-button" id="voiceTestBtn" onclick="testVoice()">🎤</button>
+                    <div class="voice-feedback" id="voiceFeedback">
+                        Click the button and say: "Create a user story for authentication"
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn-primary" onclick="nextStep()" id="voiceNextBtn" disabled>Continue</button>
+                    <button class="btn-secondary" onclick="skipVoiceTest()">Skip Voice Test</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Profile Setup -->
+            <div class="step-card step-3" id="step3" style="display: none;">
+                <div class="step-icon">👤</div>
+                <h2 class="step-title">Tell Us About Yourself</h2>
+                <p class="step-description">
+                    Help us personalize your Squiddles experience by sharing a bit about your role and preferences.
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Antoine Dubuc" value="Antoine Dubuc">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-input">
+                        <option value="pm">Product Manager</option>
+                        <option value="tpm">Technical Product Manager</option>
+                        <option value="po">Product Owner</option>
+                        <option value="eng">Engineering Lead</option>
+                        <option value="sm">Scrum Master</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Company</label>
+                    <input type="text" class="form-input" placeholder="Your company name">
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn-primary" onclick="nextStep()">Continue</button>
+                    <button class="btn-secondary" onclick="skipProfile()">Skip for Now</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Integration Selection -->
+            <div class="step-card step-4" id="step4" style="display: none;">
+                <div class="step-icon">🔗</div>
+                <h2 class="step-title">Connect Your Tools</h2>
+                <p class="step-description">
+                    Choose which tools you'd like to integrate with Squiddles. You can always add more later.
+                </p>
+                
+                <div class="integration-grid">
+                    <div class="integration-card" onclick="toggleIntegration(this, 'jira')">
+                        <div class="integration-header">
+                            <div class="integration-icon jira-icon">🎫</div>
+                            <div class="integration-title">Jira</div>
+                        </div>
+                        <div class="integration-description">
+                            Create and manage tickets, track user stories, and sync project data.
+                        </div>
+                        <div class="integration-status" style="display: none;">✓ Selected</div>
+                    </div>
+
+                    <div class="integration-card" onclick="toggleIntegration(this, 'slack')">
+                        <div class="integration-header">
+                            <div class="integration-icon slack-icon">💬</div>
+                            <div class="integration-title">Slack</div>
+                        </div>
+                        <div class="integration-description">
+                            Send notifications, share updates, and collaborate with your team.
+                        </div>
+                        <div class="integration-status" style="display: none;">✓ Selected</div>
+                    </div>
+
+                    <div class="integration-card" onclick="toggleIntegration(this, 'pinecone')">
+                        <div class="integration-header">
+                            <div class="integration-icon pinecone-icon">🔍</div>
+                            <div class="integration-title">Semantic Search</div>
+                        </div>
+                        <div class="integration-description">
+                            Enhanced search across all your project documentation and tickets.
+                        </div>
+                        <div class="integration-status" style="display: none;">✓ Selected</div>
+                    </div>
+
+                    <div class="integration-card" onclick="toggleIntegration(this, 'confluence')">
+                        <div class="integration-header">
+                            <div class="integration-icon confluence-icon">📚</div>
+                            <div class="integration-title">Confluence</div>
+                        </div>
+                        <div class="integration-description">
+                            Access documentation, requirements, and team knowledge base.
+                        </div>
+                        <div class="integration-status" style="display: none;">✓ Selected</div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn-primary" onclick="nextStep()">Continue</button>
+                    <button class="btn-secondary" onclick="skipIntegrations()">Skip for Now</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Ready to Go -->
+            <div class="step-card step-5" id="step5" style="display: none;">
+                <div class="step-icon">🚀</div>
+                <h2 class="step-title">You're All Set!</h2>
+                <p class="step-description">
+                    Squiddles is ready to help you manage your projects with voice commands. 
+                    Try saying things like "Create a user story for login functionality" or "Show me my recent tickets."
+                </p>
+
+                <div class="voice-test-area">
+                    <div style="font-size: 18px; color: #00f5ff; margin-bottom: 16px;">
+                        🎯 Try your first voice command
+                    </div>
+                    <button class="voice-button" onclick="startFirstCommand()">🎤</button>
+                    <div class="voice-feedback">
+                        Say: "Create a user story for checkout improvements"
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn-primary" onclick="completeOnboarding()">Enter Squiddles</button>
+                    <button class="btn-secondary" onclick="restartTour()">Restart Tour</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="step-navigation">
+            <button class="nav-btn" id="prevBtn" onclick="prevStep()" disabled>← Previous</button>
+            <div style="color: #666; font-size: 12px;">
+                You can always change these settings later in preferences
+            </div>
+            <button class="nav-btn" id="skipBtn" onclick="skipOnboarding()">Skip Setup</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        let selectedIntegrations = [];
+        let voiceTestPassed = false;
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('stepCounter').textContent = `Step ${currentStep} of ${totalSteps}`;
+            
+            // Update navigation
+            document.getElementById('prevBtn').disabled = currentStep === 1;
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).style.display = 'none';
+            }
+            
+            // Show current step
+            document.getElementById(`step${step}`).style.display = 'block';
+            currentStep = step;
+            updateProgress();
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function testVoice() {
+            const btn = document.getElementById('voiceTestBtn');
+            const feedback = document.getElementById('voiceFeedback');
+            const nextBtn = document.getElementById('voiceNextBtn');
+            
+            btn.classList.add('listening');
+            btn.innerHTML = '🔴';
+            feedback.textContent = 'Listening... speak now';
+            feedback.className = 'voice-feedback';
+            
+            // Simulate voice recognition
+            setTimeout(() => {
+                btn.classList.remove('listening');
+                btn.innerHTML = '✅';
+                feedback.textContent = 'Perfect! Voice recognized: "Create a user story for authentication" (96% confidence)';
+                feedback.className = 'voice-feedback success';
+                
+                nextBtn.disabled = false;
+                nextBtn.textContent = 'Continue ✓';
+                voiceTestPassed = true;
+                
+                // Add success checkmark
+                btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            }, 3000);
+        }
+
+        function skipVoiceTest() {
+            document.getElementById('voiceNextBtn').disabled = false;
+            document.getElementById('voiceNextBtn').textContent = 'Continue (Skipped)';
+            nextStep();
+        }
+
+        function toggleIntegration(card, integration) {
+            const isSelected = card.classList.contains('selected');
+            const status = card.querySelector('.integration-status');
+            
+            if (isSelected) {
+                card.classList.remove('selected');
+                status.style.display = 'none';
+                selectedIntegrations = selectedIntegrations.filter(i => i !== integration);
+            } else {
+                card.classList.add('selected');
+                status.style.display = 'block';
+                selectedIntegrations.push(integration);
+            }
+        }
+
+        function skipProfile() {
+            nextStep();
+        }
+
+        function skipIntegrations() {
+            nextStep();
+        }
+
+        function skipOnboarding() {
+            if (confirm('Are you sure you want to skip the setup? You can always configure these settings later.')) {
+                completeOnboarding();
+            }
+        }
+
+        function startFirstCommand() {
+            const btn = event.target;
+            btn.classList.add('listening');
+            btn.innerHTML = '🔴';
+            
+            setTimeout(() => {
+                btn.classList.remove('listening');
+                btn.innerHTML = '✅';
+                btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                document.querySelector('#step5 .voice-feedback').textContent = 
+                    'Excellent! Command recognized. Creating user story...';
+                document.querySelector('#step5 .voice-feedback').className = 'voice-feedback success';
+            }, 2500);
+        }
+
+        function restartTour() {
+            currentStep = 1;
+            selectedIntegrations = [];
+            voiceTestPassed = false;
+            
+            // Reset voice test
+            document.getElementById('voiceTestBtn').innerHTML = '🎤';
+            document.getElementById('voiceTestBtn').style.background = 'linear-gradient(135deg, #00f5ff 0%, #667eea 100%)';
+            document.getElementById('voiceFeedback').textContent = 'Click the button and say: "Create a user story for authentication"';
+            document.getElementById('voiceFeedback').className = 'voice-feedback';
+            document.getElementById('voiceNextBtn').disabled = true;
+            document.getElementById('voiceNextBtn').textContent = 'Continue';
+            
+            // Reset integrations
+            document.querySelectorAll('.integration-card').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('.integration-status').style.display = 'none';
+            });
+            
+            showStep(1);
+        }
+
+        function completeOnboarding() {
+            // Show completion animation
+            const container = document.querySelector('.onboarding-container');
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.95)';
+            container.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                alert('🎉 Onboarding complete! Welcome to Squiddles!\n\n' +
+                      `Selected integrations: ${selectedIntegrations.join(', ') || 'None'}\n` +
+                      `Voice test: ${voiceTestPassed ? 'Passed' : 'Skipped'}\n\n` +
+                      'You can now start using voice commands to manage your projects.');
+                
+                // In a real app, this would redirect to the main dashboard
+                window.location.href = 'product-manager-dashboard-v3.html';
+            }, 500);
+        }
+
+        // Auto-advance from step 1 after 10 seconds if no interaction
+        setTimeout(() => {
+            if (currentStep === 1) {
+                nextStep();
+            }
+        }, 10000);
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

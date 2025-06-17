@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - Error Recovery States</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            gap: 2px;
+        }
+
+        .error-panel {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            padding: 24px;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .error-state {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(35, 35, 35, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(185, 28, 28, 0.2));
+            border-bottom: 1px solid rgba(220, 38, 38, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .error-title {
+            font-weight: 600;
+            color: #fca5a5;
+            font-size: 16px;
+        }
+
+        .error-body {
+            padding: 20px 24px;
+        }
+
+        .error-description {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .recovery-steps {
+            margin-bottom: 20px;
+        }
+
+        .recovery-step {
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(25, 25, 25, 0.9));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .recovery-step:hover {
+            border-color: rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, rgba(25, 25, 25, 0.9), rgba(35, 35, 35, 0.9));
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .fallback-options {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .fallback-title {
+            color: #93c5fd;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .fallback-option {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 6px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            color: #ffffff;
+        }
+
+        .fallback-option:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .success-state {
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.2));
+            border-bottom: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .success-title {
+            color: #86efac;
+        }
+
+        .warning-state {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .warning-header {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2));
+            border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .warning-title {
+            color: #fbbf24;
+        }
+
+        .panel-title {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.7), rgba(42, 42, 42, 0.7));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .panel-title h2 {
+            background: linear-gradient(135deg, #00f5ff 0%, #667eea 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .diagnostic-info {
+            background: linear-gradient(135deg, rgba(55, 65, 81, 0.8), rgba(75, 85, 99, 0.8));
+            border: 1px solid rgba(156, 163, 175, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #d1d5db;
+        }
+
+        .retry-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin: 8px 4px;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .secondary-button {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 8px 4px;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-button:hover {
+            border-color: rgba(156, 163, 175, 0.5);
+            color: #ffffff;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel: Network & Connection Errors -->
+        <div class="error-panel">
+            <div class="panel-title">
+                <h2>🌐 Network & Connection Errors</h2>
+            </div>
+
+            <!-- WebRTC Connection Failed -->
+            <div class="error-state">
+                <div class="error-header">
+                    <span>🔌</span>
+                    <span class="error-title">WebRTC Connection Failed</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        Unable to establish real-time voice connection. This prevents voice interaction with Squiddles.
+                    </div>
+                    
+                    <div class="recovery-steps">
+                        <div class="recovery-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Check microphone permissions in browser settings</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Refresh page and allow microphone access</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Try different browser (Chrome recommended)</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">4</div>
+                            <div class="step-text">Check network firewall settings</div>
+                        </div>
+                    </div>
+
+                    <div class="diagnostic-info">
+                        Error: getUserMedia() failed<br>
+                        Browser: Safari 17.2<br>
+                        Platform: macOS 14.2<br>
+                        Timestamp: 2024-01-15 14:32:18
+                    </div>
+
+                    <div class="fallback-options">
+                        <div class="fallback-title">📝 Alternative Options</div>
+                        <div class="fallback-option">Switch to text-based interface</div>
+                        <div class="fallback-option">Use mobile app with voice support</div>
+                        <div class="fallback-option">Contact support for troubleshooting</div>
+                    </div>
+
+                    <button class="retry-button">🔄 Retry Connection</button>
+                    <button class="secondary-button">Use Text Mode</button>
+                </div>
+            </div>
+
+            <!-- API Connection Issues -->
+            <div class="error-state warning-state">
+                <div class="warning-header">
+                    <span>⚠️</span>
+                    <span class="warning-title">Jira API Connection Unstable</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        Intermittent connection to Jira API. Some features may be limited.
+                    </div>
+                    
+                    <div class="recovery-steps">
+                        <div class="recovery-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Verify Jira credentials in Settings</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Check Jira instance status</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Test API connection manually</div>
+                        </div>
+                    </div>
+
+                    <div class="diagnostic-info">
+                        Status: 429 Too Many Requests<br>
+                        Rate limit: 100/hour (exceeded)<br>
+                        Reset time: 2024-01-15 15:00:00<br>
+                        Affected: Ticket creation, search
+                    </div>
+
+                    <button class="retry-button">Test Connection</button>
+                    <button class="secondary-button">View Settings</button>
+                </div>
+            </div>
+
+            <!-- Network Disconnection -->
+            <div class="error-state">
+                <div class="error-header">
+                    <span>📡</span>
+                    <span class="error-title">Network Disconnected</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        Lost internet connection. Squiddles is running in offline mode with limited functionality.
+                    </div>
+                    
+                    <div class="recovery-steps">
+                        <div class="recovery-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Check network connection</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Reconnect to WiFi or Ethernet</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Restart network adapter if needed</div>
+                        </div>
+                    </div>
+
+                    <div class="fallback-options">
+                        <div class="fallback-title">💾 Offline Capabilities</div>
+                        <div class="fallback-option">View cached stories and templates</div>
+                        <div class="fallback-option">Create drafts (will sync when online)</div>
+                        <div class="fallback-option">Access offline documentation</div>
+                    </div>
+
+                    <button class="retry-button">🌐 Check Connection</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Voice & AI Errors -->
+        <div class="error-panel">
+            <div class="panel-title">
+                <h2>🎙️ Voice & AI Processing Errors</h2>
+            </div>
+
+            <!-- Voice Recognition Failed -->
+            <div class="error-state">
+                <div class="error-header">
+                    <span>🎤</span>
+                    <span class="error-title">Voice Recognition Failed</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        Unable to process your voice input. The speech recognition service encountered an error.
+                    </div>
+                    
+                    <div class="recovery-steps">
+                        <div class="recovery-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Speak more clearly and slowly</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Reduce background noise</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Check microphone placement</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">4</div>
+                            <div class="step-text">Try shorter phrases</div>
+                        </div>
+                    </div>
+
+                    <div class="diagnostic-info">
+                        Audio quality: Poor (SNR: 2.1 dB)<br>
+                        Confidence: 12% (threshold: 70%)<br>
+                        Recognized: "cree... user... ory for..."<br>
+                        Duration: 4.2 seconds
+                    </div>
+
+                    <div class="fallback-options">
+                        <div class="fallback-title">⌨️ Input Alternatives</div>
+                        <div class="fallback-option">Type your request instead</div>
+                        <div class="fallback-option">Use voice-to-text app</div>
+                        <div class="fallback-option">Dictate to team member</div>
+                    </div>
+
+                    <button class="retry-button">🎙️ Try Again</button>
+                    <button class="secondary-button">Type Instead</button>
+                </div>
+            </div>
+
+            <!-- AI Processing Error -->
+            <div class="error-state">
+                <div class="error-header">
+                    <span>🤖</span>
+                    <span class="error-title">AI Agent Processing Error</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        The AI agent encountered an error while processing your request. The context may have been lost.
+                    </div>
+                    
+                    <div class="recovery-steps">
+                        <div class="recovery-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Rephrase your request more specifically</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Break complex requests into steps</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Start a new conversation</div>
+                        </div>
+                    </div>
+
+                    <div class="diagnostic-info">
+                        Agent: ProductManager<br>
+                        Error: Context window exceeded (4,097 tokens)<br>
+                        Last successful: "Create user story"<br>
+                        Session: pm_session_2024_0115_143218
+                    </div>
+
+                    <button class="retry-button">🔄 Restart Session</button>
+                    <button class="secondary-button">Simplify Request</button>
+                </div>
+            </div>
+
+            <!-- Agent Handoff Failed -->
+            <div class="error-state warning-state">
+                <div class="warning-header">
+                    <span>🔄</span>
+                    <span class="warning-title">Agent Handoff Failed</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        Unable to transfer your request to the Jira integration agent. Context may be preserved but functionality limited.
+                    </div>
+                    
+                    <div class="recovery-steps">
+                        <div class="recovery-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Continue with current agent</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Manually specify which agent to use</div>
+                        </div>
+                        <div class="recovery-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Complete task in multiple steps</div>
+                        </div>
+                    </div>
+
+                    <div class="diagnostic-info">
+                        From: ProductManager → Jira<br>
+                        Context: User story creation<br>
+                        Error: Jira agent unavailable<br>
+                        Preserved: Template, requirements
+                    </div>
+
+                    <button class="retry-button">Retry Handoff</button>
+                    <button class="secondary-button">Continue Here</button>
+                </div>
+            </div>
+
+            <!-- Recovery Success -->
+            <div class="error-state success-state">
+                <div class="success-header">
+                    <span>✅</span>
+                    <span class="success-title">Connection Restored</span>
+                </div>
+                <div class="error-body">
+                    <div class="error-description">
+                        Successfully reconnected to all services. Your previous work has been preserved and you can continue where you left off.
+                    </div>
+                    
+                    <div class="diagnostic-info">
+                        Restored at: 2024-01-15 14:35:42<br>
+                        Session recovered: pm_session_2024_0115_143218<br>
+                        Data preserved: User story draft, context<br>
+                        All services: Online ✓
+                    </div>
+
+                    <button class="retry-button">🚀 Continue Working</button>
+                    <button class="secondary-button">Review Saved Work</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive error recovery simulation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Recovery step interactions
+            document.querySelectorAll('.recovery-step').forEach(step => {
+                step.addEventListener('click', function() {
+                    this.style.borderColor = '#22c55e';
+                    this.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1))';
+                    
+                    // Add checkmark
+                    if (!this.querySelector('.checkmark')) {
+                        const checkmark = document.createElement('span');
+                        checkmark.className = 'checkmark';
+                        checkmark.innerHTML = '✓';
+                        checkmark.style.color = '#22c55e';
+                        checkmark.style.marginLeft = 'auto';
+                        this.appendChild(checkmark);
+                    }
+                });
+            });
+
+            // Fallback option interactions
+            document.querySelectorAll('.fallback-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    this.style.background = 'rgba(59, 130, 246, 0.3)';
+                    this.style.borderColor = '#3b82f6';
+                    setTimeout(() => {
+                        alert('Switching to: ' + this.textContent);
+                    }, 200);
+                });
+            });
+
+            // Button interactions
+            document.querySelectorAll('.retry-button, .secondary-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.textContent.includes('Retry') || this.textContent.includes('Try Again')) {
+                        this.textContent = '⏳ Retrying...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = this.textContent.replace('⏳ Retrying...', '✅ Success');
+                            this.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+                        }, 2000);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

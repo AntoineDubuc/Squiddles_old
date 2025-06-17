@@ -212,12 +212,22 @@
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1.5rem;
             overflow-y: auto;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .left-panel.collapsed {
+            width: 0;
+            padding: 0;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .center-panel {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
+            transition: all 0.3s ease;
         }
 
         .right-panel {
@@ -227,6 +237,62 @@
             border-left: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1.5rem;
             overflow-y: auto;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .right-panel.collapsed {
+            width: 0;
+            padding: 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* Panel Toggle Buttons */
+        .panel-toggle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 60px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #A1A1AA;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .panel-toggle:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #FFFFFF;
+        }
+
+        .left-panel .panel-toggle {
+            right: -24px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .right-panel .panel-toggle {
+            left: -24px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .left-panel.collapsed .panel-toggle {
+            right: -24px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .right-panel.collapsed .panel-toggle {
+            left: -24px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 8px 0 0 8px;
         }
 
         /* Create Header */
@@ -326,6 +392,34 @@
 
         .voice-transcript.active {
             color: #3B82F6;
+        }
+
+        .voice-input-button {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border: none;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .voice-input-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .voice-input-button.listening {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         /* Ticket Form */
@@ -546,38 +640,8 @@
         <div class="main-layout">
             <div class="main-content">
                 <!-- Left Panel - Contextual Intelligence -->
-                <aside class="left-panel">
-                    <div class="context-section">
-                        <div class="context-title">
-                            <span>📍</span>
-                            <span>Related Tickets</span>
-                        </div>
-                        <div class="context-item">
-                            <div class="context-item-title">PROD-234: Checkout Optimization</div>
-                            <div class="context-item-meta">
-                                <span>Story</span>
-                                <span>•</span>
-                                <span>In Progress</span>
-                            </div>
-                        </div>
-                        <div class="context-item">
-                            <div class="context-item-title">TASK-189: Payment API Update</div>
-                            <div class="context-item-meta">
-                                <span>Task</span>
-                                <span>•</span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="context-item">
-                            <div class="context-item-title">BUG-156: Cart Calculation Error</div>
-                            <div class="context-item-meta">
-                                <span>Bug</span>
-                                <span>•</span>
-                                <span>Resolved</span>
-                            </div>
-                        </div>
-                    </div>
-
+                <aside class="left-panel" id="leftPanel">
+                    <div class="panel-toggle" id="leftToggle" onclick="toggleLeftPanel()">‹</div>
                     <div class="context-section">
                         <div class="context-title">
                             <span>💬</span>
@@ -619,6 +683,9 @@
                     <!-- Voice Input Area -->
                     <div class="voice-input-area">
                         <div class="voice-prompt">Describe what you need to create</div>
+                        <button class="voice-input-button" id="voiceInputButton" onclick="toggleVoiceInput()">
+                            🎙️
+                        </button>
                         <div class="voice-transcript" id="voiceTranscript">
                             Click the microphone or press SPACE to start speaking
                         </div>
@@ -685,7 +752,8 @@
                 </main>
 
                 <!-- Right Panel - Actions & Suggestions -->
-                <aside class="right-panel">
+                <aside class="right-panel" id="rightPanel">
+                    <div class="panel-toggle" id="rightToggle" onclick="toggleRightPanel()">›</div>
                     <div class="actions-section">
                         <div class="context-title">
                             <span>⚡</span>
@@ -747,10 +815,38 @@
     </div>
 
     <script>
-        // Global voice button
+        // Real conversation state
+        let realtimeClient = null;
+        let isConnected = false;
+        let conversationHistory = [];
+        
+        // UI elements
         const globalVoiceButton = document.getElementById('globalVoiceButton');
+        const voiceInputButton = document.getElementById('voiceInputButton');
         const voiceTranscript = document.getElementById('voiceTranscript');
         let isListening = false;
+        
+        // Initialize real conversation system
+        async function initializeRealConversation() {
+            try {
+                console.log('🔑 Fetching session key...');
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                
+                if (!data.client_secret?.value) {
+                    console.error('❌ No ephemeral key provided');
+                    return false;
+                }
+                
+                console.log('✅ Got session key, initializing conversation...');
+                // For now, we'll simulate the conversation flow until we can import the actual client
+                isConnected = true;
+                return true;
+            } catch (error) {
+                console.error('❌ Failed to initialize conversation:', error);
+                return false;
+            }
+        }
         
         globalVoiceButton.addEventListener('click', toggleVoice);
         
@@ -786,6 +882,47 @@
                 }, 2000);
             } else {
                 globalVoiceButton.classList.remove('listening');
+                voiceTranscript.classList.remove('active');
+                voiceTranscript.textContent = 'Click the microphone or press SPACE to start speaking';
+            }
+        }
+        
+        // Voice input button (main microphone in voice area)
+        function toggleVoiceInput() {
+            isListening = !isListening;
+            
+            if (isListening) {
+                voiceInputButton.classList.add('listening');
+                voiceInputButton.textContent = '🔴';
+                voiceTranscript.classList.add('active');
+                voiceTranscript.textContent = '🎤 Listening...';
+                
+                // Simulate voice input
+                setTimeout(() => {
+                    voiceTranscript.textContent = '"I need to create a bug report for the checkout process..."';
+                    
+                    // Simulate AI processing
+                    setTimeout(() => {
+                        // Auto-detect type as Bug
+                        selectType('typeBug');
+                        
+                        // Fill in fields
+                        document.getElementById('titleInput').value = 'Checkout process fails for guest users';
+                        document.getElementById('descriptionInput').value = 'When guest users try to complete checkout, the payment form does not load properly. This happens specifically on mobile devices.';
+                        
+                        // Add bug-specific sections
+                        addBugSections();
+                        
+                        voiceInputButton.classList.remove('listening');
+                        voiceInputButton.textContent = '🎙️';
+                        voiceTranscript.classList.remove('active');
+                        voiceTranscript.textContent = '✓ Created bug report template';
+                        isListening = false;
+                    }, 1500);
+                }, 2000);
+            } else {
+                voiceInputButton.classList.remove('listening');
+                voiceInputButton.textContent = '🎙️';
                 voiceTranscript.classList.remove('active');
                 voiceTranscript.textContent = 'Click the microphone or press SPACE to start speaking';
             }
@@ -915,6 +1052,53 @@
             `;
             document.getElementById('dynamicSections').innerHTML = sections;
         }
+        
+        // Panel toggle functions
+        function toggleLeftPanel() {
+            const panel = document.getElementById('leftPanel');
+            const toggle = document.getElementById('leftToggle');
+            
+            if (panel.classList.contains('collapsed')) {
+                panel.classList.remove('collapsed');
+                toggle.textContent = '‹';
+            } else {
+                panel.classList.add('collapsed');
+                toggle.textContent = '›';
+            }
+        }
+        
+        function toggleRightPanel() {
+            const panel = document.getElementById('rightPanel');
+            const toggle = document.getElementById('rightToggle');
+            
+            if (panel.classList.contains('collapsed')) {
+                panel.classList.remove('collapsed');
+                toggle.textContent = '›';
+            } else {
+                panel.classList.add('collapsed');
+                toggle.textContent = '‹';
+            }
+        }
+        
+        // Auto-collapse panels on smaller screens
+        function handleResize() {
+            const leftPanel = document.getElementById('leftPanel');
+            const rightPanel = document.getElementById('rightPanel');
+            
+            if (window.innerWidth < 1200) {
+                leftPanel.classList.add('collapsed');
+                rightPanel.classList.add('collapsed');
+                document.getElementById('leftToggle').textContent = '›';
+                document.getElementById('rightToggle').textContent = '‹';
+            }
+        }
+        
+        // Initialize panels
+        window.addEventListener('load', () => {
+            handleResize();
+        });
+        
+        window.addEventListener('resize', handleResize);
         
         // Keyboard shortcut
         document.addEventListener('keydown', (e) => {

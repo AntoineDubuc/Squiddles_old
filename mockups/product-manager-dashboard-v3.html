@@ -368,6 +368,59 @@
             color: #FFFFFF;
         }
 
+        .hero-voice-button {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border: none;
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 320px;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+        }
+
+        .hero-voice-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .hero-voice-button.listening {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            animation: voice-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes voice-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .voice-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .voice-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .voice-main {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 0.25rem;
+        }
+
+        .voice-sub {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         .hero-actions {
             display: flex;
             gap: 1rem;
@@ -760,6 +813,13 @@
                 <!-- Primary Action Hero -->
                 <div class="primary-action-hero">
                     <h2 class="hero-voice-prompt">What would you like to do?</h2>
+                    <div class="hero-voice-button" id="heroVoiceButton" onclick="activateVoiceMode()">
+                        <div class="voice-icon">🎙️</div>
+                        <div class="voice-text">
+                            <span class="voice-main">Just ask me</span>
+                            <span class="voice-sub">Press Space or click to speak</span>
+                        </div>
+                    </div>
                     <div class="hero-actions">
                         <button class="hero-button" onclick="window.location.href='product-manager-create-v2.html'">
                             <span>➕</span>
@@ -1087,9 +1147,50 @@
     <script>
         // Global voice button
         const globalVoiceButton = document.getElementById('globalVoiceButton');
+        const heroVoiceButton = document.getElementById('heroVoiceButton');
         let isListening = false;
         
         globalVoiceButton.addEventListener('click', toggleVoice);
+        
+        // Hero voice activation
+        function activateVoiceMode() {
+            const button = heroVoiceButton;
+            const icon = button.querySelector('.voice-icon');
+            const mainText = button.querySelector('.voice-main');
+            const subText = button.querySelector('.voice-sub');
+            
+            if (!isListening) {
+                isListening = true;
+                button.classList.add('listening');
+                icon.textContent = '🔴';
+                mainText.textContent = 'Listening...';
+                subText.textContent = 'Speak now or press Space to stop';
+                
+                // Simulate voice processing
+                setTimeout(() => {
+                    mainText.textContent = 'Processing...';
+                    subText.textContent = '"Create a bug report for the checkout issue"';
+                    
+                    setTimeout(() => {
+                        button.classList.remove('listening');
+                        icon.textContent = '🎙️';
+                        mainText.textContent = 'Creating ticket...';
+                        subText.textContent = 'Redirecting to ticket creation';
+                        isListening = false;
+                        
+                        setTimeout(() => {
+                            window.location.href = 'product-manager-create-v2.html';
+                        }, 1000);
+                    }, 2000);
+                }, 2000);
+            } else {
+                button.classList.remove('listening');
+                icon.textContent = '🎙️';
+                mainText.textContent = 'Just ask me';
+                subText.textContent = 'Press Space or click to speak';
+                isListening = false;
+            }
+        }
         
         function toggleVoice() {
             isListening = !isListening;

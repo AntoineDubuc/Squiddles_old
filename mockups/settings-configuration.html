@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - Settings & Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 70px 1fr;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-title {
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding: 0 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            color: #ffffff;
+            border-right: 3px solid #667eea;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            margin-bottom: 32px;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .content-subtitle {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .settings-section {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(35, 35, 35, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(42, 42, 42, 0.8), rgba(58, 58, 58, 0.8));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        .setting-group {
+            margin-bottom: 24px;
+        }
+
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            display: block;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .setting-description {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .form-input {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(25, 25, 25, 0.9));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(25, 25, 25, 0.9));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #333;
+            border-radius: 28px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        .slider-container {
+            margin: 16px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(156, 163, 175, 0.5);
+            color: #ffffff;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .status-dot.error {
+            background: #ef4444;
+        }
+
+        .status-dot.warning {
+            background: #f59e0b;
+        }
+
+        .voice-test-area {
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(25, 25, 25, 0.9));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .voice-test-button {
+            background: linear-gradient(135deg, #00f5ff 0%, #667eea 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .voice-test-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.3);
+        }
+
+        .integration-card {
+            background: linear-gradient(135deg, rgba(35, 35, 35, 0.8), rgba(45, 45, 45, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .integration-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .integration-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .jira-icon { background: linear-gradient(135deg, #0052cc, #2684ff); }
+        .slack-icon { background: linear-gradient(135deg, #4a154b, #611f69); }
+        .pinecone-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="../squiddles_logo_nobg.png" alt="Squiddles Logo">
+                    <span class="logo-text">Squiddles</span>
+                </div>
+                <div class="breadcrumb">Settings / Voice & Integrations</div>
+            </div>
+            <div class="user-info">
+                <span>Antoine Dubuc</span>
+                <span>👤</span>
+            </div>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">Voice Settings</div>
+                <div class="nav-item active">
+                    <span>🎙️</span>
+                    <span>Audio & Voice</span>
+                </div>
+                <div class="nav-item">
+                    <span>🤖</span>
+                    <span>Agent Behavior</span>
+                </div>
+                <div class="nav-item">
+                    <span>🌐</span>
+                    <span>Language & Region</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Integrations</div>
+                <div class="nav-item">
+                    <span>🔗</span>
+                    <span>Connected Services</span>
+                </div>
+                <div class="nav-item">
+                    <span>🎫</span>
+                    <span>Jira Configuration</span>
+                </div>
+                <div class="nav-item">
+                    <span>💬</span>
+                    <span>Slack Workspace</span>
+                </div>
+                <div class="nav-item">
+                    <span>🔍</span>
+                    <span>Pinecone Search</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">User Experience</div>
+                <div class="nav-item">
+                    <span>🎨</span>
+                    <span>Interface Themes</span>
+                </div>
+                <div class="nav-item">
+                    <span>♿</span>
+                    <span>Accessibility</span>
+                </div>
+                <div class="nav-item">
+                    <span>🔔</span>
+                    <span>Notifications</span>
+                </div>
+                <div class="nav-item">
+                    <span>🔐</span>
+                    <span>Privacy & Security</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">Audio & Voice Settings</h1>
+                <p class="content-subtitle">Configure voice recognition, audio quality, and interaction preferences</p>
+            </div>
+
+            <!-- Voice Recognition Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <span>🎙️</span>
+                    <span class="section-title">Voice Recognition</span>
+                </div>
+                <div class="section-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Microphone Input Device</label>
+                        <p class="setting-description">Select the microphone to use for voice input</p>
+                        <select class="form-select">
+                            <option>MacBook Pro Microphone (Default)</option>
+                            <option>AirPods Pro - Antoine's AirPods</option>
+                            <option>USB Condenser Microphone</option>
+                            <option>External USB Audio Device</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Voice Sensitivity</label>
+                        <p class="setting-description">Adjust how sensitive the voice detection is to background noise</p>
+                        <div class="slider-container">
+                            <input type="range" min="1" max="10" value="7" class="slider" id="sensitivity">
+                            <div class="slider-labels">
+                                <span>Low</span>
+                                <span>Medium</span>
+                                <span>High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Voice Test Area</label>
+                        <p class="setting-description">Test your microphone and voice recognition accuracy</p>
+                        <div class="voice-test-area">
+                            <div style="margin-bottom: 16px; color: #888;">Click the button and say "Create a user story for authentication"</div>
+                            <button class="voice-test-button">🎙️ Start Voice Test</button>
+                            <div style="margin-top: 16px; font-size: 14px; color: #00f5ff;">
+                                Recognized: "Create a user story for authentication" (Confidence: 96%)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Push-to-Talk Mode</label>
+                        <p class="setting-description">Enable push-to-talk instead of always-listening mode</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Behavior Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <span>🤖</span>
+                    <span class="section-title">Agent Behavior</span>
+                </div>
+                <div class="section-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Response Speed</label>
+                        <p class="setting-description">How quickly agents respond to your voice commands</p>
+                        <select class="form-select">
+                            <option>Instant (may interrupt)</option>
+                            <option selected>Balanced (recommended)</option>
+                            <option>Patient (waits for pauses)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Conversation Context Length</label>
+                        <p class="setting-description">How much conversation history to maintain for context</p>
+                        <div class="slider-container">
+                            <input type="range" min="5" max="50" value="20" class="slider" id="context">
+                            <div class="slider-labels">
+                                <span>5 messages</span>
+                                <span>20 messages</span>
+                                <span>50 messages</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Agent Handoff Notifications</label>
+                        <p class="setting-description">Show visual indicators when conversation transfers between agents</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Voice Confirmation</label>
+                        <p class="setting-description">Require voice confirmation for destructive actions</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integration Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <span>🔗</span>
+                    <span class="section-title">Connected Integrations</span>
+                </div>
+                <div class="section-content">
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon jira-icon">🎫</div>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">Jira Software</div>
+                                <div style="font-size: 12px; color: #888;">extendtv.atlassian.net</div>
+                                <div class="connection-status">
+                                    <div class="status-dot"></div>
+                                    <span style="font-size: 12px; color: #10b981;">Connected</span>
+                                    <span style="font-size: 12px; color: #888;">• 50 tickets accessible</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-secondary">Configure</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon slack-icon">💬</div>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">Slack Workspace</div>
+                                <div style="font-size: 12px; color: #888;">Not connected</div>
+                                <div class="connection-status">
+                                    <div class="status-dot error"></div>
+                                    <span style="font-size: 12px; color: #ef4444;">Disconnected</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-primary">Connect</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon pinecone-icon">🔍</div>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">Pinecone Search</div>
+                                <div style="font-size: 12px; color: #888;">squiddles-prod index</div>
+                                <div class="connection-status">
+                                    <div class="status-dot warning"></div>
+                                    <span style="font-size: 12px; color: #f59e0b;">Limited</span>
+                                    <span style="font-size: 12px; color: #888;">• Search issues detected</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-secondary">Debug</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Quality Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <span>🔊</span>
+                    <span class="section-title">Audio Quality</span>
+                </div>
+                <div class="section-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Audio Output Device</label>
+                        <p class="setting-description">Device for agent voice responses and system sounds</p>
+                        <select class="form-select">
+                            <option>MacBook Pro Speakers (Default)</option>
+                            <option selected>AirPods Pro - Antoine's AirPods</option>
+                            <option>External USB Headset</option>
+                            <option>HDMI Audio Output</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Noise Cancellation</label>
+                        <p class="setting-description">Reduce background noise in voice input</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Echo Cancellation</label>
+                        <p class="setting-description">Prevent audio feedback and echo</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Audio Quality</label>
+                        <p class="setting-description">Higher quality uses more bandwidth</p>
+                        <select class="form-select">
+                            <option>Low (8 kHz)</option>
+                            <option selected>Standard (16 kHz)</option>
+                            <option>High (24 kHz)</option>
+                            <option>Premium (48 kHz)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary">Save Changes</button>
+                <button class="btn-secondary">Reset to Defaults</button>
+                <button class="btn-secondary">Test All Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive settings simulation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation item interactions
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                });
+            });
+
+            // Voice test button
+            document.querySelector('.voice-test-button').addEventListener('click', function() {
+                this.textContent = '🔴 Listening...';
+                this.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                
+                setTimeout(() => {
+                    this.textContent = '✅ Test Complete';
+                    this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    
+                    setTimeout(() => {
+                        this.textContent = '🎙️ Start Voice Test';
+                        this.style.background = 'linear-gradient(135deg, #00f5ff 0%, #667eea 100%)';
+                    }, 2000);
+                }, 3000);
+            });
+
+            // Integration card interactions
+            document.querySelectorAll('.integration-card button').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.textContent === 'Connect') {
+                        this.textContent = 'Connecting...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = 'Configure';
+                            this.disabled = false;
+                            this.className = 'btn-secondary';
+                            
+                            // Update status
+                            const statusDot = this.closest('.integration-card').querySelector('.status-dot');
+                            const statusText = statusDot.nextElementSibling;
+                            statusDot.className = 'status-dot';
+                            statusText.textContent = 'Connected';
+                            statusText.style.color = '#10b981';
+                        }, 2000);
+                    } else if (this.textContent === 'Debug') {
+                        this.textContent = 'Testing...';
+                        
+                        setTimeout(() => {
+                            this.textContent = 'Configure';
+                            
+                            // Update status to connected
+                            const statusDot = this.closest('.integration-card').querySelector('.status-dot');
+                            const statusText = statusDot.nextElementSibling;
+                            statusDot.className = 'status-dot';
+                            statusText.textContent = 'Connected';
+                            statusText.style.color = '#10b981';
+                        }, 3000);
+                    }
+                });
+            });
+
+            // Save button
+            document.querySelector('.btn-primary').addEventListener('click', function() {
+                const originalText = this.textContent;
+                this.textContent = '✅ Saved!';
+                this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

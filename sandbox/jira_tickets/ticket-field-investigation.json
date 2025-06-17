@@ -1,0 +1,1314 @@
+{
+  "investigation": {
+    "timestamp": "2025-06-17T20:22:16.696Z",
+    "jiraHost": "https://extendtv.atlassian.net",
+    "testTicket": "PROD-9733"
+  },
+  "minimalTicket": {
+    "expand": "operations,versionedRepresentations,editmeta,changelog,customfield_10300.properties,customfield_10400.properties,customfield_10900.requestTypePractice,renderedFields,customfield_11239.properties",
+    "id": "85826",
+    "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826",
+    "key": "PROD-9733",
+    "fields": {
+      "statuscategorychangedate": "2025-06-17T10:16:14.164-0700",
+      "customfield_11280": null,
+      "customfield_11282": null,
+      "customfield_11283": null,
+      "fixVersions": [],
+      "customfield_11200": null,
+      "statusCategory": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+        "id": 3,
+        "key": "done",
+        "colorName": "green",
+        "name": "Done"
+      },
+      "resolution": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/resolution/1",
+        "id": "1",
+        "description": "A fix for this issue is checked into the tree and tested.",
+        "name": "Fixed"
+      },
+      "customfield_11201": null,
+      "customfield_11202": null,
+      "customfield_10500": null,
+      "customfield_10900": null,
+      "customfield_10901": [],
+      "customfield_10902": null,
+      "customfield_10903": null,
+      "customfield_10904": [],
+      "lastViewed": null,
+      "customfield_11270": null,
+      "priority": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/priority/10003",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/priorities/minor.svg",
+        "name": "P4",
+        "id": "10003"
+      },
+      "customfield_10100": null,
+      "customfield_11279": null,
+      "labels": [],
+      "timeestimate": null,
+      "aggregatetimeoriginalestimate": null,
+      "versions": [],
+      "issuelinks": [],
+      "assignee": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "status": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/status/5",
+        "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/statuses/resolved.png",
+        "name": "Resolved",
+        "id": "5",
+        "statusCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+          "id": 3,
+          "key": "done",
+          "colorName": "green",
+          "name": "Done"
+        }
+      },
+      "components": [],
+      "customfield_11269": null,
+      "customfield_10600": {
+        "hasEpicLinkFieldDependency": false,
+        "showField": false,
+        "nonEditableReason": {
+          "reason": "EPIC_LINK_SHOULD_BE_USED",
+          "message": "To set an epic as the parent, use the epic link instead"
+        }
+      },
+      "aggregatetimeestimate": null,
+      "creator": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "subtasks": [],
+      "customfield_11251": null,
+      "customfield_11252": null,
+      "reporter": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "aggregateprogress": {
+        "progress": 0,
+        "total": 0
+      },
+      "customfield_10200": "0|i07tuo:",
+      "customfield_11248": 0.7,
+      "progress": {
+        "progress": 0,
+        "total": 0
+      },
+      "votes": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/PROD-9733/votes",
+        "votes": 0,
+        "hasVoted": false
+      },
+      "issuetype": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issuetype/3",
+        "id": "3",
+        "description": "A task that needs to be done.",
+        "iconUrl": "https://extendtv.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10818?size=medium",
+        "name": "Task",
+        "subtask": false,
+        "avatarId": 10818,
+        "hierarchyLevel": 0
+      },
+      "timespent": null,
+      "customfield_11240": null,
+      "project": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/project/13600",
+        "id": "13600",
+        "key": "PROD",
+        "name": "Production",
+        "projectTypeKey": "software",
+        "simplified": false,
+        "avatarUrls": {
+          "48x48": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503",
+          "24x24": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=small",
+          "16x16": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=xsmall",
+          "32x32": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=medium"
+        },
+        "projectCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/projectCategory/10001",
+          "id": "10001",
+          "description": "",
+          "name": "Engineering & Technology"
+        }
+      },
+      "customfield_11241": null,
+      "customfield_11242": null,
+      "customfield_11000": null,
+      "customfield_11001": null,
+      "customfield_11243": null,
+      "aggregatetimespent": null,
+      "customfield_11002": null,
+      "customfield_11244": null,
+      "customfield_11245": null,
+      "customfield_11246": null,
+      "customfield_11247": null,
+      "customfield_11237": "",
+      "customfield_11238": 0,
+      "customfield_10700": "{}",
+      "customfield_11239": null,
+      "resolutiondate": "2025-06-17T10:16:14.018-0700",
+      "workratio": -1,
+      "watches": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/PROD-9733/watchers",
+        "watchCount": 2,
+        "isWatching": false
+      },
+      "created": "2025-06-17T10:13:55.533-0700",
+      "customfield_11232": null,
+      "customfield_11233": null,
+      "customfield_11234": null,
+      "customfield_10300": null,
+      "customfield_11235": null,
+      "customfield_11236": null,
+      "customfield_11105": null,
+      "customfield_11226": null,
+      "customfield_11227": null,
+      "customfield_11228": null,
+      "customfield_11229": null,
+      "updated": "2025-06-17T10:48:12.716-0700",
+      "timeoriginalestimate": null,
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hello Umair,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Please set up Zendesk access for Kara Bates ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@digitalremedy.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@digitalremedy.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "], Sr. Manager AdOps, who will join Jeff Barry’s team. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "If needed so that this user has access to Sinclair SSO and MS suite, then she has ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@sbgtv.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@sbgtv.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "]"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Kindly note that all outlook [@sbgtv.com] is now forwarded to the new google gmail [@digitalremedy.com]."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Thanks,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Joanna"
+              }
+            ]
+          }
+        ]
+      },
+      "customfield_11220": null,
+      "customfield_11100": null,
+      "customfield_11221": null,
+      "customfield_11222": null,
+      "customfield_11101": null,
+      "customfield_11223": null,
+      "customfield_11102": null,
+      "customfield_11103": null,
+      "customfield_11104": null,
+      "customfield_11225": null,
+      "customfield_11215": null,
+      "customfield_11216": null,
+      "customfield_10007": null,
+      "security": null,
+      "customfield_11217": null,
+      "customfield_10008": null,
+      "customfield_11218": null,
+      "customfield_10800": null,
+      "customfield_11219": null,
+      "summary": "Please set up Zendesk access for new hire ",
+      "customfield_11210": null,
+      "customfield_10000": "10943_*:*_1_*:*_108778_*|*_3_*:*_1_*:*_0",
+      "customfield_10001": null,
+      "customfield_11212": null,
+      "customfield_10002": null,
+      "customfield_10003": null,
+      "customfield_11213": null,
+      "customfield_10400": null,
+      "customfield_10004": null,
+      "customfield_11205": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/customFieldOption/10202",
+        "value": "Sev3",
+        "id": "10202"
+      },
+      "environment": null,
+      "customfield_11208": null,
+      "duedate": null
+    }
+  },
+  "specificFieldsTicket": {
+    "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+    "id": "85826",
+    "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826",
+    "key": "PROD-9733",
+    "fields": {
+      "summary": "Please set up Zendesk access for new hire ",
+      "issuetype": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issuetype/3",
+        "id": "3",
+        "description": "A task that needs to be done.",
+        "iconUrl": "https://extendtv.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10818?size=medium",
+        "name": "Task",
+        "subtask": false,
+        "avatarId": 10818,
+        "hierarchyLevel": 0
+      },
+      "created": "2025-06-17T10:13:55.533-0700",
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hello Umair,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Please set up Zendesk access for Kara Bates ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@digitalremedy.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@digitalremedy.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "], Sr. Manager AdOps, who will join Jeff Barry’s team. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "If needed so that this user has access to Sinclair SSO and MS suite, then she has ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@sbgtv.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@sbgtv.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "]"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Kindly note that all outlook [@sbgtv.com] is now forwarded to the new google gmail [@digitalremedy.com]."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Thanks,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Joanna"
+              }
+            ]
+          }
+        ]
+      },
+      "reporter": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "assignee": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "priority": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/priority/10003",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/priorities/minor.svg",
+        "name": "P4",
+        "id": "10003"
+      },
+      "updated": "2025-06-17T10:48:12.716-0700",
+      "status": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/status/5",
+        "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/statuses/resolved.png",
+        "name": "Resolved",
+        "id": "5",
+        "statusCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+          "id": 3,
+          "key": "done",
+          "colorName": "green",
+          "name": "Done"
+        }
+      }
+    }
+  },
+  "expandedTicket": {
+    "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+    "id": "85826",
+    "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826",
+    "key": "PROD-9733",
+    "renderedFields": {
+      "summary": null,
+      "description": "<p>Hello Umair,</p>\n\n<p>Please set up Zendesk access for Kara Bates [<a href=\"mailto:kbates@digitalremedy.com\" class=\"external-link\" rel=\"nofollow noreferrer\">kbates@digitalremedy.com</a>], Sr. Manager AdOps, who will join Jeff Barry’s team. </p>\n\n<p>If needed so that this user has access to Sinclair SSO and MS suite, then she has [<a href=\"mailto:kbates@sbgtv.com\" class=\"external-link\" rel=\"nofollow noreferrer\">kbates@sbgtv.com</a>]</p>\n\n<p>Kindly note that all outlook <span class=\"error\">&#91;@sbgtv.com&#93;</span> is now forwarded to the new google gmail <span class=\"error\">&#91;@digitalremedy.com&#93;</span>.</p>\n\n<p>Thanks,</p>\n\n<p>Joanna</p>",
+      "status": null
+    },
+    "fields": {
+      "summary": "Please set up Zendesk access for new hire ",
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hello Umair,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Please set up Zendesk access for Kara Bates ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@digitalremedy.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@digitalremedy.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "], Sr. Manager AdOps, who will join Jeff Barry’s team. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "If needed so that this user has access to Sinclair SSO and MS suite, then she has ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@sbgtv.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@sbgtv.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "]"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Kindly note that all outlook [@sbgtv.com] is now forwarded to the new google gmail [@digitalremedy.com]."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Thanks,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Joanna"
+              }
+            ]
+          }
+        ]
+      },
+      "status": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/status/5",
+        "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/statuses/resolved.png",
+        "name": "Resolved",
+        "id": "5",
+        "statusCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+          "id": 3,
+          "key": "done",
+          "colorName": "green",
+          "name": "Done"
+        }
+      }
+    }
+  },
+  "singleIssueTicket": {
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations,customfield_10900.requestTypePractice,customfield_11239.properties,customfield_10300.properties,customfield_10400.properties",
+    "id": "85826",
+    "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826",
+    "key": "PROD-9733",
+    "fields": {
+      "statuscategorychangedate": "2025-06-17T10:16:14.164-0700",
+      "customfield_11280": null,
+      "customfield_11282": null,
+      "customfield_11283": null,
+      "fixVersions": [],
+      "customfield_11200": null,
+      "statusCategory": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+        "id": 3,
+        "key": "done",
+        "colorName": "green",
+        "name": "Done"
+      },
+      "resolution": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/resolution/1",
+        "id": "1",
+        "description": "A fix for this issue is checked into the tree and tested.",
+        "name": "Fixed"
+      },
+      "customfield_11201": null,
+      "customfield_11202": null,
+      "customfield_10500": null,
+      "customfield_10900": null,
+      "customfield_10901": [],
+      "customfield_10902": null,
+      "customfield_10903": null,
+      "customfield_10904": [],
+      "lastViewed": null,
+      "customfield_11270": null,
+      "priority": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/priority/10003",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/priorities/minor.svg",
+        "name": "P4",
+        "id": "10003"
+      },
+      "customfield_10100": null,
+      "customfield_11279": null,
+      "labels": [],
+      "timeestimate": null,
+      "aggregatetimeoriginalestimate": null,
+      "versions": [],
+      "issuelinks": [],
+      "assignee": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "status": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/status/5",
+        "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/statuses/resolved.png",
+        "name": "Resolved",
+        "id": "5",
+        "statusCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+          "id": 3,
+          "key": "done",
+          "colorName": "green",
+          "name": "Done"
+        }
+      },
+      "components": [],
+      "customfield_11269": null,
+      "customfield_10600": {
+        "hasEpicLinkFieldDependency": false,
+        "showField": false,
+        "nonEditableReason": {
+          "reason": "EPIC_LINK_SHOULD_BE_USED",
+          "message": "To set an epic as the parent, use the epic link instead"
+        }
+      },
+      "aggregatetimeestimate": null,
+      "creator": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "subtasks": [],
+      "customfield_11251": null,
+      "customfield_11252": null,
+      "reporter": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "aggregateprogress": {
+        "progress": 0,
+        "total": 0
+      },
+      "customfield_10200": "0|i07tuo:",
+      "customfield_11248": 0.7,
+      "progress": {
+        "progress": 0,
+        "total": 0
+      },
+      "votes": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/PROD-9733/votes",
+        "votes": 0,
+        "hasVoted": false
+      },
+      "worklog": {
+        "startAt": 0,
+        "maxResults": 20,
+        "total": 0,
+        "worklogs": []
+      },
+      "issuetype": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issuetype/3",
+        "id": "3",
+        "description": "A task that needs to be done.",
+        "iconUrl": "https://extendtv.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10818?size=medium",
+        "name": "Task",
+        "subtask": false,
+        "avatarId": 10818,
+        "hierarchyLevel": 0
+      },
+      "timespent": null,
+      "customfield_11240": null,
+      "project": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/project/13600",
+        "id": "13600",
+        "key": "PROD",
+        "name": "Production",
+        "projectTypeKey": "software",
+        "simplified": false,
+        "avatarUrls": {
+          "48x48": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503",
+          "24x24": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=small",
+          "16x16": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=xsmall",
+          "32x32": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=medium"
+        },
+        "projectCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/projectCategory/10001",
+          "id": "10001",
+          "description": "",
+          "name": "Engineering & Technology"
+        }
+      },
+      "customfield_11241": null,
+      "customfield_11242": null,
+      "customfield_11000": null,
+      "customfield_11001": null,
+      "customfield_11243": null,
+      "aggregatetimespent": null,
+      "customfield_11002": null,
+      "customfield_11244": null,
+      "customfield_11245": null,
+      "customfield_11246": null,
+      "customfield_11247": null,
+      "customfield_11237": "",
+      "customfield_11238": 0,
+      "customfield_10700": "{}",
+      "customfield_11239": null,
+      "resolutiondate": "2025-06-17T10:16:14.018-0700",
+      "workratio": -1,
+      "watches": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/PROD-9733/watchers",
+        "watchCount": 2,
+        "isWatching": false
+      },
+      "created": "2025-06-17T10:13:55.533-0700",
+      "customfield_11232": null,
+      "customfield_11233": null,
+      "customfield_11234": null,
+      "customfield_10300": null,
+      "customfield_11235": null,
+      "customfield_11236": null,
+      "customfield_11105": null,
+      "customfield_11226": null,
+      "customfield_11227": null,
+      "customfield_11228": null,
+      "customfield_11229": null,
+      "updated": "2025-06-17T10:48:12.716-0700",
+      "timeoriginalestimate": null,
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hello Umair,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Please set up Zendesk access for Kara Bates ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@digitalremedy.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@digitalremedy.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "], Sr. Manager AdOps, who will join Jeff Barry’s team. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "If needed so that this user has access to Sinclair SSO and MS suite, then she has ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@sbgtv.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@sbgtv.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "]"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Kindly note that all outlook [@sbgtv.com] is now forwarded to the new google gmail [@digitalremedy.com]."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Thanks,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Joanna"
+              }
+            ]
+          }
+        ]
+      },
+      "customfield_11220": null,
+      "customfield_11100": null,
+      "customfield_11221": null,
+      "customfield_11222": null,
+      "customfield_11101": null,
+      "customfield_11223": null,
+      "customfield_11102": null,
+      "customfield_11103": null,
+      "customfield_11104": null,
+      "timetracking": {},
+      "customfield_11225": null,
+      "customfield_11215": null,
+      "customfield_11216": null,
+      "customfield_10007": null,
+      "security": null,
+      "customfield_11217": null,
+      "customfield_10008": null,
+      "customfield_11218": null,
+      "customfield_10800": null,
+      "customfield_11219": null,
+      "attachment": [],
+      "summary": "Please set up Zendesk access for new hire ",
+      "customfield_11210": null,
+      "customfield_10000": "10943_*:*_1_*:*_108778_*|*_3_*:*_1_*:*_0",
+      "customfield_10001": null,
+      "customfield_11212": null,
+      "customfield_10002": null,
+      "customfield_10003": null,
+      "customfield_11213": null,
+      "customfield_10400": null,
+      "customfield_10004": null,
+      "customfield_11205": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/customFieldOption/10202",
+        "value": "Sev3",
+        "id": "10202"
+      },
+      "environment": null,
+      "customfield_11208": null,
+      "duedate": null,
+      "comment": {
+        "comments": [],
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826/comment",
+        "maxResults": 0,
+        "total": 0,
+        "startAt": 0
+      }
+    }
+  },
+  "attachmentTicket": {
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations,customfield_10900.requestTypePractice,customfield_11239.properties,customfield_10300.properties,customfield_10400.properties",
+    "id": "85826",
+    "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826",
+    "key": "PROD-9733",
+    "fields": {
+      "statuscategorychangedate": "2025-06-17T10:16:14.164-0700",
+      "customfield_11280": null,
+      "customfield_11282": null,
+      "customfield_11283": null,
+      "fixVersions": [],
+      "customfield_11200": null,
+      "statusCategory": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+        "id": 3,
+        "key": "done",
+        "colorName": "green",
+        "name": "Done"
+      },
+      "resolution": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/resolution/1",
+        "id": "1",
+        "description": "A fix for this issue is checked into the tree and tested.",
+        "name": "Fixed"
+      },
+      "customfield_11201": null,
+      "customfield_11202": null,
+      "customfield_10500": null,
+      "customfield_10900": null,
+      "customfield_10901": [],
+      "customfield_10902": null,
+      "customfield_10903": null,
+      "customfield_10904": [],
+      "lastViewed": null,
+      "customfield_11270": null,
+      "priority": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/priority/10003",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/priorities/minor.svg",
+        "name": "P4",
+        "id": "10003"
+      },
+      "customfield_10100": null,
+      "customfield_11279": null,
+      "labels": [],
+      "timeestimate": null,
+      "aggregatetimeoriginalestimate": null,
+      "versions": [],
+      "issuelinks": [],
+      "assignee": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "status": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/status/5",
+        "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+        "iconUrl": "https://extendtv.atlassian.net/images/icons/statuses/resolved.png",
+        "name": "Resolved",
+        "id": "5",
+        "statusCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/statuscategory/3",
+          "id": 3,
+          "key": "done",
+          "colorName": "green",
+          "name": "Done"
+        }
+      },
+      "components": [],
+      "customfield_11269": null,
+      "customfield_10600": {
+        "hasEpicLinkFieldDependency": false,
+        "showField": false,
+        "nonEditableReason": {
+          "reason": "EPIC_LINK_SHOULD_BE_USED",
+          "message": "To set an epic as the parent, use the epic link instead"
+        }
+      },
+      "aggregatetimeestimate": null,
+      "creator": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "subtasks": [],
+      "customfield_11251": null,
+      "customfield_11252": null,
+      "reporter": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3A880786a2-1714-462b-bb72-5e136139b2c9",
+        "accountId": "712020:880786a2-1714-462b-bb72-5e136139b2c9",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "24x24": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "16x16": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png",
+          "32x32": "https://secure.gravatar.com/avatar/38d905d5dbb805914f33c6d5177ca7e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJN-5.png"
+        },
+        "displayName": "Joanna Napies",
+        "active": true,
+        "timeZone": "America/Los_Angeles",
+        "accountType": "atlassian"
+      },
+      "aggregateprogress": {
+        "progress": 0,
+        "total": 0
+      },
+      "customfield_10200": "0|i07tuo:",
+      "customfield_11248": 0.7,
+      "progress": {
+        "progress": 0,
+        "total": 0
+      },
+      "votes": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/PROD-9733/votes",
+        "votes": 0,
+        "hasVoted": false
+      },
+      "worklog": {
+        "startAt": 0,
+        "maxResults": 20,
+        "total": 0,
+        "worklogs": []
+      },
+      "issuetype": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issuetype/3",
+        "id": "3",
+        "description": "A task that needs to be done.",
+        "iconUrl": "https://extendtv.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10818?size=medium",
+        "name": "Task",
+        "subtask": false,
+        "avatarId": 10818,
+        "hierarchyLevel": 0
+      },
+      "timespent": null,
+      "customfield_11240": null,
+      "project": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/project/13600",
+        "id": "13600",
+        "key": "PROD",
+        "name": "Production",
+        "projectTypeKey": "software",
+        "simplified": false,
+        "avatarUrls": {
+          "48x48": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503",
+          "24x24": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=small",
+          "16x16": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=xsmall",
+          "32x32": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/11503?size=medium"
+        },
+        "projectCategory": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/projectCategory/10001",
+          "id": "10001",
+          "description": "",
+          "name": "Engineering & Technology"
+        }
+      },
+      "customfield_11241": null,
+      "customfield_11242": null,
+      "customfield_11000": null,
+      "customfield_11001": null,
+      "customfield_11243": null,
+      "aggregatetimespent": null,
+      "customfield_11002": null,
+      "customfield_11244": null,
+      "customfield_11245": null,
+      "customfield_11246": null,
+      "customfield_11247": null,
+      "customfield_11237": "",
+      "customfield_11238": 0,
+      "customfield_10700": "{}",
+      "customfield_11239": null,
+      "resolutiondate": "2025-06-17T10:16:14.018-0700",
+      "workratio": -1,
+      "watches": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/PROD-9733/watchers",
+        "watchCount": 2,
+        "isWatching": false
+      },
+      "created": "2025-06-17T10:13:55.533-0700",
+      "customfield_11232": null,
+      "customfield_11233": null,
+      "customfield_11234": null,
+      "customfield_10300": null,
+      "customfield_11235": null,
+      "customfield_11236": null,
+      "customfield_11105": null,
+      "customfield_11226": null,
+      "customfield_11227": null,
+      "customfield_11228": null,
+      "customfield_11229": null,
+      "updated": "2025-06-17T10:48:12.716-0700",
+      "timeoriginalestimate": null,
+      "description": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hello Umair,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Please set up Zendesk access for Kara Bates ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@digitalremedy.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@digitalremedy.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "], Sr. Manager AdOps, who will join Jeff Barry’s team. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "If needed so that this user has access to Sinclair SSO and MS suite, then she has ["
+              },
+              {
+                "type": "text",
+                "text": "kbates@sbgtv.com",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "mailto:kbates@sbgtv.com"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "]"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Kindly note that all outlook [@sbgtv.com] is now forwarded to the new google gmail [@digitalremedy.com]."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Thanks,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Joanna"
+              }
+            ]
+          }
+        ]
+      },
+      "customfield_11220": null,
+      "customfield_11100": null,
+      "customfield_11221": null,
+      "customfield_11222": null,
+      "customfield_11101": null,
+      "customfield_11223": null,
+      "customfield_11102": null,
+      "customfield_11103": null,
+      "customfield_11104": null,
+      "timetracking": {},
+      "customfield_11225": null,
+      "customfield_11215": null,
+      "customfield_11216": null,
+      "customfield_10007": null,
+      "security": null,
+      "customfield_11217": null,
+      "customfield_10008": null,
+      "customfield_11218": null,
+      "customfield_10800": null,
+      "customfield_11219": null,
+      "attachment": [],
+      "summary": "Please set up Zendesk access for new hire ",
+      "customfield_11210": null,
+      "customfield_10000": "10943_*:*_1_*:*_108778_*|*_3_*:*_1_*:*_0",
+      "customfield_10001": null,
+      "customfield_11212": null,
+      "customfield_10002": null,
+      "customfield_10003": null,
+      "customfield_11213": null,
+      "customfield_10400": null,
+      "customfield_10004": null,
+      "customfield_11205": {
+        "self": "https://extendtv.atlassian.net/rest/api/3/customFieldOption/10202",
+        "value": "Sev3",
+        "id": "10202"
+      },
+      "environment": null,
+      "customfield_11208": null,
+      "duedate": null,
+      "comment": {
+        "comments": [],
+        "self": "https://extendtv.atlassian.net/rest/api/3/issue/85826/comment",
+        "maxResults": 0,
+        "total": 0,
+        "startAt": 0
+      }
+    }
+  }
+}

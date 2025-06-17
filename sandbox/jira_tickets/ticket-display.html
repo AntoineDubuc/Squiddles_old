@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎫 Jira Ticket Display - Live Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0052cc 0%, #0065ff 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .ticket-key {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .ticket-summary {
+            font-size: 1.4em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .meta-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-badge {
+            background: #0052cc;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .section-content {
+            padding: 25px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .status-resolved { background: #d4edda; color: #155724; }
+        .status-open { background: #d1ecf1; color: #0c5460; }
+        .status-in-progress { background: #fff3cd; color: #856404; }
+        .status-done { background: #d4edda; color: #155724; }
+
+        /* Priority Badge */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .priority-high { background: #f8d7da; color: #721c24; }
+        .priority-medium { background: #fff3cd; color: #856404; }
+        .priority-low { background: #d4edda; color: #155724; }
+
+        /* Issue Type Badge */
+        .issue-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            background: #e7f3ff;
+            color: #0052cc;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        /* People Cards */
+        .person-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .person-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #0052cc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .person-info h4 {
+            margin: 0;
+            color: #333;
+        }
+
+        .person-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* ADF Content */
+        .adf-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .adf-summary {
+            background: #e7f3ff;
+            border-left: 4px solid #0052cc;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .adf-element {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .adf-element-type {
+            font-weight: bold;
+            color: #0052cc;
+            margin-bottom: 10px;
+        }
+
+        /* Tables */
+        .adf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .adf-table th,
+        .adf-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .adf-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        /* Code Blocks */
+        .adf-code {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        /* Links */
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .link-icon {
+            width: 40px;
+            height: 40px;
+            background: #0052cc;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Attachments */
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .attachment-icon {
+            width: 40px;
+            height: 40px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .attachment-info h4 {
+            margin: 0;
+            color: #333;
+        }
+
+        .attachment-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Labels */
+        .label {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .ticket-key {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0052cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="ticket-key" id="ticketKey">Loading...</div>
+                <div class="ticket-summary" id="ticketSummary">Loading ticket data...</div>
+                <div class="header-meta" id="headerMeta">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading ticket information...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content" id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                Parsing ticket data...
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Generated from live Jira data • <span id="extractedDate"></span></p>
+            <p>Data source: <span id="jiraHost"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Ticket data will be loaded here
+        let ticketData = null;
+
+        // Load ticket data and media downloads
+        async function loadTicketData() {
+            try {
+                const response = await fetch('./ticket-display-data.json');
+                ticketData = await response.json();
+                
+                // Also try to load media downloads data
+                try {
+                    const mediaResponse = await fetch('./ticket-media-downloads.json');
+                    ticketData.mediaDownloads = await mediaResponse.json();
+                    console.log('✅ Loaded media downloads:', ticketData.mediaDownloads);
+                } catch (mediaError) {
+                    console.log('ℹ️  No media downloads available');
+                    ticketData.mediaDownloads = null;
+                }
+                
+                renderTicket();
+            } catch (error) {
+                console.error('Failed to load ticket data:', error);
+                document.getElementById('content').innerHTML = 
+                    '<div class="empty-state">❌ Failed to load ticket data. Please ensure ticket-display-data.json is available.</div>';
+            }
+        }
+
+        // Render the ticket
+        function renderTicket() {
+            if (!ticketData) return;
+
+            // Update header
+            document.getElementById('ticketKey').textContent = ticketData.key;
+            document.getElementById('ticketSummary').textContent = ticketData.summary;
+            document.getElementById('extractedDate').textContent = new Date(ticketData.extractedAt).toLocaleString();
+            document.getElementById('jiraHost').textContent = ticketData.url;
+
+            // Update header meta
+            const headerMeta = document.getElementById('headerMeta');
+            headerMeta.innerHTML = `
+                <div class="meta-item">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value">
+                        <span class="status-badge status-${getStatusClass(ticketData.status?.name)}">
+                            ${ticketData.status?.name || 'Unknown'}
+                        </span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Priority</div>
+                    <div class="meta-value">
+                        <span class="priority-badge priority-${getPriorityClass(ticketData.priority?.name)}">
+                            ${ticketData.priority?.name || 'Unknown'}
+                        </span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Type</div>
+                    <div class="meta-value">
+                        <span class="issue-type-badge">
+                            ${ticketData.issueType?.name || 'Unknown'}
+                        </span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Project</div>
+                    <div class="meta-value">${ticketData.project?.name || 'Unknown'}</div>
+                </div>
+            `;
+
+            // Render content sections
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+
+            // Basic Information Section
+            content.appendChild(createBasicInfoSection());
+
+            // Description Section
+            if (ticketData.description) {
+                content.appendChild(createDescriptionSection());
+            }
+
+            // People Section
+            content.appendChild(createPeopleSection());
+
+            // Metadata Section
+            content.appendChild(createMetadataSection());
+
+            // Relationships Section
+            if (ticketData.issuelinks.length > 0 || ticketData.subtasks.length > 0) {
+                content.appendChild(createRelationshipsSection());
+            }
+
+            // Attachments Section
+            if (ticketData.attachments.length > 0) {
+                content.appendChild(createAttachmentsSection());
+            }
+
+            // Comments Section
+            if (ticketData.commentsTotal > 0) {
+                content.appendChild(createCommentsSection());
+            }
+        }
+
+        // Helper functions for CSS classes
+        function getStatusClass(status) {
+            if (!status) return 'unknown';
+            const s = status.toLowerCase();
+            if (s.includes('done') || s.includes('resolved') || s.includes('closed')) return 'resolved';
+            if (s.includes('progress') || s.includes('review')) return 'in-progress';
+            return 'open';
+        }
+
+        function getPriorityClass(priority) {
+            if (!priority) return 'medium';
+            const p = priority.toLowerCase();
+            if (p.includes('high') || p.includes('critical') || p.includes('blocker') || p.includes('p1') || p.includes('p2')) return 'high';
+            if (p.includes('low') || p.includes('minor') || p.includes('p5')) return 'low';
+            return 'medium';
+        }
+
+        // Section creators
+        function createBasicInfoSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        📋 Basic Information
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div>
+                            <h4>Dates</h4>
+                            <p><strong>Created:</strong> ${formatDate(ticketData.created)}</p>
+                            <p><strong>Updated:</strong> ${formatDate(ticketData.updated)}</p>
+                            ${ticketData.resolutiondate ? `<p><strong>Resolved:</strong> ${formatDate(ticketData.resolutiondate)}</p>` : ''}
+                        </div>
+                        <div>
+                            <h4>Engagement</h4>
+                            <p><strong>Comments:</strong> ${ticketData.commentsTotal}</p>
+                            <p><strong>Attachments:</strong> ${ticketData.attachments.length}</p>
+                            <p><strong>Links:</strong> ${ticketData.issuelinks.length}</p>
+                            <p><strong>Subtasks:</strong> ${ticketData.subtasks.length}</p>
+                        </div>
+                        <div>
+                            <h4>Direct Link</h4>
+                            <a href="${ticketData.url}" target="_blank" style="color: #0052cc; text-decoration: none;">
+                                🔗 View in Jira
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function createDescriptionSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            const analysis = ticketData.descriptionAnalysis;
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        📝 Description
+                        <span class="section-badge">${analysis.hasADF ? 'ADF Format' : 'Plain Text'}</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="adf-summary">
+                        <strong>Content Summary:</strong> ${analysis.contentSummary}
+                    </div>
+                    ${analysis.hasADF ? renderADFContent() : renderPlainContent()}
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function renderADFContent() {
+            const analysis = ticketData.descriptionAnalysis;
+            
+            // First show the actual description content
+            let html = `
+                <div style="margin-bottom: 30px;">
+                    <h4>📖 Description Content</h4>
+                    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: #fafafa; font-size: 1.1em; line-height: 1.6;">
+                        ${renderDescriptionText()}
+                    </div>
+                </div>
+            `;
+            
+            // Then show technical analysis
+            html += `
+                <div class="adf-content">
+                    <h4>🔧 Technical Analysis</h4>
+                    <p><strong>Node Types Found:</strong> ${analysis.structure.nodeTypes.join(', ')}</p>
+                    <p><strong>Total Nodes:</strong> ${analysis.structure.nodeCount}</p>
+                    <p><strong>Text Length:</strong> ${analysis.structure.textLength} characters</p>
+            `;
+            
+            if (analysis.structure.elements.length > 0) {
+                html += `
+                    <h4 style="margin-top: 20px;">📋 Rich Elements</h4>
+                `;
+                
+                analysis.structure.elements.forEach((element, index) => {
+                    html += renderADFElement(element, index);
+                });
+            } else {
+                html += `<p><em>No special elements found - content is primarily text and paragraphs.</em></p>`;
+            }
+            
+            html += `</div>`;
+            
+            // Also show rendered HTML if available
+            if (ticketData.renderedFields && ticketData.renderedFields.description) {
+                html += `
+                    <div style="margin-top: 20px;">
+                        <h4>🎨 Jira Rendered HTML</h4>
+                        <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; background: #fafafa;">
+                            ${ticketData.renderedFields.description}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+
+        function renderADFElement(element, index) {
+            let html = `
+                <div class="adf-element">
+                    <div class="adf-element-type">${getElementIcon(element.type)} ${element.type.toUpperCase()}</div>
+            `;
+            
+            switch (element.type) {
+                case 'mention':
+                    html += `
+                        <p><strong>User:</strong> ${element.data.displayName || element.data.userId}</p>
+                        ${element.data.userType ? `<p><strong>Type:</strong> ${element.data.userType}</p>` : ''}
+                    `;
+                    break;
+                case 'table':
+                    html += renderTableElement(element.data);
+                    break;
+                case 'media':
+                    // Try to find downloaded media file that matches this ADF media node
+                    let mediaDisplay = `
+                        <p><strong>Media ID:</strong> ${element.data.id || 'Unknown'}</p>
+                        ${element.data.fileName ? `<p><strong>File:</strong> ${element.data.fileName}</p>` : ''}
+                        ${element.data.mimeType ? `<p><strong>Type:</strong> ${element.data.mimeType}</p>` : ''}
+                    `;
+                    
+                    // Check if we have a downloaded file that matches
+                    if (ticketData.mediaDownloads && element.data.id) {
+                        const matchingAttachment = ticketData.attachments.find(att => 
+                            att.filename && (
+                                att.filename.includes(element.data.id) || 
+                                element.data.id.includes(att.id)
+                            )
+                        );
+                        
+                        if (matchingAttachment) {
+                            const downloadedFile = ticketData.mediaDownloads.files.find(f => f.id === matchingAttachment.id);
+                            if (downloadedFile && downloadedFile.isImage) {
+                                mediaDisplay += `
+                                    <div style="margin-top: 15px; text-align: center;">
+                                        <img src="${downloadedFile.webPath}" alt="${downloadedFile.filename}" 
+                                             style="max-width: 400px; max-height: 300px; border: 1px solid #ddd; border-radius: 5px;">
+                                        <div style="margin-top: 5px; font-size: 0.8em; color: #666;">
+                                            📷 ${downloadedFile.filename}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                    
+                    html += mediaDisplay;
+                    break;
+                case 'status':
+                    html += `
+                        <p><strong>Status:</strong> ${element.data.text}</p>
+                        ${element.data.color ? `<p><strong>Color:</strong> ${element.data.color}</p>` : ''}
+                    `;
+                    break;
+                case 'link':
+                    html += `
+                        <p><strong>URL:</strong> <a href="${element.data.url}" target="_blank">${element.data.url}</a></p>
+                        ${element.data.title ? `<p><strong>Title:</strong> ${element.data.title}</p>` : ''}
+                    `;
+                    break;
+                case 'code':
+                    html += `
+                        ${element.data.language ? `<p><strong>Language:</strong> ${element.data.language}</p>` : ''}
+                        <div class="adf-code">${escapeHtml(element.data.content)}</div>
+                    `;
+                    break;
+                default:
+                    html += `<p>Element data: ${JSON.stringify(element.data, null, 2)}</p>`;
+            }
+            
+            html += `</div>`;
+            return html;
+        }
+
+        function renderTableElement(tableData) {
+            let html = `
+                <p><strong>Table:</strong> ${tableData.rows.length} rows × ${tableData.columnCount} columns</p>
+                <table class="adf-table">
+            `;
+            
+            tableData.rows.forEach(row => {
+                html += '<tr>';
+                row.cells.forEach(cell => {
+                    const tag = cell.isHeader ? 'th' : 'td';
+                    html += `<${tag}>${escapeHtml(cell.content)}</${tag}>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            return html;
+        }
+
+        function renderDescriptionText() {
+            if (!ticketData.description || typeof ticketData.description !== 'object') {
+                return '<em>No description available</em>';
+            }
+            
+            // Extract text content from ADF structure
+            return extractFormattedTextFromADF(ticketData.description);
+        }
+        
+        function extractFormattedTextFromADF(adfNode) {
+            if (!adfNode || typeof adfNode !== 'object') {
+                return '';
+            }
+            
+            let html = '';
+            
+            function processNode(node, depth = 0) {
+                if (!node) return '';
+                
+                const type = node.type;
+                let content = '';
+                
+                // Handle text nodes
+                if (node.text) {
+                    let text = escapeHtml(node.text);
+                    
+                    // Apply text formatting
+                    if (node.marks && Array.isArray(node.marks)) {
+                        node.marks.forEach(mark => {
+                            switch (mark.type) {
+                                case 'strong':
+                                    text = `<strong>${text}</strong>`;
+                                    break;
+                                case 'em':
+                                    text = `<em>${text}</em>`;
+                                    break;
+                                case 'code':
+                                    text = `<code style="background: #f1f1f1; padding: 2px 4px; border-radius: 3px;">${text}</code>`;
+                                    break;
+                                case 'underline':
+                                    text = `<u>${text}</u>`;
+                                    break;
+                                case 'strike':
+                                    text = `<del>${text}</del>`;
+                                    break;
+                            }
+                        });
+                    }
+                    
+                    return text;
+                }
+                
+                // Process child content
+                if (node.content && Array.isArray(node.content)) {
+                    content = node.content.map(child => processNode(child, depth + 1)).join('');
+                }
+                
+                // Handle different node types
+                switch (type) {
+                    case 'doc':
+                        return content;
+                    case 'paragraph':
+                        return `<p style="margin: 10px 0;">${content}</p>`;
+                    case 'heading':
+                        const level = Math.min(node.attrs?.level || 1, 6);
+                        return `<h${level} style="margin: 15px 0 10px 0; color: #333;">${content}</h${level}>`;
+                    case 'bulletList':
+                        return `<ul style="margin: 10px 0; padding-left: 20px;">${content}</ul>`;
+                    case 'orderedList':
+                        return `<ol style="margin: 10px 0; padding-left: 20px;">${content}</ol>`;
+                    case 'listItem':
+                        return `<li style="margin: 5px 0;">${content}</li>`;
+                    case 'blockquote':
+                        return `<blockquote style="border-left: 3px solid #ccc; margin: 15px 0; padding: 10px 15px; background: #f9f9f9;">${content}</blockquote>`;
+                    case 'codeBlock':
+                        const language = node.attrs?.language || '';
+                        return `<pre style="background: #f5f5f5; border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin: 15px 0; overflow-x: auto;"><code>${content}</code></pre>`;
+                    case 'hardBreak':
+                        return '<br>';
+                    case 'rule':
+                        return '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
+                    case 'mention':
+                        const displayName = node.attrs?.text || node.attrs?.displayName || 'Unknown User';
+                        return `<span style="background: #e7f3ff; color: #0052cc; padding: 2px 6px; border-radius: 12px; font-weight: bold;">@${displayName}</span>`;
+                    case 'emoji':
+                        return node.attrs?.shortName || '😊';
+                    case 'status':
+                        const statusText = node.attrs?.text || 'Status';
+                        const statusColor = node.attrs?.color || 'neutral';
+                        return `<span style="background: #f0f0f0; color: #333; padding: 3px 8px; border-radius: 3px; font-size: 0.9em; font-weight: bold;">${statusText}</span>`;
+                    case 'table':
+                        return `<table style="border-collapse: collapse; width: 100%; margin: 15px 0; border: 1px solid #ddd;">${content}</table>`;
+                    case 'tableRow':
+                        return `<tr>${content}</tr>`;
+                    case 'tableCell':
+                        return `<td style="border: 1px solid #ddd; padding: 8px;">${content}</td>`;
+                    case 'tableHeader':
+                        return `<th style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa; font-weight: bold;">${content}</th>`;
+                    case 'mediaSingle':
+                        return `<div style="margin: 20px 0; text-align: center;">${content}</div>`;
+                    case 'mediaGroup':
+                        return `<div style="margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap;">${content}</div>`;
+                    case 'media':
+                        return renderInlineMedia(node);
+                    case 'inlineCard':
+                        const url = node.attrs?.url || '#';
+                        const title = node.attrs?.title || url;
+                        return `<a href="${url}" target="_blank" style="color: #0052cc; text-decoration: none; background: #f0f8ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;">🔗 ${title}</a>`;
+                    case 'panel':
+                        const panelType = node.attrs?.panelType || 'info';
+                        const bgColor = panelType === 'warning' ? '#fff3cd' : panelType === 'error' ? '#f8d7da' : '#d1ecf1';
+                        return `<div style="background: ${bgColor}; border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin: 15px 0;">${content}</div>`;
+                    default:
+                        return content;
+                }
+            }
+            
+            return processNode(adfNode);
+        }
+
+        function renderInlineMedia(mediaNode) {
+            const mediaId = mediaNode.attrs?.id;
+            const fileName = mediaNode.attrs?.fileName || mediaNode.attrs?.alt || 'Media File';
+            const mimeType = mediaNode.attrs?.mimeType;
+            
+            // Try to find a matching downloaded file
+            if (ticketData.mediaDownloads && ticketData.mediaDownloads.files) {
+                let downloadedFile = null;
+                
+                // Method 1: Try to find by matching filename (including alt text)
+                if (fileName && fileName !== 'Media File') {
+                    downloadedFile = ticketData.mediaDownloads.files.find(f => 
+                        f.filename.toLowerCase() === fileName.toLowerCase() ||
+                        f.safeFilename.toLowerCase() === fileName.toLowerCase() ||
+                        fileName.toLowerCase().includes(f.filename.toLowerCase()) ||
+                        f.filename.toLowerCase().includes(fileName.toLowerCase())
+                    );
+                }
+                
+                // Method 2: Try to match by attachment ID through attachment list
+                if (!downloadedFile && mediaId) {
+                    const matchingAttachment = ticketData.attachments.find(att => 
+                        att.id === mediaId || 
+                        (att.filename && att.filename.includes(mediaId)) ||
+                        (mediaId.includes && typeof mediaId === 'string' && mediaId.includes(att.id))
+                    );
+                    
+                    if (matchingAttachment) {
+                        downloadedFile = ticketData.mediaDownloads.files.find(f => f.id === matchingAttachment.id);
+                    }
+                }
+                
+                // Method 3: If we have alt text that matches a filename, use it
+                if (!downloadedFile && mediaNode.attrs?.alt) {
+                    const altText = mediaNode.attrs.alt;
+                    downloadedFile = ticketData.mediaDownloads.files.find(f => 
+                        f.filename.toLowerCase() === altText.toLowerCase() ||
+                        altText.toLowerCase().includes(f.filename.toLowerCase()) ||
+                        f.filename.toLowerCase().includes(altText.toLowerCase())
+                    );
+                }
+                
+                // Method 4: If still no match and we only have one image, use it (likely the right one)
+                if (!downloadedFile && ticketData.mediaDownloads.files.length === 1) {
+                    const singleFile = ticketData.mediaDownloads.files[0];
+                    if (singleFile.isImage) {
+                        downloadedFile = singleFile;
+                    }
+                }
+                
+                // If we found a downloaded file, render it
+                if (downloadedFile) {
+                    if (downloadedFile.isImage) {
+                        return `
+                            <div style="margin: 20px 0; text-align: center; border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: #fafafa;">
+                                <img src="${downloadedFile.webPath}" alt="${downloadedFile.filename}" 
+                                     style="max-width: 100%; max-height: 500px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <div style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                                    📷 ${downloadedFile.filename} (${formatFileSize(downloadedFile.downloadedSize)})
+                                </div>
+                                <div style="margin-top: 5px;">
+                                    <a href="${downloadedFile.webPath}" target="_blank" style="color: #0052cc; text-decoration: none; font-size: 0.8em;">
+                                        🔍 View Full Size
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    } else if (downloadedFile.isVideo) {
+                        return `
+                            <div style="margin: 20px 0; text-align: center; border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: #fafafa;">
+                                <video controls style="max-width: 100%; max-height: 400px; border: 1px solid #ccc; border-radius: 5px;">
+                                    <source src="${downloadedFile.webPath}" type="${downloadedFile.mimeType}">
+                                    Your browser does not support video playback.
+                                </video>
+                                <div style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                                    🎥 ${downloadedFile.filename} (${formatFileSize(downloadedFile.downloadedSize)})
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div style="margin: 15px 0; padding: 15px; background: #f0f8ff; border: 1px solid #ddd; border-radius: 5px; text-align: center;">
+                                <div style="margin-bottom: 10px;">
+                                    📎 ${downloadedFile.filename}
+                                </div>
+                                <a href="${downloadedFile.webPath}" target="_blank" style="color: #0052cc; text-decoration: none;">
+                                    📥 Download (${formatFileSize(downloadedFile.downloadedSize)})
+                                </a>
+                            </div>
+                        `;
+                    }
+                }
+            }
+            
+            // Fallback: show media placeholder if no downloaded file found
+            return `
+                <div style="margin: 15px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; text-align: center;">
+                    <div style="color: #856404;">📎 ${fileName}</div>
+                    ${mimeType ? `<div style="font-size: 0.8em; color: #666; margin-top: 5px;">${mimeType}</div>` : ''}
+                    <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                        ${mediaId ? `Media ID: ${mediaId}` : 'Media not downloaded'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlainContent() {
+            return `<div class="adf-content">Plain text description format detected.</div>`;
+        }
+
+        function createPeopleSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        👥 People
+                    </div>
+                </div>
+                <div class="section-content">
+                    ${createPersonCard('Reporter', ticketData.reporter)}
+                    ${createPersonCard('Assignee', ticketData.assignee)}
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function createPersonCard(role, person) {
+            if (!person) {
+                return `
+                    <div class="person-card">
+                        <div class="person-avatar">?</div>
+                        <div class="person-info">
+                            <h4>${role}</h4>
+                            <p>Unassigned</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const initials = person.displayName.split(' ').map(n => n[0]).join('').substring(0, 2);
+            
+            return `
+                <div class="person-card">
+                    <div class="person-avatar">${initials}</div>
+                    <div class="person-info">
+                        <h4>${role}: ${person.displayName}</h4>
+                        <p>${person.emailAddress}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createMetadataSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        🏷️ Metadata
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div>
+                            <h4>Labels</h4>
+                            ${ticketData.labels.length > 0 ? 
+                                ticketData.labels.map(label => `<span class="label">${label}</span>`).join('') :
+                                '<p><em>No labels</em></p>'
+                            }
+                        </div>
+                        <div>
+                            <h4>Components</h4>
+                            ${ticketData.components.length > 0 ? 
+                                ticketData.components.map(comp => `<span class="label">${comp.name}</span>`).join('') :
+                                '<p><em>No components</em></p>'
+                            }
+                        </div>
+                        <div>
+                            <h4>Fix Versions</h4>
+                            ${ticketData.fixVersions.length > 0 ? 
+                                ticketData.fixVersions.map(ver => `<span class="label">${ver.name}</span>`).join('') :
+                                '<p><em>No fix versions</em></p>'
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function createRelationshipsSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            let content = '';
+            
+            if (ticketData.issuelinks.length > 0) {
+                content += `
+                    <h4>🔗 Linked Issues</h4>
+                    ${ticketData.issuelinks.map(link => `
+                        <div class="link-item">
+                            <div class="link-icon">${link.direction === 'outward' ? '→' : '←'}</div>
+                            <div>
+                                <h4>${link.type} (${link.direction})</h4>
+                                <p>${link.linkedIssue.key}: ${link.linkedIssue.fields.summary}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            if (ticketData.subtasks.length > 0) {
+                content += `
+                    <h4 style="margin-top: 30px;">📋 Subtasks</h4>
+                    ${ticketData.subtasks.map(subtask => `
+                        <div class="link-item">
+                            <div class="link-icon">📝</div>
+                            <div>
+                                <h4>${subtask.key} - ${subtask.issueType}</h4>
+                                <p>${subtask.summary} (${subtask.status})</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        🔗 Relationships
+                    </div>
+                </div>
+                <div class="section-content">
+                    ${content}
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function createAttachmentsSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            let attachmentContent = '';
+            
+            ticketData.attachments.forEach(att => {
+                const downloadedFile = ticketData.mediaDownloads ? 
+                    ticketData.mediaDownloads.files.find(f => f.id === att.id) : null;
+                
+                if (downloadedFile && downloadedFile.isImage) {
+                    // Render actual image
+                    attachmentContent += `
+                        <div class="attachment-item" style="flex-direction: column; align-items: flex-start;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                <div class="attachment-icon">${getFileIcon(att.mimeType)}</div>
+                                <div class="attachment-info">
+                                    <h4>${att.filename}</h4>
+                                    <p>${formatFileSize(att.size)} • ${att.mimeType} • Added by ${att.author} on ${formatDate(att.created)}</p>
+                                </div>
+                            </div>
+                            <div style="max-width: 100%; text-align: center;">
+                                <img src="${downloadedFile.webPath}" alt="${att.filename}" 
+                                     style="max-width: 800px; max-height: 600px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                <div style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                                    📥 Downloaded: ${formatFileSize(downloadedFile.downloadedSize)} • 
+                                    <a href="${downloadedFile.webPath}" target="_blank" style="color: #0052cc;">View Full Size</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Standard attachment display
+                    attachmentContent += `
+                        <div class="attachment-item">
+                            <div class="attachment-icon">${getFileIcon(att.mimeType)}</div>
+                            <div class="attachment-info">
+                                <h4>${att.filename}</h4>
+                                <p>${formatFileSize(att.size)} • ${att.mimeType} • Added by ${att.author} on ${formatDate(att.created)}</p>
+                                ${downloadedFile ? `<p style="color: #28a745;">✅ Downloaded as: ${downloadedFile.safeFilename}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        📎 Attachments
+                        <span class="section-badge">${ticketData.attachments.length}</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    ${attachmentContent}
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function createCommentsSection() {
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            // Check if we have detailed comment data
+            const hasDetailedComments = ticketData.comments && Array.isArray(ticketData.comments);
+            
+            let commentsContent = '';
+            
+            if (hasDetailedComments && ticketData.comments.length > 0) {
+                commentsContent = ticketData.comments.map((comment, index) => {
+                    const author = comment.author || {};
+                    const authorInitials = author.displayName ? 
+                        author.displayName.split(' ').map(n => n[0]).join('').substring(0, 2) : '?';
+                    
+                    return `
+                        <div class="comment-item" style="margin-bottom: 25px; border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden;">
+                            <div class="comment-header" style="background: #f8f9fa; padding: 15px; border-bottom: 1px solid #e9ecef; display: flex; align-items: center; gap: 15px;">
+                                <div class="person-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: #0052cc; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                    ${authorInitials}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: bold; color: #333;">${author.displayName || 'Unknown User'}</div>
+                                    <div style="font-size: 0.9em; color: #666;">${formatDate(comment.created)}</div>
+                                </div>
+                                <div style="font-size: 0.8em; color: #666;">
+                                    #${index + 1}
+                                </div>
+                            </div>
+                            <div class="comment-content" style="padding: 20px;">
+                                ${renderCommentBody(comment.body)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Fallback when we only have comment count
+                commentsContent = `
+                    <div style="text-align: center; padding: 40px; color: #666; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">💬</div>
+                        <div>This ticket has ${ticketData.commentsTotal} comment${ticketData.commentsTotal !== 1 ? 's' : ''}</div>
+                        <div style="font-size: 0.9em; margin-top: 5px;">
+                            Comment details not available in current data extraction
+                        </div>
+                    </div>
+                `;
+            }
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-title">
+                        💬 Comments
+                        <span class="section-badge">${ticketData.commentsTotal}</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    ${commentsContent}
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function renderCommentBody(commentBody) {
+            if (!commentBody) {
+                return '<em>No comment content</em>';
+            }
+            
+            // If it's ADF format, render it
+            if (typeof commentBody === 'object' && commentBody.type === 'doc') {
+                return extractFormattedTextFromADF(commentBody);
+            }
+            
+            // If it's plain text, escape and format
+            if (typeof commentBody === 'string') {
+                return `<p>${escapeHtml(commentBody)}</p>`;
+            }
+            
+            // Fallback
+            return '<em>Comment format not supported</em>';
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleString();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(mimeType) {
+            if (!mimeType) return '📄';
+            if (mimeType.startsWith('image/')) return '🖼️';
+            if (mimeType.startsWith('video/')) return '🎥';
+            if (mimeType.startsWith('audio/')) return '🔊';
+            if (mimeType.includes('pdf')) return '📕';
+            if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
+            if (mimeType.includes('word') || mimeType.includes('document')) return '📝';
+            return '📄';
+        }
+
+        function getElementIcon(type) {
+            const icons = {
+                'mention': '👤',
+                'table': '📊',
+                'media': '🖼️',
+                'status': '🏷️',
+                'link': '🔗',
+                'code': '💻'
+            };
+            return icons[type] || '📋';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize the page
+        loadTicketData();
+    </script>
+</body>
+</html>

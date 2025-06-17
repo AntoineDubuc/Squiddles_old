@@ -3,7 +3,7 @@
  * Implements TICKET-001: Mock user data for development
  */
 
-import { User } from '@/app/types/ui-models';
+import { User } from '@/app/types';
 
 export const MOCK_USERS: User[] = [
   {

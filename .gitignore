@@ -64,3 +64,5 @@ temp/
 
 # Turbo
 .turbo
+# Development archive (optional - can be committed)
+# development-archive/

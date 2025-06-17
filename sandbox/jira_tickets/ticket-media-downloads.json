@@ -1,0 +1,22 @@
+{
+  "ticketKey": "DE-3081",
+  "downloadedAt": "2025-06-17T21:36:01.794Z",
+  "totalFiles": 1,
+  "files": [
+    {
+      "id": "79075",
+      "filename": "pacing_sheet_add_data.jpg",
+      "safeFilename": "pacing_sheet_add_data.jpg",
+      "mimeType": "image/jpeg",
+      "originalSize": 209531,
+      "downloadedSize": 209531,
+      "outputPath": "/Users/antoinedubuc/Squiddles/sandbox/jira_tickets/ticket-media/pacing_sheet_add_data.jpg",
+      "webPath": "/ticket-media/pacing_sheet_add_data.jpg",
+      "ticketKey": "DE-3081",
+      "isImage": true,
+      "isVideo": false,
+      "isAudio": false,
+      "downloadedAt": "2025-06-17T21:36:01.291Z"
+    }
+  ]
+}

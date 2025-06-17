@@ -3,7 +3,7 @@
  * Implements TICKET-001: Enhanced User Types and Authentication
  */
 
-import { User, UserPreferences } from '@/app/types/ui-models';
+import { User, UserPreferences } from '@/app/types';
 import { MOCK_USERS, validateMockCredentials } from '@/lib/mock-data/users';
 
 

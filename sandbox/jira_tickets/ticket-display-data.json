@@ -1,0 +1,1272 @@
+{
+  "key": "DE-3081",
+  "id": "81169",
+  "url": "https://extendtv.atlassian.net/browse/DE-3081",
+  "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169",
+  "summary": "Add Data Column in Pacing Sheet: 11/13",
+  "description": {
+    "type": "doc",
+    "version": 1,
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Hi Engg Team,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "I hope you’re doing well"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "We are here looking for your help in adding another data column by the name: "
+          },
+          {
+            "type": "text",
+            "text": "Today, ",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "before"
+          },
+          {
+            "type": "text",
+            "text": " ",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "the yesterday’s delivery column in all the versions of the pacing sheet."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Currently, we do have 3 data columns "
+          },
+          {
+            "type": "text",
+            "text": "(yesterday/ 2 days ago/ 3 days ago",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "). So, we need to add Today delivery column also before yesterday & I think it will reflect today’s delivery data till when pacing script job starts on daily basis."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Can you please look into this request?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Thanks,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "CC "
+          },
+          {
+            "type": "mention",
+            "attrs": {
+              "id": "5a4d5c1f03ffbd29f8a4be28",
+              "text": "@Chen Cao",
+              "accessLevel": "",
+              "localId": "f248d210-7800-4f77-bae8-0debd4716cd4"
+            }
+          },
+          {
+            "type": "text",
+            "text": "  "
+          },
+          {
+            "type": "mention",
+            "attrs": {
+              "id": "60303ec17b23f400687d2547",
+              "text": "@Jeff Barry",
+              "accessLevel": "",
+              "localId": "329ce1ec-71e1-40df-9c63-b8578c5e3ec9"
+            }
+          },
+          {
+            "type": "text",
+            "text": " "
+          },
+          {
+            "type": "mention",
+            "attrs": {
+              "id": "5ddc4cb7be8a460cfe264339",
+              "text": "@Shu-Yao Chien",
+              "accessLevel": "",
+              "localId": "2db7cdf1-d93c-4269-9f8f-2cab38cc034a"
+            }
+          },
+          {
+            "type": "text",
+            "text": " "
+          },
+          {
+            "type": "mention",
+            "attrs": {
+              "id": "5c3fb404d650366f5317f10e",
+              "text": "@Vishnu Ramesh",
+              "accessLevel": "",
+              "localId": "5fe9ed0c-0005-4640-8a0f-06062fb179e6"
+            }
+          },
+          {
+            "type": "text",
+            "text": " "
+          }
+        ]
+      },
+      {
+        "type": "paragraph"
+      },
+      {
+        "type": "mediaSingle",
+        "attrs": {
+          "layout": "align-start"
+        },
+        "content": [
+          {
+            "type": "media",
+            "attrs": {
+              "type": "file",
+              "id": "8e1789bc-5922-41a5-b690-2e1ebf39f53a",
+              "alt": "pacing_sheet_add_data.jpg",
+              "collection": "",
+              "height": 684,
+              "width": 1284
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "descriptionAnalysis": {
+    "hasADF": true,
+    "structure": {
+      "nodeTypes": [
+        "doc",
+        "paragraph",
+        "text",
+        "mention",
+        "mediaSingle",
+        "media"
+      ],
+      "textLength": 488,
+      "nodeCount": 32,
+      "elements": [
+        {
+          "type": "mention",
+          "data": {
+            "userId": "5a4d5c1f03ffbd29f8a4be28",
+            "displayName": "@Chen Cao"
+          },
+          "depth": 2,
+          "path": [
+            "doc",
+            6,
+            "paragraph",
+            1,
+            "mention"
+          ]
+        },
+        {
+          "type": "mention",
+          "data": {
+            "userId": "60303ec17b23f400687d2547",
+            "displayName": "@Jeff Barry"
+          },
+          "depth": 2,
+          "path": [
+            "doc",
+            6,
+            "paragraph",
+            3,
+            "mention"
+          ]
+        },
+        {
+          "type": "mention",
+          "data": {
+            "userId": "5ddc4cb7be8a460cfe264339",
+            "displayName": "@Shu-Yao Chien"
+          },
+          "depth": 2,
+          "path": [
+            "doc",
+            6,
+            "paragraph",
+            5,
+            "mention"
+          ]
+        },
+        {
+          "type": "mention",
+          "data": {
+            "userId": "5c3fb404d650366f5317f10e",
+            "displayName": "@Vishnu Ramesh"
+          },
+          "depth": 2,
+          "path": [
+            "doc",
+            6,
+            "paragraph",
+            7,
+            "mention"
+          ]
+        },
+        {
+          "type": "media",
+          "data": {},
+          "depth": 1,
+          "path": [
+            "doc",
+            8,
+            "mediaSingle"
+          ]
+        },
+        {
+          "type": "media",
+          "data": {
+            "id": "8e1789bc-5922-41a5-b690-2e1ebf39f53a",
+            "collection": ""
+          },
+          "depth": 2,
+          "path": [
+            "doc",
+            8,
+            "mediaSingle",
+            0,
+            "media"
+          ]
+        }
+      ]
+    },
+    "contentSummary": "32 nodes, 6 types, 488 chars"
+  },
+  "status": {
+    "name": "Open",
+    "id": "10943",
+    "category": "To Do",
+    "color": "blue-gray"
+  },
+  "priority": {
+    "name": "P2",
+    "id": "10001",
+    "iconUrl": "https://extendtv.atlassian.net/images/icons/priorities/critical.svg"
+  },
+  "issueType": {
+    "name": "Story",
+    "id": "7",
+    "description": "A user story. Created by JIRA Software - do not edit or delete.",
+    "iconUrl": "https://extendtv.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10815?size=medium",
+    "subtask": false
+  },
+  "project": {
+    "key": "DE",
+    "name": "Data Engineering",
+    "id": "13827",
+    "avatarUrls": {
+      "48x48": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/12481",
+      "24x24": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/12481?size=small",
+      "16x16": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/12481?size=xsmall",
+      "32x32": "https://extendtv.atlassian.net/rest/api/3/universal_avatar/view/type/project/avatar/12481?size=medium"
+    }
+  },
+  "reporter": {
+    "displayName": "Shubham Rastogi",
+    "accountId": "5eb3991fddd45f0b943c92b5",
+    "avatarUrls": {
+      "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+      "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+      "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+      "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+    }
+  },
+  "assignee": {
+    "displayName": "Grover Rivera",
+    "accountId": "61028466979810007059a746",
+    "avatarUrls": {
+      "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/GR-0.png",
+      "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/GR-0.png",
+      "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/GR-0.png",
+      "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/GR-0.png"
+    }
+  },
+  "created": "2024-11-13T22:44:13.435-0800",
+  "updated": "2025-05-30T08:27:46.288-0700",
+  "resolutiondate": null,
+  "labels": [],
+  "components": [],
+  "fixVersions": [],
+  "issuelinks": [],
+  "subtasks": [],
+  "attachments": [
+    {
+      "id": "79075",
+      "filename": "pacing_sheet_add_data.jpg",
+      "size": 209531,
+      "mimeType": "image/jpeg",
+      "created": "2024-11-13T22:44:13.639-0800",
+      "author": "Shubham Rastogi"
+    }
+  ],
+  "commentsTotal": 5,
+  "comments": [
+    {
+      "id": "168929",
+      "author": {
+        "displayName": "Priscila Espinoza",
+        "accountId": "61028467b704b40068b5202a",
+        "avatarUrls": {
+          "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+          "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+          "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+          "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png"
+        }
+      },
+      "body": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hi "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5eb3991fddd45f0b943c92b5",
+                  "text": "@Shubham Rastogi",
+                  "accessLevel": "",
+                  "localId": "75b85afb-40f0-4a86-8702-549e1c977310"
+                }
+              },
+              {
+                "type": "text",
+                "text": " I converted this ticket to a User Story as this involves development work."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5ddc4cb7be8a460cfe264339",
+                  "text": "@Shu-Yao Chien",
+                  "accessLevel": "",
+                  "localId": "5d222393-c5a9-48bf-9c38-4f686f1e6925"
+                }
+              },
+              {
+                "type": "text",
+                "text": " can you please check this new requirement."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "cc: "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5c3fb404d650366f5317f10e",
+                  "text": "@Vishnu Ramesh",
+                  "accessLevel": "",
+                  "localId": "b0581f70-d2d8-4052-8027-2a41dc27dc64"
+                }
+              },
+              {
+                "type": "text",
+                "text": "  "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "61028466979810007059a746",
+                  "text": "@Grover Rivera",
+                  "accessLevel": "",
+                  "localId": "25a139d2-2dad-4bf1-809c-8c0b72d44f4d"
+                }
+              },
+              {
+                "type": "text",
+                "text": "  "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5a4d5c1f03ffbd29f8a4be28",
+                  "text": "@Chen Cao",
+                  "accessLevel": "",
+                  "localId": "f644f5a0-b12d-4f31-ab9b-ebca44539160"
+                }
+              },
+              {
+                "type": "text",
+                "text": " "
+              }
+            ]
+          }
+        ]
+      },
+      "created": "2024-11-14T06:51:18.188-0800",
+      "updated": "2024-11-14T06:51:18.188-0800",
+      "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/168929"
+    },
+    {
+      "id": "169989",
+      "author": {
+        "displayName": "Shubham Rastogi",
+        "accountId": "5eb3991fddd45f0b943c92b5",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+          "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+          "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+          "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+        }
+      },
+      "body": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Hi Team,"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Any update on the request raised?"
+              }
+            ]
+          }
+        ]
+      },
+      "created": "2024-11-26T09:59:27.229-0800",
+      "updated": "2024-11-26T09:59:27.229-0800",
+      "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/169989"
+    },
+    {
+      "id": "170269",
+      "author": {
+        "displayName": "Shu-Yao Chien",
+        "accountId": "5ddc4cb7be8a460cfe264339",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+          "24x24": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+          "16x16": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+          "32x32": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png"
+        }
+      },
+      "body": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5eb3991fddd45f0b943c92b5",
+                  "text": "@Shubham Rastogi",
+                  "accessLevel": "",
+                  "localId": "45be9717-bc08-4bdd-b5f3-8fc08c58c80e"
+                }
+              },
+              {
+                "type": "text",
+                "text": " , typically “today” data is not available till early “tomorrow” for processing. There is no way to provide “today” data “today” since “today data” won’t be available till “tomorrow”. "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Please let us know your thoughts? Thanks."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "cc: "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5c3fb404d650366f5317f10e",
+                  "text": "@Vishnu Ramesh",
+                  "accessLevel": "",
+                  "localId": "f8f391cc-f42c-40fe-b876-3c9271c4d157"
+                }
+              },
+              {
+                "type": "text",
+                "text": " "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "61028467b704b40068b5202a",
+                  "text": "@Priscila Espinoza",
+                  "accessLevel": "",
+                  "localId": "f3979813-5565-456b-825d-cf1ddbde8aeb"
+                }
+              },
+              {
+                "type": "text",
+                "text": " "
+              },
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "61028466979810007059a746",
+                  "text": "@Grover Rivera",
+                  "accessLevel": "",
+                  "localId": "7b7e8da9-f666-443b-9452-c614590d7bde"
+                }
+              },
+              {
+                "type": "text",
+                "text": " "
+              }
+            ]
+          }
+        ]
+      },
+      "created": "2024-12-02T08:58:31.452-0800",
+      "updated": "2024-12-02T08:58:31.452-0800",
+      "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/170269"
+    },
+    {
+      "id": "170556",
+      "author": {
+        "displayName": "Shubham Rastogi",
+        "accountId": "5eb3991fddd45f0b943c92b5",
+        "avatarUrls": {
+          "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+          "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+          "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+          "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+        }
+      },
+      "body": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5ddc4cb7be8a460cfe264339",
+                  "text": "@Shu-Yao Chien",
+                  "accessLevel": "",
+                  "localId": "1b0b7b34-547d-4e06-9e45-6da1293c5065"
+                }
+              },
+              {
+                "type": "text",
+                "text": "  Thank you for looking into our request"
+              }
+            ]
+          }
+        ]
+      },
+      "created": "2024-12-04T11:35:39.076-0800",
+      "updated": "2024-12-04T11:35:39.076-0800",
+      "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/170556"
+    },
+    {
+      "id": "185557",
+      "author": {
+        "displayName": "Antoine Dubuc",
+        "emailAddress": "adubuc@cloudgeometry.com",
+        "accountId": "712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e",
+        "avatarUrls": {
+          "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/48",
+          "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/24",
+          "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/16",
+          "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/32"
+        }
+      },
+      "body": {
+        "type": "doc",
+        "version": 1,
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "mention",
+                "attrs": {
+                  "id": "5d6e41926e3e1f0d9623cc29",
+                  "text": "@Aleksandr Korolyov",
+                  "accessLevel": "",
+                  "localId": "9f77e979-a938-4152-a6f8-ef1c532f1e05"
+                }
+              },
+              {
+                "type": "text",
+                "text": " Alex, please let me and Grover know why you assigned this one to me. Is it because this is now needed? Thank you for contextualizing the assignment! Have a great weekend."
+              }
+            ]
+          }
+        ]
+      },
+      "created": "2025-05-30T08:27:46.114-0700",
+      "updated": "2025-05-30T08:27:46.114-0700",
+      "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/185557"
+    }
+  ],
+  "renderedFields": {
+    "statuscategorychangedate": "13/Nov/24 10:44 PM",
+    "customfield_11280": null,
+    "customfield_11282": null,
+    "customfield_11283": null,
+    "fixVersions": null,
+    "customfield_11200": null,
+    "statusCategory": null,
+    "resolution": null,
+    "customfield_11201": null,
+    "customfield_11202": "",
+    "customfield_10500": null,
+    "customfield_10900": null,
+    "customfield_10901": null,
+    "customfield_10902": null,
+    "customfield_10903": null,
+    "customfield_10904": null,
+    "lastViewed": "Today 2:34 PM",
+    "customfield_11270": null,
+    "priority": null,
+    "customfield_10100": null,
+    "customfield_11279": null,
+    "labels": null,
+    "timeestimate": null,
+    "aggregatetimeoriginalestimate": null,
+    "versions": null,
+    "issuelinks": null,
+    "assignee": null,
+    "status": null,
+    "components": null,
+    "customfield_11269": "",
+    "customfield_10600": null,
+    "aggregatetimeestimate": null,
+    "creator": null,
+    "subtasks": null,
+    "customfield_11251": null,
+    "customfield_11252": null,
+    "reporter": null,
+    "aggregateprogress": null,
+    "customfield_10200": null,
+    "customfield_11248": null,
+    "progress": null,
+    "votes": null,
+    "worklog": {
+      "startAt": 0,
+      "maxResults": 20,
+      "total": 0,
+      "worklogs": []
+    },
+    "issuetype": null,
+    "timespent": null,
+    "customfield_11240": "",
+    "project": null,
+    "customfield_11241": "",
+    "customfield_11242": "",
+    "customfield_11000": null,
+    "customfield_11001": null,
+    "customfield_11243": "",
+    "aggregatetimespent": null,
+    "customfield_11002": null,
+    "customfield_11244": null,
+    "customfield_11245": null,
+    "customfield_11246": null,
+    "customfield_11247": null,
+    "customfield_11237": null,
+    "customfield_11238": null,
+    "customfield_10700": null,
+    "customfield_11239": null,
+    "resolutiondate": null,
+    "workratio": null,
+    "watches": null,
+    "created": "13/Nov/24 10:44 PM",
+    "customfield_11232": null,
+    "customfield_11233": null,
+    "customfield_11234": null,
+    "customfield_10300": null,
+    "customfield_11235": null,
+    "customfield_11236": null,
+    "customfield_11105": null,
+    "customfield_11226": null,
+    "customfield_11227": null,
+    "customfield_11228": null,
+    "customfield_11229": null,
+    "updated": "30/May/25 8:27 AM",
+    "timeoriginalestimate": null,
+    "description": "<p>Hi Engg Team,</p>\n\n<p>I hope you’re doing well</p>\n\n<p>We are here looking for your help in adding another data column by the name: <b>Today,</b> before the yesterday’s delivery column in all the versions of the pacing sheet.</p>\n\n<p>Currently, we do have 3 data columns <b>(yesterday/ 2 days ago/ 3 days ago</b>). So, we need to add Today delivery column also before yesterday &amp; I think it will reflect today’s delivery data till when pacing script job starts on daily basis.</p>\n\n<p>Can you please look into this request?</p>\n\n<p>Thanks,</p>\n\n<p>CC <a href=\"https://extendtv.atlassian.net/secure/ViewProfile.jspa?accountId=5a4d5c1f03ffbd29f8a4be28\" class=\"user-hover\" rel=\"5a4d5c1f03ffbd29f8a4be28\" data-account-id=\"5a4d5c1f03ffbd29f8a4be28\" accountid=\"5a4d5c1f03ffbd29f8a4be28\" rel=\"noreferrer\">Chen Cao</a>  <a href=\"https://extendtv.atlassian.net/secure/ViewProfile.jspa?accountId=60303ec17b23f400687d2547\" class=\"user-hover\" rel=\"60303ec17b23f400687d2547\" data-account-id=\"60303ec17b23f400687d2547\" accountid=\"60303ec17b23f400687d2547\" rel=\"noreferrer\">Jeff Barry</a> <a href=\"https://extendtv.atlassian.net/secure/ViewProfile.jspa?accountId=5ddc4cb7be8a460cfe264339\" class=\"user-hover\" rel=\"5ddc4cb7be8a460cfe264339\" data-account-id=\"5ddc4cb7be8a460cfe264339\" accountid=\"5ddc4cb7be8a460cfe264339\" rel=\"noreferrer\">Shu-Yao Chien</a> <a href=\"https://extendtv.atlassian.net/secure/ViewProfile.jspa?accountId=5c3fb404d650366f5317f10e\" class=\"user-hover\" rel=\"5c3fb404d650366f5317f10e\" data-account-id=\"5c3fb404d650366f5317f10e\" accountid=\"5c3fb404d650366f5317f10e\" rel=\"noreferrer\">Vishnu Ramesh</a> </p>\n\n\n\n<p><span class=\"image-wrap\" style=\"\"><img src=\"/rest/api/3/attachment/content/79075\" alt=\"pacing_sheet_add_data.jpg\" height=\"684\" width=\"1284\" style=\"border: 0px solid black\" /></span></p>",
+    "customfield_11220": null,
+    "customfield_11100": null,
+    "customfield_11221": null,
+    "customfield_11222": null,
+    "customfield_11101": null,
+    "customfield_11223": null,
+    "customfield_11102": null,
+    "customfield_11103": null,
+    "customfield_11104": null,
+    "timetracking": {},
+    "customfield_11225": "",
+    "customfield_10005": null,
+    "customfield_11215": null,
+    "customfield_11216": null,
+    "customfield_10007": null,
+    "security": null,
+    "customfield_11217": null,
+    "customfield_10008": null,
+    "customfield_11218": null,
+    "customfield_10800": null,
+    "customfield_11219": null,
+    "attachment": [
+      {
+        "self": "https://extendtv.atlassian.net/rest/api/3/attachment/79075",
+        "id": "79075",
+        "filename": "pacing_sheet_add_data.jpg",
+        "author": {
+          "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5eb3991fddd45f0b943c92b5",
+          "accountId": "5eb3991fddd45f0b943c92b5",
+          "avatarUrls": {
+            "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+            "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+            "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+            "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+          },
+          "displayName": "Shubham Rastogi",
+          "active": true,
+          "timeZone": "America/Los_Angeles",
+          "accountType": "atlassian"
+        },
+        "created": "13/Nov/24 10:44 PM",
+        "size": "205 kB",
+        "mimeType": "image/jpeg",
+        "content": "https://extendtv.atlassian.net/rest/api/3/attachment/content/79075",
+        "thumbnail": "https://extendtv.atlassian.net/rest/api/3/attachment/thumbnail/79075"
+      }
+    ],
+    "summary": null,
+    "customfield_11210": null,
+    "customfield_10000": null,
+    "customfield_10001": "14/Nov/24 6:51 AM",
+    "customfield_11212": null,
+    "customfield_10002": null,
+    "customfield_10003": null,
+    "customfield_11213": null,
+    "customfield_10400": null,
+    "customfield_10004": null,
+    "customfield_11205": null,
+    "environment": "",
+    "customfield_11208": null,
+    "duedate": null,
+    "comment": {
+      "comments": [
+        {
+          "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/168929",
+          "id": "168929",
+          "author": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=61028467b704b40068b5202a",
+            "accountId": "61028467b704b40068b5202a",
+            "avatarUrls": {
+              "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+              "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+              "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+              "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png"
+            },
+            "displayName": "Priscila Espinoza",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Hi "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5eb3991fddd45f0b943c92b5",
+                      "text": "@Shubham Rastogi",
+                      "accessLevel": "",
+                      "localId": "75b85afb-40f0-4a86-8702-549e1c977310"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " I converted this ticket to a User Story as this involves development work."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5ddc4cb7be8a460cfe264339",
+                      "text": "@Shu-Yao Chien",
+                      "accessLevel": "",
+                      "localId": "5d222393-c5a9-48bf-9c38-4f686f1e6925"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " can you please check this new requirement."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "cc: "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5c3fb404d650366f5317f10e",
+                      "text": "@Vishnu Ramesh",
+                      "accessLevel": "",
+                      "localId": "b0581f70-d2d8-4052-8027-2a41dc27dc64"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "  "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "61028466979810007059a746",
+                      "text": "@Grover Rivera",
+                      "accessLevel": "",
+                      "localId": "25a139d2-2dad-4bf1-809c-8c0b72d44f4d"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "  "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5a4d5c1f03ffbd29f8a4be28",
+                      "text": "@Chen Cao",
+                      "accessLevel": "",
+                      "localId": "f644f5a0-b12d-4f31-ab9b-ebca44539160"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " "
+                  }
+                ]
+              }
+            ]
+          },
+          "updateAuthor": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=61028467b704b40068b5202a",
+            "accountId": "61028467b704b40068b5202a",
+            "avatarUrls": {
+              "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+              "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+              "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png",
+              "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/PE-3.png"
+            },
+            "displayName": "Priscila Espinoza",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "created": "14/Nov/24 6:51 AM",
+          "updated": "14/Nov/24 6:51 AM",
+          "jsdPublic": true
+        },
+        {
+          "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/169989",
+          "id": "169989",
+          "author": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5eb3991fddd45f0b943c92b5",
+            "accountId": "5eb3991fddd45f0b943c92b5",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+            },
+            "displayName": "Shubham Rastogi",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Hi Team,"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Any update on the request raised?"
+                  }
+                ]
+              }
+            ]
+          },
+          "updateAuthor": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5eb3991fddd45f0b943c92b5",
+            "accountId": "5eb3991fddd45f0b943c92b5",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+            },
+            "displayName": "Shubham Rastogi",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "created": "26/Nov/24 9:59 AM",
+          "updated": "26/Nov/24 9:59 AM",
+          "jsdPublic": true
+        },
+        {
+          "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/170269",
+          "id": "170269",
+          "author": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5ddc4cb7be8a460cfe264339",
+            "accountId": "5ddc4cb7be8a460cfe264339",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+              "24x24": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+              "16x16": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+              "32x32": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png"
+            },
+            "displayName": "Shu-Yao Chien",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5eb3991fddd45f0b943c92b5",
+                      "text": "@Shubham Rastogi",
+                      "accessLevel": "",
+                      "localId": "45be9717-bc08-4bdd-b5f3-8fc08c58c80e"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " , typically “today” data is not available till early “tomorrow” for processing. There is no way to provide “today” data “today” since “today data” won’t be available till “tomorrow”. "
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Please let us know your thoughts? Thanks."
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "cc: "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5c3fb404d650366f5317f10e",
+                      "text": "@Vishnu Ramesh",
+                      "accessLevel": "",
+                      "localId": "f8f391cc-f42c-40fe-b876-3c9271c4d157"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "61028467b704b40068b5202a",
+                      "text": "@Priscila Espinoza",
+                      "accessLevel": "",
+                      "localId": "f3979813-5565-456b-825d-cf1ddbde8aeb"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " "
+                  },
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "61028466979810007059a746",
+                      "text": "@Grover Rivera",
+                      "accessLevel": "",
+                      "localId": "7b7e8da9-f666-443b-9452-c614590d7bde"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " "
+                  }
+                ]
+              }
+            ]
+          },
+          "updateAuthor": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5ddc4cb7be8a460cfe264339",
+            "accountId": "5ddc4cb7be8a460cfe264339",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+              "24x24": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+              "16x16": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png",
+              "32x32": "https://secure.gravatar.com/avatar/f46741eda2a7f745d75c282971d99941?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSC-1.png"
+            },
+            "displayName": "Shu-Yao Chien",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "created": "02/Dec/24 8:58 AM",
+          "updated": "02/Dec/24 8:58 AM",
+          "jsdPublic": true
+        },
+        {
+          "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/170556",
+          "id": "170556",
+          "author": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5eb3991fddd45f0b943c92b5",
+            "accountId": "5eb3991fddd45f0b943c92b5",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+            },
+            "displayName": "Shubham Rastogi",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5ddc4cb7be8a460cfe264339",
+                      "text": "@Shu-Yao Chien",
+                      "accessLevel": "",
+                      "localId": "1b0b7b34-547d-4e06-9e45-6da1293c5065"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "  Thank you for looking into our request"
+                  }
+                ]
+              }
+            ]
+          },
+          "updateAuthor": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=5eb3991fddd45f0b943c92b5",
+            "accountId": "5eb3991fddd45f0b943c92b5",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "24x24": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "16x16": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png",
+              "32x32": "https://secure.gravatar.com/avatar/9ad7d2d70defb806cb9e4bce6b77334a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSR-3.png"
+            },
+            "displayName": "Shubham Rastogi",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "created": "04/Dec/24 11:35 AM",
+          "updated": "04/Dec/24 11:35 AM",
+          "jsdPublic": true
+        },
+        {
+          "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment/185557",
+          "id": "185557",
+          "author": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3Aca041fb3-f2cf-4ef4-86dd-fbae8bb1441e",
+            "accountId": "712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e",
+            "emailAddress": "adubuc@cloudgeometry.com",
+            "avatarUrls": {
+              "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/48",
+              "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/24",
+              "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/16",
+              "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/32"
+            },
+            "displayName": "Antoine Dubuc",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "mention",
+                    "attrs": {
+                      "id": "5d6e41926e3e1f0d9623cc29",
+                      "text": "@Aleksandr Korolyov",
+                      "accessLevel": "",
+                      "localId": "9f77e979-a938-4152-a6f8-ef1c532f1e05"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": " Alex, please let me and Grover know why you assigned this one to me. Is it because this is now needed? Thank you for contextualizing the assignment! Have a great weekend."
+                  }
+                ]
+              }
+            ]
+          },
+          "updateAuthor": {
+            "self": "https://extendtv.atlassian.net/rest/api/3/user?accountId=712020%3Aca041fb3-f2cf-4ef4-86dd-fbae8bb1441e",
+            "accountId": "712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e",
+            "emailAddress": "adubuc@cloudgeometry.com",
+            "avatarUrls": {
+              "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/48",
+              "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/24",
+              "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/16",
+              "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e/b615e65e-39db-4ba8-9140-7e4365f67106/32"
+            },
+            "displayName": "Antoine Dubuc",
+            "active": true,
+            "timeZone": "America/Los_Angeles",
+            "accountType": "atlassian"
+          },
+          "created": "30/May/25 8:27 AM",
+          "updated": "30/May/25 8:27 AM",
+          "jsdPublic": true
+        }
+      ],
+      "self": "https://extendtv.atlassian.net/rest/api/3/issue/81169/comment",
+      "maxResults": 5,
+      "total": 5,
+      "startAt": 0
+    }
+  },
+  "extractedAt": "2025-06-17T22:57:23.295Z",
+  "extractedBy": "jira-tickets-display-extractor"
+}

@@ -1,8 +1,51 @@
 import { z } from "zod";
 
-// Re-export all UI and API types
-export * from './types/ui-models';
-export * from './types/api-endpoints';
+// NOTE: Comprehensive UI and API types moved to development-archive/experimental/types/
+// Only core types needed for active application are defined here
+
+// ==== USER MANAGEMENT (Essential for auth) ====
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'pm' | 'tpm' | 'po' | 'eng' | 'sm' | 'other';
+  company?: string;
+  avatarUrl?: string;
+  preferences: UserPreferences;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserPreferences {
+  voiceSettings: VoiceSettings;
+  theme: 'dark' | 'light' | 'auto';
+  notifications: NotificationSettings;
+  panelStates: {
+    leftPanelCollapsed: boolean;
+    rightPanelCollapsed: boolean;
+  };
+}
+
+export interface VoiceSettings {
+  inputDevice?: string;
+  outputDevice?: string;
+  sensitivity: number;
+  pushToTalk: boolean;
+  noiseCancellation: boolean;
+  echoCancellation: boolean;
+  audioQuality: 'low' | 'standard' | 'high' | 'premium';
+  voiceActivationEnabled: boolean;
+}
+
+export interface NotificationSettings {
+  mentions: boolean;
+  comments: boolean;
+  ticketUpdates: boolean;
+  systemAlerts: boolean;
+  emailNotifications: boolean;
+  browserNotifications: boolean;
+}
 
 // Define the allowed moderation categories only once
 export const MODERATION_CATEGORIES = [

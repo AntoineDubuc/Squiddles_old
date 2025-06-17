@@ -31,12 +31,17 @@ echo "OPENAI_API_KEY=your_openai_api_key_here" > .env.local
 
 # 3. Start development server
 npm run dev
-# → http://localhost:8888
 
-# 4. Wait for full compilation (IMPORTANT!)
-# - First startup takes 15-20 seconds
-# - Wait for "✓ Compiled / in Xms" message
-# - Don't navigate to localhost:8888 until compilation is complete
+# ✅ Success indicators:
+# ▲ Next.js 15.1.0
+# - Local:        http://localhost:8888
+# - Network:      http://192.168.0.176:8888
+# ✓ Ready in 968ms
+
+# 4. Server behavior (IMPORTANT!)
+# - Terminal will appear to "hang" after showing ready - this is NORMAL
+# - Server is running in foreground and serving the application
+# - Navigate to http://localhost:8888 in your browser
 
 # 5. Test the voice interface
 # - Dashboard loads automatically

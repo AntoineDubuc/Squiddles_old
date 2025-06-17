@@ -372,6 +372,10 @@ export default function Home() {
       <Dashboard 
         onNavigateToVoice={handleNavigateToVoice}
         onNavigateToTickets={handleNavigateToTickets}
+        onStartVoiceSession={startSession}
+        onEndVoiceSession={endSession}
+        sessionStatus={sessionStatus}
+        isListening={isListening}
       />
     );
   }

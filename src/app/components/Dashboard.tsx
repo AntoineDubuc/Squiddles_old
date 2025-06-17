@@ -9,9 +9,13 @@ import React from 'react';
 interface DashboardProps {
   onNavigateToVoice?: () => void;
   onNavigateToTickets?: () => void;
+  onStartVoiceSession?: () => void;
+  onEndVoiceSession?: () => void;
+  sessionStatus?: 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED';
+  isListening?: boolean;
 }
 
-export default function Dashboard({ onNavigateToVoice, onNavigateToTickets }: DashboardProps) {
+export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onStartVoiceSession, onEndVoiceSession, sessionStatus = 'DISCONNECTED', isListening = false }: DashboardProps) {
   return (
     <>
       <div className="background-gradient"></div>
@@ -32,7 +36,24 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets }: Da
                 🔔
                 <div className="notification-badge">3</div>
               </div>
-              <div className="global-voice-button" onClick={onNavigateToVoice}>🎙️</div>
+              <div 
+                className="global-voice-button" 
+                onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : onEndVoiceSession}
+                style={{
+                  background: sessionStatus === 'CONNECTED' && isListening 
+                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(34, 197, 94, 0.9))'
+                    : sessionStatus === 'CONNECTING'
+                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))'
+                    : sessionStatus === 'CONNECTED'
+                    ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))'
+                    : 'linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9))',
+                  animation: sessionStatus === 'CONNECTED' && isListening ? 'pulse 2s infinite' : 'none'
+                }}
+              >
+                {sessionStatus === 'CONNECTED' && isListening ? '🎙️' : 
+                 sessionStatus === 'CONNECTING' ? '⏳' :
+                 sessionStatus === 'CONNECTED' ? '⏹️' : '🎙️'}
+              </div>
               <div className="user-menu">
                 <div className="user-avatar">👤</div>
                 <div>
@@ -52,12 +73,38 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets }: Da
             </div>
 
             <div className="primary-action-hero">
-              <h2 className="hero-voice-prompt">What would you like to do?</h2>
-              <div className="hero-voice-button" onClick={onNavigateToVoice}>
-                <div className="voice-icon">🎙️</div>
+              <div 
+                className="hero-voice-button" 
+                onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : onEndVoiceSession}
+                style={{
+                  background: sessionStatus === 'CONNECTED' && isListening 
+                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(34, 197, 94, 0.9))'
+                    : sessionStatus === 'CONNECTING'
+                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))'
+                    : sessionStatus === 'CONNECTED'
+                    ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))'
+                    : 'linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9))',
+                  animation: sessionStatus === 'CONNECTED' && isListening ? 'pulse 2s infinite' : 'none'
+                }}
+              >
+                <div className="voice-icon">
+                  {sessionStatus === 'CONNECTED' && isListening ? '🎙️' : 
+                   sessionStatus === 'CONNECTING' ? '⏳' :
+                   sessionStatus === 'CONNECTED' ? '⏹️' : '🎙️'}
+                </div>
                 <div className="voice-text">
-                  <span className="voice-main">Just ask me</span>
-                  <span className="voice-sub">Press Space or click to speak</span>
+                  <span className="voice-main">
+                    {sessionStatus === 'CONNECTED' && isListening ? 'Listening...' :
+                     sessionStatus === 'CONNECTING' ? 'Connecting...' :
+                     sessionStatus === 'CONNECTED' ? 'Stop session' :
+                     'Just ask me'}
+                  </span>
+                  <span className="voice-sub">
+                    {sessionStatus === 'CONNECTED' && isListening ? 'Click to stop' :
+                     sessionStatus === 'CONNECTED' ? 'Click to end voice session' : 
+                     sessionStatus === 'CONNECTING' ? 'Please wait...' :
+                     'Press Space or click to speak'}
+                  </span>
                 </div>
               </div>
               <div className="hero-actions">

@@ -149,19 +149,31 @@ body {
 .global-voice-button {
     width: 40px;
     height: 40px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9));
-    border-radius: 0.5rem;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 1.25rem;
 }
 
 .global-voice-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3B82F6;
+}
+
+.global-voice-button.listening {
+    animation: global-pulse 1.5s ease-in-out infinite;
+    background: rgba(139, 92, 246, 0.2);
+    border-color: #8B5CF6;
+}
+
+@keyframes global-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
 .user-menu {
@@ -230,13 +242,31 @@ body {
 
 /* Primary Action Hero */
 .primary-action-hero {
-    background: rgba(20, 20, 20, 0.5);
-    backdrop-filter: blur(20px);
+    background: rgba(20, 20, 20, 0.4);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1rem;
     padding: 3rem;
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-action-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #3B82F6, #8B5CF6, transparent);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .hero-voice-prompt {
@@ -250,19 +280,29 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 1rem;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9));
+    background: linear-gradient(135deg, #3B82F6, #8B5CF6);
     border: none;
     border-radius: 1rem;
     padding: 1.5rem 2rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: 2rem;
-    min-width: 300px;
+    margin: 2rem auto;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
 }
 
 .hero-voice-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+}
+
+.hero-voice-button.listening {
+    animation: voice-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes voice-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .voice-icon {

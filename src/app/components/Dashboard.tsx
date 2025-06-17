@@ -37,17 +37,19 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
                 <div className="notification-badge">3</div>
               </div>
               <div 
-                className="global-voice-button" 
+                className={`global-voice-button ${sessionStatus === 'CONNECTED' && isListening ? 'listening' : ''}`}
                 onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : onEndVoiceSession}
                 style={{
-                  background: sessionStatus === 'CONNECTED' && isListening 
-                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(34, 197, 94, 0.9))'
-                    : sessionStatus === 'CONNECTING'
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))'
-                    : sessionStatus === 'CONNECTED'
-                    ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))'
-                    : 'linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9))',
-                  animation: sessionStatus === 'CONNECTED' && isListening ? 'pulse 2s infinite' : 'none'
+                  background: sessionStatus === 'CONNECTING'
+                    ? 'rgba(245, 158, 11, 0.2)'
+                    : sessionStatus === 'CONNECTED' && !isListening
+                    ? 'rgba(239, 68, 68, 0.2)'
+                    : undefined,
+                  borderColor: sessionStatus === 'CONNECTING'
+                    ? '#F59E0B'
+                    : sessionStatus === 'CONNECTED' && !isListening
+                    ? '#EF4444'
+                    : undefined
                 }}
               >
                 {sessionStatus === 'CONNECTED' && isListening ? '🎙️' : 
@@ -74,17 +76,23 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
 
             <div className="primary-action-hero">
               <div 
-                className="hero-voice-button" 
+                className={`hero-voice-button ${sessionStatus === 'CONNECTED' && isListening ? 'listening' : ''}`}
                 onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : onEndVoiceSession}
                 style={{
                   background: sessionStatus === 'CONNECTED' && isListening 
-                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(34, 197, 94, 0.9))'
+                    ? 'linear-gradient(135deg, #10B981, #22C55E)'
                     : sessionStatus === 'CONNECTING'
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))'
+                    ? 'linear-gradient(135deg, #F59E0B, #FBB04C)'
                     : sessionStatus === 'CONNECTED'
-                    ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))'
-                    : 'linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9))',
-                  animation: sessionStatus === 'CONNECTED' && isListening ? 'pulse 2s infinite' : 'none'
+                    ? 'linear-gradient(135deg, #EF4444, #DC2626)'
+                    : undefined,
+                  boxShadow: sessionStatus === 'CONNECTED' && isListening 
+                    ? '0 12px 40px rgba(16, 185, 129, 0.4)'
+                    : sessionStatus === 'CONNECTING'
+                    ? '0 12px 40px rgba(245, 158, 11, 0.4)'
+                    : sessionStatus === 'CONNECTED'
+                    ? '0 12px 40px rgba(239, 68, 68, 0.4)'
+                    : undefined
                 }}
               >
                 <div className="voice-icon">

@@ -3,10 +3,10 @@
  * Run with: npx tsx src/lib/pinecone/testEndpoints.ts
  */
 
-const BASE_URL = 'http://localhost:8888/api/pinecone';
+const PINECONE_BASE_URL = 'http://localhost:8888/api/pinecone';
 
 // ANSI color codes
-const colors = {
+const pineconeColors = {
   reset: '\x1b[0m',
   green: '\x1b[32m',
   red: '\x1b[31m',
@@ -15,44 +15,44 @@ const colors = {
 };
 
 async function testEndpoints() {
-  console.log(`${colors.blue}🦑 Testing Pinecone API Endpoints${colors.reset}\n`);
+  console.log(`${pineconeColors.blue}🦑 Testing Pinecone API Endpoints${pineconeColors.reset}\n`);
 
   // Test 1: Health Check
-  console.log(`${colors.yellow}1. Testing health check...${colors.reset}`);
+  console.log(`${pineconeColors.yellow}1. Testing health check...${pineconeColors.reset}`);
   try {
-    const response = await fetch(`${BASE_URL}/health`);
+    const response = await fetch(`${PINECONE_BASE_URL}/health`);
     const data = await response.json();
     
     if (response.ok && data.status === 'healthy') {
-      console.log(`${colors.green}✓ Health check passed${colors.reset}`);
+      console.log(`${pineconeColors.green}✓ Health check passed${pineconeColors.reset}`);
       console.log(`  Status: ${data.status}`);
       console.log(`  Index: ${data.details?.indexName}`);
     } else {
-      console.log(`${colors.red}✗ Health check failed${colors.reset}`);
+      console.log(`${pineconeColors.red}✗ Health check failed${pineconeColors.reset}`);
     }
   } catch (error) {
-    console.log(`${colors.red}✗ Health check error: ${error}${colors.reset}`);
+    console.log(`${pineconeColors.red}✗ Health check error: ${error}${pineconeColors.reset}`);
   }
 
   // Test 2: Get Stats
-  console.log(`\n${colors.yellow}2. Testing stats endpoint...${colors.reset}`);
+  console.log(`\n${pineconeColors.yellow}2. Testing stats endpoint...${pineconeColors.reset}`);
   try {
-    const response = await fetch(`${BASE_URL}/stats`);
+    const response = await fetch(`${PINECONE_BASE_URL}/stats`);
     const data = await response.json();
     
     if (response.ok) {
-      console.log(`${colors.green}✓ Stats retrieved${colors.reset}`);
+      console.log(`${pineconeColors.green}✓ Stats retrieved${pineconeColors.reset}`);
       console.log(`  Total vectors: ${data.stats.totalVectors}`);
       console.log(`  Index fullness: ${data.stats.indexFullness}`);
     } else {
-      console.log(`${colors.red}✗ Stats failed: ${data.error}${colors.reset}`);
+      console.log(`${pineconeColors.red}✗ Stats failed: ${data.error}${pineconeColors.reset}`);
     }
   } catch (error) {
-    console.log(`${colors.red}✗ Stats error: ${error}${colors.reset}`);
+    console.log(`${pineconeColors.red}✗ Stats error: ${error}${pineconeColors.reset}`);
   }
 
   // Test 3: Upsert Single Document
-  console.log(`\n${colors.yellow}3. Testing single document upsert...${colors.reset}`);
+  console.log(`\n${pineconeColors.yellow}3. Testing single document upsert...${pineconeColors.reset}`);
   const testDoc = {
     id: 'api-test-001',
     type: 'TICKET',
@@ -70,7 +70,7 @@ async function testEndpoints() {
   };
 
   try {
-    const response = await fetch(`${BASE_URL}/documents`, {
+    const response = await fetch(`${PINECONE_BASE_URL}/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(testDoc),
@@ -78,17 +78,17 @@ async function testEndpoints() {
     const data = await response.json();
     
     if (response.ok) {
-      console.log(`${colors.green}✓ Document upserted${colors.reset}`);
+      console.log(`${pineconeColors.green}✓ Document upserted${pineconeColors.reset}`);
       console.log(`  ID: ${data.id}`);
     } else {
-      console.log(`${colors.red}✗ Upsert failed: ${data.error}${colors.reset}`);
+      console.log(`${pineconeColors.red}✗ Upsert failed: ${data.error}${pineconeColors.reset}`);
     }
   } catch (error) {
-    console.log(`${colors.red}✗ Upsert error: ${error}${colors.reset}`);
+    console.log(`${pineconeColors.red}✗ Upsert error: ${error}${pineconeColors.reset}`);
   }
 
   // Test 4: Batch Upsert
-  console.log(`\n${colors.yellow}4. Testing batch upsert...${colors.reset}`);
+  console.log(`\n${pineconeColors.yellow}4. Testing batch upsert...${pineconeColors.reset}`);
   const batchDocs = {
     documents: [
       {
@@ -120,7 +120,7 @@ async function testEndpoints() {
   };
 
   try {
-    const response = await fetch(`${BASE_URL}/documents`, {
+    const response = await fetch(`${PINECONE_BASE_URL}/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(batchDocs),
@@ -128,21 +128,21 @@ async function testEndpoints() {
     const data = await response.json();
     
     if (response.ok) {
-      console.log(`${colors.green}✓ Batch upserted${colors.reset}`);
+      console.log(`${pineconeColors.green}✓ Batch upserted${pineconeColors.reset}`);
       console.log(`  Count: ${data.count} documents`);
     } else {
-      console.log(`${colors.red}✗ Batch upsert failed: ${data.error}${colors.reset}`);
+      console.log(`${pineconeColors.red}✗ Batch upsert failed: ${data.error}${pineconeColors.reset}`);
     }
   } catch (error) {
-    console.log(`${colors.red}✗ Batch upsert error: ${error}${colors.reset}`);
+    console.log(`${pineconeColors.red}✗ Batch upsert error: ${error}${pineconeColors.reset}`);
   }
 
   // Wait for indexing
-  console.log(`\n${colors.blue}Waiting for indexing...${colors.reset}`);
+  console.log(`\n${pineconeColors.blue}Waiting for indexing...${pineconeColors.reset}`);
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Test 5: Search
-  console.log(`\n${colors.yellow}5. Testing search...${colors.reset}`);
+  console.log(`\n${pineconeColors.yellow}5. Testing search...${pineconeColors.reset}`);
   try {
     const params = new URLSearchParams({
       query: 'API test',
@@ -151,24 +151,24 @@ async function testEndpoints() {
       limit: '5',
     });
     
-    const response = await fetch(`${BASE_URL}/documents?${params}`);
+    const response = await fetch(`${PINECONE_BASE_URL}/documents?${params}`);
     const data = await response.json();
     
     if (response.ok) {
-      console.log(`${colors.green}✓ Search completed${colors.reset}`);
+      console.log(`${pineconeColors.green}✓ Search completed${pineconeColors.reset}`);
       console.log(`  Results: ${data.count}`);
       data.results.forEach((result: any, i: number) => {
         console.log(`  ${i + 1}. ${result.document.metadata.title} (${result.score.toFixed(4)})`);
       });
     } else {
-      console.log(`${colors.red}✗ Search failed: ${data.error}${colors.reset}`);
+      console.log(`${pineconeColors.red}✗ Search failed: ${data.error}${pineconeColors.reset}`);
     }
   } catch (error) {
-    console.log(`${colors.red}✗ Search error: ${error}${colors.reset}`);
+    console.log(`${pineconeColors.red}✗ Search error: ${error}${pineconeColors.reset}`);
   }
 
   // Test 6: Delete Documents
-  console.log(`\n${colors.yellow}6. Testing delete...${colors.reset}`);
+  console.log(`\n${pineconeColors.yellow}6. Testing delete...${pineconeColors.reset}`);
   const deleteIds = [
     { id: 'api-test-001', type: 'TICKET' },
     { id: 'api-test-002', type: 'COMMENT' },
@@ -177,28 +177,28 @@ async function testEndpoints() {
 
   for (const { id, type } of deleteIds) {
     try {
-      const response = await fetch(`${BASE_URL}/documents/${id}?type=${type}`, {
+      const response = await fetch(`${PINECONE_BASE_URL}/documents/${id}?type=${type}`, {
         method: 'DELETE',
       });
       const data = await response.json();
       
       if (response.ok) {
-        console.log(`${colors.green}✓ Deleted ${id}${colors.reset}`);
+        console.log(`${pineconeColors.green}✓ Deleted ${id}${pineconeColors.reset}`);
       } else {
-        console.log(`${colors.red}✗ Delete failed for ${id}: ${data.error}${colors.reset}`);
+        console.log(`${pineconeColors.red}✗ Delete failed for ${id}: ${data.error}${pineconeColors.reset}`);
       }
     } catch (error) {
-      console.log(`${colors.red}✗ Delete error for ${id}: ${error}${colors.reset}`);
+      console.log(`${pineconeColors.red}✗ Delete error for ${id}: ${error}${pineconeColors.reset}`);
     }
   }
 
-  console.log(`\n${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-  console.log(`${colors.green}✅ API endpoint tests completed!${colors.reset}`);
+  console.log(`\n${pineconeColors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${pineconeColors.reset}`);
+  console.log(`${pineconeColors.green}✅ API endpoint tests completed!${pineconeColors.reset}`);
 }
 
 // Note: This requires the Next.js server to be running
-console.log(`${colors.yellow}Note: Make sure the Next.js server is running (npm run dev)${colors.reset}\n`);
+console.log(`${pineconeColors.yellow}Note: Make sure the Next.js server is running (npm run dev)${pineconeColors.reset}\n`);
 
 testEndpoints().catch(error => {
-  console.error(`${colors.red}Test error: ${error}${colors.reset}`);
+  console.error(`${pineconeColors.red}Test error: ${error}${pineconeColors.reset}`);
 });

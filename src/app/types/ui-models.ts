@@ -132,6 +132,7 @@ export interface Sprint {
   completedPoints: number;
   totalPoints: number;
   completionPercentage: number;
+  burndownRate: number;
 }
 
 export interface Project {

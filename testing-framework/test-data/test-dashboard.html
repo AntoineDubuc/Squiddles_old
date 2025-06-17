@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; }
+        .debug { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ddd; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🦑 Force Dashboard Test</h1>
+    
+    <div class="debug">
+        <h3>This will force the app to show the dashboard with mock data</h3>
+        <p>Expected: Beautiful glass-themed dashboard with collapsible panels, voice hero section, metrics, and tickets</p>
+    </div>
+
+    <button onclick="forceDashboard()">🎯 Force Dashboard View</button>
+    <button onclick="forceVoice()">🎙️ Force Voice View</button>
+    <button onclick="clearAndReload()">🔄 Clear & Reload</button>
+
+    <div id="status" class="debug"></div>
+
+    <iframe id="app-frame" src="http://localhost:8888"></iframe>
+
+    <script>
+        function log(message) {
+            document.getElementById('status').innerHTML = message;
+        }
+
+        function forceDashboard() {
+            // Set authentication to force dashboard view
+            const mockSession = {
+                user: {
+                    id: 'user_001',
+                    name: 'Jordan Kim',
+                    email: 'jordan@squiddles.dev',
+                    role: 'pm',
+                    preferences: {
+                        panelStates: {
+                            leftPanelCollapsed: false,
+                            rightPanelCollapsed: false
+                        }
+                    }
+                },
+                token: 'mock_token_123',
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+            };
+            localStorage.setItem('squiddles_session', JSON.stringify(mockSession));
+            
+            log('✅ Forced dashboard mode - reloading...');
+            document.getElementById('app-frame').src = document.getElementById('app-frame').src;
+        }
+
+        function forceVoice() {
+            localStorage.removeItem('squiddles_session');
+            log('✅ Forced voice mode - reloading...');
+            document.getElementById('app-frame').src = document.getElementById('app-frame').src;
+        }
+
+        function clearAndReload() {
+            localStorage.clear();
+            log('🔄 Cleared all data - reloading...');
+            document.getElementById('app-frame').src = document.getElementById('app-frame').src;
+        }
+
+        // Auto force dashboard on load to test
+        window.addEventListener('load', function() {
+            setTimeout(forceDashboard, 1000);
+        });
+    </script>
+</body>
+</html>

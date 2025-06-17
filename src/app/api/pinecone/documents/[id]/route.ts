@@ -14,10 +14,10 @@ const DeleteSchema = z.object({
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // Get type from query parameter or body
     const { searchParams } = new URL(request.url);

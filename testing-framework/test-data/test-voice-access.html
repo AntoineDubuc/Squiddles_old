@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Voice Access - Squiddles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.pass { background: #d4edda; color: #155724; }
+        .status.fail { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦑 Squiddles Voice Access Test</h1>
+    
+    <div class="test-section">
+        <h2>Current Status</h2>
+        <div id="current-status" class="status info">Testing application state...</div>
+        
+        <h3>Expected Behavior</h3>
+        <ul>
+            <li>✅ With no user logged in → Voice interface should load immediately</li>
+            <li>✅ Voice interface should have microphone button and connect to OpenAI</li>
+            <li>✅ Original conversation agent (Product Manager) should work</li>
+            <li>✅ User can create user stories via voice commands</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Authentication States</h2>
+        <p>Test different authentication scenarios:</p>
+        
+        <button onclick="clearAuth()">Clear Auth (Should show Voice)</button>
+        <button onclick="setMockAuth()">Set Mock Auth (Should show Dashboard)</button>
+        <button onclick="openApp()">Open Squiddles App</button>
+        
+        <div id="auth-status" class="status info">Click buttons above to test different states</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Voice Commands to Test</h2>
+        <p>Once the voice interface loads, try these commands:</p>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <p><strong>"Create a user story for authentication"</strong></p>
+            <p><strong>"Help me analyze this feature request"</strong></p>
+            <p><strong>"I need a story for OAuth integration"</strong></p>
+            <p><strong>"Search for related login tickets"</strong></p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Application Frame</h2>
+        <iframe id="app-frame" src="http://localhost:8888"></iframe>
+    </div>
+
+    <script>
+        function clearAuth() {
+            localStorage.removeItem('squiddles_session');
+            document.getElementById('auth-status').textContent = 'Authentication cleared - app should show voice interface';
+            document.getElementById('auth-status').className = 'status pass';
+            document.getElementById('app-frame').src = document.getElementById('app-frame').src; // Reload
+        }
+
+        function setMockAuth() {
+            const mockSession = {
+                user: {
+                    id: 'user_001',
+                    name: 'Jordan Kim',
+                    email: 'jordan@squiddles.dev',
+                    role: 'pm'
+                },
+                token: 'mock_token_123',
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+            };
+            localStorage.setItem('squiddles_session', JSON.stringify(mockSession));
+            document.getElementById('auth-status').textContent = 'Mock authentication set - app should show dashboard';
+            document.getElementById('auth-status').className = 'status info';
+            document.getElementById('app-frame').src = document.getElementById('app-frame').src; // Reload
+        }
+
+        function openApp() {
+            window.open('http://localhost:8888', '_blank');
+        }
+
+        // Check current status
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const hasAuth = localStorage.getItem('squiddles_session');
+                const statusEl = document.getElementById('current-status');
+                
+                if (hasAuth) {
+                    statusEl.textContent = '✅ User is authenticated - should see dashboard';
+                    statusEl.className = 'status pass';
+                } else {
+                    statusEl.textContent = '🎙️ No authentication - should see voice interface';
+                    statusEl.className = 'status pass';
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

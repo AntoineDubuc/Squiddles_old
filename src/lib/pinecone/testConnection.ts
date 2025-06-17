@@ -196,7 +196,7 @@ async function testPineconeConnection() {
     console.log(`  - Matches found: ${queryResponse.matches?.length || 0}`);
     
     if (queryResponse.matches && queryResponse.matches.length > 0) {
-      queryResponse.matches.forEach((match, i) => {
+      queryResponse.matches.forEach((match: any, i: number) => {
         console.log(`  - Match ${i + 1}: ID=${match.id}, Score=${match.score?.toFixed(4)}`);
       });
     }

@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-06-17T19:37:26.243Z",
+  "targetTickets": [
+    "DE-3360"
+  ],
+  "downloads": [
+    {
+      "id": "88717",
+      "filename": "PROD 9622 Campaign Performance Analysis.xlsx",
+      "sanitizedFilename": "DE-3360_PROD 9622 Campaign Performance Analysis.xlsx",
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "originalSize": 12281,
+      "downloadedSize": 12281,
+      "outputPath": "/Users/antoinedubuc/Squiddles/jira_comments/test-media/DE-3360_PROD 9622 Campaign Performance Analysis.xlsx",
+      "relativePath": "test-media/DE-3360_PROD 9622 Campaign Performance Analysis.xlsx",
+      "downloadUrl": "https://extendtv.atlassian.net/rest/api/3/attachment/content/88717",
+      "webPath": "/test-media/DE-3360_PROD 9622 Campaign Performance Analysis.xlsx",
+      "ticketKey": "DE-3360",
+      "success": true,
+      "isImage": false,
+      "isVideo": false,
+      "isAudio": false
+    }
+  ],
+  "outputDirectory": "/Users/antoinedubuc/Squiddles/jira_comments/test-media",
+  "summary": {
+    "total": 1,
+    "images": 0,
+    "videos": 0,
+    "audio": 0,
+    "other": 1
+  }
+}

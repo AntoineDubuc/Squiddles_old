@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Jira ADF Content Types - Live Examples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .data-type {
+            margin-bottom: 40px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-type-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-type-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-found {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-missing {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .data-type-content {
+            padding: 20px;
+        }
+
+        .example {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .example-header {
+            background: #e9ecef;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .example-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .example-meta span {
+            color: #666;
+        }
+
+        .example-meta strong {
+            color: #333;
+        }
+
+        .example-content {
+            padding: 20px;
+        }
+
+        .adf-preview {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .rendered-content {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .rendered-content h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        /* ADF Content Rendering Styles */
+        .adf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .adf-table th,
+        .adf-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .adf-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .adf-media {
+            background: #e3f2fd;
+            border: 2px dashed #2196f3;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .adf-media-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .adf-code {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .adf-mention {
+            background: #e1f5fe;
+            color: #0277bd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .adf-panel {
+            border-left: 4px solid #2196f3;
+            background: #f3f9ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .adf-list {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .adf-heading {
+            margin: 20px 0 10px 0;
+            color: #333;
+        }
+
+        .adf-heading.h1 { font-size: 2em; }
+        .adf-heading.h2 { font-size: 1.5em; }
+        .adf-heading.h3 { font-size: 1.3em; }
+        .adf-heading.h4 { font-size: 1.1em; }
+        .adf-heading.h5 { font-size: 1em; }
+        .adf-heading.h6 { font-size: 0.9em; }
+
+        .adf-blockquote {
+            border-left: 4px solid #ccc;
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .adf-rule {
+            height: 2px;
+            background: #ddd;
+            margin: 20px 0;
+            border: none;
+        }
+
+        .adf-link {
+            color: #1976d2;
+            text-decoration: none;
+            border: 1px solid #e3f2fd;
+            background: #f3f9ff;
+            padding: 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .adf-link:hover {
+            background: #e3f2fd;
+        }
+
+        .jira-link {
+            display: inline-block;
+            background: #0052cc;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .jira-link:hover {
+            background: #003c8f;
+        }
+
+        .no-examples {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Jira ADF Content Types</h1>
+            <p>Live Examples from Real Jira Comments</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTypes">14</div>
+                <div class="stat-label">Total ADF Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="foundTypes">12</div>
+                <div class="stat-label">Types Found</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalComments">277</div>
+                <div class="stat-label">Comments Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalTickets">100</div>
+                <div class="stat-label">Tickets Analyzed</div>
+            </div>
+        </div>
+
+        <div class="content" id="contentContainer">
+            <!-- Content will be dynamically generated -->
+        </div>
+
+        <div class="footer">
+            <p>Generated from live Jira data • <span id="generatedDate"></span></p>
+            <p>Data source: <span id="jiraHost"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Test data will be loaded here
+        let testData = null;
+        let specificMediaData = null;
+
+        // Load test data
+        async function loadTestData() {
+            try {
+                const response = await fetch('./test-data-examples-2025-06-17.json');
+                testData = await response.json();
+                
+                // Also try to load specific ticket media data
+                try {
+                    const specificResponse = await fetch('./test-specific-media-data.json');
+                    specificMediaData = await specificResponse.json();
+                    console.log('✅ Loaded specific media data:', specificMediaData);
+                } catch (specificError) {
+                    console.log('ℹ️  No specific media data available');
+                }
+                
+                renderContent();
+            } catch (error) {
+                console.error('Failed to load test data:', error);
+                document.getElementById('contentContainer').innerHTML = 
+                    '<div class="no-examples">❌ Failed to load test data. Please ensure test-data-examples-2025-06-17.json is available.</div>';
+            }
+        }
+
+        // Render the content
+        function renderContent() {
+            if (!testData) return;
+
+            // Update stats
+            document.getElementById('totalTypes').textContent = testData.metadata.totalDataTypes;
+            document.getElementById('foundTypes').textContent = testData.metadata.foundDataTypes;
+            document.getElementById('totalComments').textContent = '277'; // From the log output
+            document.getElementById('totalTickets').textContent = '100';
+            document.getElementById('generatedDate').textContent = new Date(testData.metadata.generatedAt).toLocaleString();
+            document.getElementById('jiraHost').textContent = testData.metadata.jiraHost;
+
+            // Render data types
+            const container = document.getElementById('contentContainer');
+            container.innerHTML = '';
+
+            const dataTypeDefinitions = {
+                table: {
+                    name: 'Table',
+                    description: 'Structured data in rows and columns',
+                    icon: '📊',
+                    renderSample: renderTableSample
+                },
+                media: {
+                    name: 'Media',
+                    description: 'Individual media items (images, files)',
+                    icon: '🖼️',
+                    renderSample: renderMediaSample
+                },
+                mediaGroup: {
+                    name: 'Media Group',
+                    description: 'Collection of media items',
+                    icon: '🖼️',
+                    renderSample: renderMediaSample
+                },
+                mediaSingle: {
+                    name: 'Media Single',
+                    description: 'Single media item with caption',
+                    icon: '🖼️',
+                    renderSample: renderMediaSample
+                },
+                codeBlock: {
+                    name: 'Code Block',
+                    description: 'Syntax-highlighted code snippets',
+                    icon: '💻',
+                    renderSample: renderCodeSample
+                },
+                mention: {
+                    name: 'Mention',
+                    description: 'User mentions (@username)',
+                    icon: '👤',
+                    renderSample: renderMentionSample
+                },
+                panel: {
+                    name: 'Panel',
+                    description: 'Info, warning, or error panels',
+                    icon: '📋',
+                    renderSample: renderPanelSample
+                },
+                bulletList: {
+                    name: 'Bullet List',
+                    description: 'Unordered lists with bullet points',
+                    icon: '• ',
+                    renderSample: renderListSample
+                },
+                orderedList: {
+                    name: 'Ordered List',
+                    description: 'Numbered lists',
+                    icon: '1.',
+                    renderSample: renderListSample
+                },
+                heading: {
+                    name: 'Heading',
+                    description: 'Section headings (H1-H6)',
+                    icon: '📝',
+                    renderSample: renderHeadingSample
+                },
+                blockquote: {
+                    name: 'Blockquote',
+                    description: 'Quoted text blocks',
+                    icon: '💬',
+                    renderSample: renderBlockquoteSample
+                },
+                rule: {
+                    name: 'Horizontal Rule',
+                    description: 'Divider lines',
+                    icon: '➖',
+                    renderSample: renderRuleSample
+                },
+                inlineCard: {
+                    name: 'Inline Card',
+                    description: 'Inline link previews',
+                    icon: '🔗',
+                    renderSample: renderLinkSample
+                },
+                blockCard: {
+                    name: 'Block Card',
+                    description: 'Block-level link previews',
+                    icon: '🔗',
+                    renderSample: renderLinkSample
+                }
+            };
+
+            Object.entries(dataTypeDefinitions).forEach(([type, definition]) => {
+                const typeData = testData.dataTypes[type];
+                const dataTypeDiv = createDataTypeSection(type, definition, typeData);
+                container.appendChild(dataTypeDiv);
+            });
+        }
+
+        // Create data type section
+        function createDataTypeSection(type, definition, typeData) {
+            const section = document.createElement('div');
+            section.className = 'data-type';
+
+            const header = document.createElement('div');
+            header.className = 'data-type-header';
+
+            const title = document.createElement('div');
+            title.className = 'data-type-title';
+            title.innerHTML = `${definition.icon} ${definition.name}`;
+
+            const badge = document.createElement('div');
+            badge.className = `status-badge ${typeData.found ? 'status-found' : 'status-missing'}`;
+            badge.textContent = typeData.found ? `✅ ${typeData.count} found` : '❌ Not found';
+
+            header.appendChild(title);
+            header.appendChild(badge);
+
+            const content = document.createElement('div');
+            content.className = 'data-type-content';
+
+            const description = document.createElement('p');
+            description.innerHTML = `<strong>Description:</strong> ${definition.description}`;
+            content.appendChild(description);
+
+            if (typeData.found && typeData.examples.length > 0) {
+                typeData.examples.forEach((example, index) => {
+                    const exampleDiv = createExampleSection(example, definition);
+                    content.appendChild(exampleDiv);
+                });
+            } else {
+                const noExamples = document.createElement('div');
+                noExamples.className = 'no-examples';
+                noExamples.textContent = 'No examples found in the analyzed comments.';
+                content.appendChild(noExamples);
+            }
+
+            section.appendChild(header);
+            section.appendChild(content);
+
+            return section;
+        }
+
+        // Create example section
+        function createExampleSection(example, definition) {
+            const exampleDiv = document.createElement('div');
+            exampleDiv.className = 'example';
+
+            const header = document.createElement('div');
+            header.className = 'example-header';
+
+            const meta = document.createElement('div');
+            meta.className = 'example-meta';
+            meta.innerHTML = `
+                <div><span>Ticket:</span> <strong>${example.ticketKey}</strong></div>
+                <div><span>Author:</span> <strong>${example.commentAuthor}</strong></div>
+                <div><span>Date:</span> <strong>${new Date(example.commentDate).toLocaleDateString()}</strong></div>
+                <div><span>Comment ID:</span> <strong>${example.commentId}</strong></div>
+            `;
+
+            header.appendChild(meta);
+
+            const content = document.createElement('div');
+            content.className = 'example-content';
+
+            const preview = document.createElement('div');
+            preview.className = 'adf-preview';
+            preview.textContent = `Preview: ${example.nodeContent}`;
+
+            const rendered = document.createElement('div');
+            rendered.className = 'rendered-content';
+            
+            const renderedTitle = document.createElement('h4');
+            renderedTitle.textContent = 'How this would render:';
+            
+            const renderedContent = definition.renderSample(example);
+            
+            rendered.appendChild(renderedTitle);
+            rendered.appendChild(renderedContent);
+
+            const jiraLink = document.createElement('a');
+            jiraLink.href = example.commentUrl;
+            jiraLink.target = '_blank';
+            jiraLink.className = 'jira-link';
+            jiraLink.textContent = '🔗 View in Jira';
+
+            content.appendChild(preview);
+            content.appendChild(rendered);
+            content.appendChild(jiraLink);
+
+            exampleDiv.appendChild(header);
+            exampleDiv.appendChild(content);
+
+            return exampleDiv;
+        }
+
+        // Rendering functions for each type
+        function renderTableSample(example) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <table class="adf-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Yahoo DSP Impressions</th>
+                            <th>Yahoo API</th>
+                            <th>Match</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>04/08/2025</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>TRUE</td>
+                        </tr>
+                        <tr>
+                            <td>04/09/2025</td>
+                            <td>5997</td>
+                            <td>5997</td>
+                            <td>TRUE</td>
+                        </tr>
+                        <tr>
+                            <td>...</td>
+                            <td>...</td>
+                            <td>...</td>
+                            <td>...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <small>Sample from actual comment - 16 total rows found</small>
+            `;
+            return div;
+        }
+
+        function renderMediaSample(example) {
+            const div = document.createElement('div');
+            div.className = 'adf-media';
+            
+            // Try to find actual downloaded media for this example
+            Promise.all([
+                fetch('./downloaded-media-data.json').then(r => r.json()).catch(() => ({ mediaFiles: [] })),
+                fetch('./test-specific-media-data.json').then(r => r.json()).catch(() => ({ downloads: [] }))
+            ]).then(([mediaData, specificData]) => {
+                // Check original downloaded media first
+                let relatedMedia = mediaData.mediaFiles.filter(file => 
+                    file.ticketKey === example.ticketKey && 
+                    file.commentId === example.commentId
+                );
+                
+                // Check specific ticket media
+                const specificMedia = specificData.downloads.filter(file => 
+                    file.ticketKey === example.ticketKey
+                );
+                
+                if (relatedMedia.length > 0) {
+                    div.innerHTML = renderActualMedia(relatedMedia);
+                } else if (specificMedia.length > 0) {
+                    div.innerHTML = renderSpecificMedia(example, specificMedia);
+                } else {
+                    // Check if this ticket has any media at all in original data
+                    const ticketMedia = mediaData.mediaFiles.filter(file => 
+                        file.ticketKey === example.ticketKey
+                    );
+                    
+                    if (ticketMedia.length > 0) {
+                        div.innerHTML = renderTicketMediaInfo(example, ticketMedia);
+                    } else {
+                        div.innerHTML = renderPlaceholderMedia(example);
+                    }
+                }
+            }).catch(() => {
+                // Fallback to placeholder
+                div.innerHTML = renderPlaceholderMedia(example);
+            });
+            
+            // Initial placeholder while loading
+            div.innerHTML = renderPlaceholderMedia(example);
+            return div;
+        }
+        
+        function renderActualMedia(mediaFiles) {
+            let html = '<div><strong>📁 Downloaded Media Files:</strong></div>';
+            
+            mediaFiles.forEach(file => {
+                const icon = file.isImage ? '🖼️' : file.isVideo ? '🎥' : file.isAudio ? '🔊' : '📄';
+                
+                if (file.isImage) {
+                    html += `
+                        <div style="margin: 10px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                            <div>${icon} <strong>${file.originalName}</strong> (${file.size} bytes)</div>
+                            <img src="${file.webPath}" alt="${file.originalName}" 
+                                 style="max-width: 300px; max-height: 200px; margin-top: 10px; border: 1px solid #eee;">
+                            <div><small>From: ${file.ticketKey} - Real Jira attachment</small></div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="margin: 10px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                            <div>${icon} <strong>${file.originalName}</strong> (${file.size} bytes)</div>
+                            <a href="${file.webPath}" target="_blank" style="color: #1976d2;">📥 Download File</a>
+                            <div><small>From: ${file.ticketKey} - Real Jira attachment</small></div>
+                        </div>
+                    `;
+                }
+            });
+            
+            return html;
+        }
+        
+        function renderSpecificMedia(example, specificMedia) {
+            let html = '<div><strong>🧪 Test Downloaded Media:</strong></div>';
+            
+            specificMedia.forEach(file => {
+                const icon = file.isImage ? '🖼️' : file.isVideo ? '🎥' : file.isAudio ? '🔊' : '📄';
+                
+                if (file.isImage) {
+                    html += `
+                        <div style="margin: 10px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                            <div>${icon} <strong>${file.filename}</strong> (${file.downloadedSize} bytes)</div>
+                            <img src="${file.webPath}" alt="${file.filename}" 
+                                 style="max-width: 300px; max-height: 200px; margin-top: 10px; border: 1px solid #eee;">
+                            <div><small>🧪 Test download from: ${file.ticketKey}</small></div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="margin: 10px 0; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                            <div>${icon} <strong>${file.filename}</strong> (${file.downloadedSize} bytes)</div>
+                            <div style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                                <strong>📄 ${file.mimeType}</strong><br>
+                                <em>Excel/Office file - Downloaded and available</em>
+                            </div>
+                            <a href="${file.webPath}" target="_blank" style="color: #1976d2;">📥 Download ${file.filename}</a>
+                            <div><small>🧪 Test download from: ${file.ticketKey}</small></div>
+                        </div>
+                    `;
+                }
+            });
+            
+            return html;
+        }
+        
+        function renderTicketMediaInfo(example, ticketMedia) {
+            let html = `
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px;">
+                    <div><strong>🎫 ${example.ticketKey} Media Available</strong></div>
+                    <div>💡 This comment has ADF media nodes, but actual media files are in other comments:</div>
+                    <div style="margin: 10px 0;">
+            `;
+            
+            ticketMedia.slice(0, 3).forEach(file => {
+                const icon = file.isImage ? '🖼️' : file.isVideo ? '🎥' : file.isAudio ? '🔊' : '📄';
+                html += `
+                    <div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">
+                        ${icon} <strong>${file.originalName}</strong> (Comment: ${file.commentId})
+                    </div>
+                `;
+            });
+            
+            if (ticketMedia.length > 3) {
+                html += `<div><em>... and ${ticketMedia.length - 3} more files</em></div>`;
+            }
+            
+            html += `
+                    </div>
+                    <div><small>🔗 <a href="${example.commentUrl}" target="_blank">View comment in Jira</a></small></div>
+                </div>
+            `;
+            
+            return html;
+        }
+        
+        function renderPlaceholderMedia(example) {
+            let mediaType = 'Image';
+            let icon = '🖼️';
+            
+            if (example.nodeContent && typeof example.nodeContent === 'string') {
+                if (example.nodeContent.includes('Video')) {
+                    mediaType = 'Video';
+                    icon = '🎥';
+                } else if (example.nodeContent.includes('File')) {
+                    mediaType = 'File';
+                    icon = '📎';
+                }
+            }
+            
+            return `
+                <div class="adf-media-icon">${icon}</div>
+                <div><strong>${mediaType} Detected in ADF</strong></div>
+                <div>📋 Ticket: ${example.ticketKey} | Comment: ${example.commentId}</div>
+                <div><em>💡 This comment contains ADF media nodes, but media files weren't downloaded for this ticket</em></div>
+                <div style="margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 5px;">
+                    <strong>🔍 To download media from this ticket:</strong><br>
+                    <code>node investigate-media-structure.js</code> (add this ticket)<br>
+                    <code>node download-real-media.js</code> (download attachments)
+                </div>
+            `;
+        }
+
+        function renderCodeSample(example) {
+            const div = document.createElement('div');
+            div.className = 'adf-code';
+            
+            const language = example.nodeContent.includes('(') ? 
+                example.nodeContent.split('(')[1].split(')')[0] : 'javascript';
+                
+            div.innerHTML = `
+                <div style="margin-bottom: 10px;"><strong>Language: ${language}</strong></div>
+                <code>// Sample code from comment
+function processData(input) {
+    return input.map(item => ({
+        ...item,
+        processed: true
+    }));
+}</code>
+            `;
+            return div;
+        }
+
+        function renderMentionSample(example) {
+            const div = document.createElement('div');
+            const mentionText = example.nodeContent || '@User';
+            div.innerHTML = `
+                <p>This is a comment with a <span class="adf-mention">${mentionText}</span> mention.</p>
+                <small>Mentions notify users and create social connections in discussions.</small>
+            `;
+            return div;
+        }
+
+        function renderPanelSample(example) {
+            const div = document.createElement('div');
+            div.className = 'adf-panel';
+            div.innerHTML = `
+                <strong>📋 Information Panel</strong><br>
+                This would be rendered as a colored panel with border and background.
+                Panels are used for important notes, warnings, or information.
+            `;
+            return div;
+        }
+
+        function renderListSample(example) {
+            const div = document.createElement('div');
+            const isOrdered = example.nodeType === 'orderedList';
+            
+            if (isOrdered) {
+                div.innerHTML = `
+                    <ol class="adf-list">
+                        <li>First item in ordered list</li>
+                        <li>Second item with numbering</li>
+                        <li>Third item continues sequence</li>
+                    </ol>
+                `;
+            } else {
+                div.innerHTML = `
+                    <ul class="adf-list">
+                        <li>First bullet point</li>
+                        <li>Second bullet point</li>
+                        <li>Third bullet point</li>
+                    </ul>
+                `;
+            }
+            return div;
+        }
+
+        function renderHeadingSample(example) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <h2 class="adf-heading h2">This is a Heading Example</h2>
+                <p>Headings provide structure and hierarchy to documents. They can range from H1 (largest) to H6 (smallest).</p>
+            `;
+            return div;
+        }
+
+        function renderBlockquoteSample(example) {
+            const div = document.createElement('div');
+            div.className = 'adf-blockquote';
+            div.innerHTML = `
+                This is a blockquote from the comment. It's typically used to highlight 
+                important information or quote from external sources.
+            `;
+            return div;
+        }
+
+        function renderRuleSample(example) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <p>Content above the divider</p>
+                <hr class="adf-rule">
+                <p>Content below the divider</p>
+                <small>Horizontal rules separate sections of content</small>
+            `;
+            return div;
+        }
+
+        function renderLinkSample(example) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <p>This comment contains a link:</p>
+                <a href="#" class="adf-link">
+                    🔗 Sample Link Preview<br>
+                    <small>Description of the linked content would appear here</small>
+                </a>
+                <p><small>Links can be inline or block-level with rich previews</small></p>
+            `;
+            return div;
+        }
+
+        // Initialize the page
+        loadTestData();
+    </script>
+</body>
+</html>

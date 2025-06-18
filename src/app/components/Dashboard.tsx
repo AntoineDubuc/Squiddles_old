@@ -49,7 +49,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [sessionStatus, onStartVoiceSession, onEndVoiceSession]);
 
-  // Handle clicks outside sidebar on mobile
+  // Handle clicks outside sidebar on mobile only
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isMobile && !sidebarCollapsed) {
@@ -64,7 +64,10 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    if (isMobile) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobile, sidebarCollapsed]);
 

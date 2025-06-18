@@ -217,7 +217,7 @@ body {
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     padding: 24px 0;
     overflow-y: auto;
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease;
     position: relative;
     z-index: 200;
     flex-shrink: 0;
@@ -423,7 +423,9 @@ body {
 /* Desktop Collapsed State */
 @media (min-width: 1025px) {
     .sidebar.collapsed {
-        transform: translateX(-100%);
+        width: 0;
+        padding: 0;
+        border-right: none;
     }
 }
 
@@ -433,11 +435,16 @@ body {
         position: fixed;
         height: 100vh;
         z-index: 300;
-        transform: translateX(-100%);
+        width: 0;
+        padding: 0;
+        border-right: none;
+        transition: width 0.3s ease, padding 0.3s ease;
     }
     
     .sidebar.open {
-        transform: translateX(0);
+        width: 280px;
+        padding: 24px 0;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .main-area {

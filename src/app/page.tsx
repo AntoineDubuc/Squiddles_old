@@ -6,6 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 // Main components
 import Dashboard from "./components/Dashboard";
 import VoiceInterface from "./components/VoiceInterface";
+import Settings from "./components/Settings";
+import Integrations from "./components/Integrations";
+import TemplateManager from "./components/TemplateManager";
 
 // Types
 import { SessionStatus, TranscriptItem } from "./types";
@@ -24,7 +27,7 @@ import { allAgentSets, defaultAgentSetKey } from "../agents";
 
 export default function Home() {
   // App state
-  const [currentView, setCurrentView] = useState<'dashboard' | 'voice' | 'tickets' | 'loading'>('loading');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'voice' | 'tickets' | 'settings' | 'integrations' | 'templates' | 'loading'>('loading');
   const [user, setUser] = useState<any>(null);
   
   // Session state (for voice interface)
@@ -355,6 +358,21 @@ export default function Home() {
     setCurrentView('dashboard');
   };
 
+  const handleNavigateToSettings = () => {
+    console.log('⚙️ Navigating to settings');
+    setCurrentView('settings');
+  };
+
+  const handleNavigateToIntegrations = () => {
+    console.log('🔗 Navigating to integrations');
+    setCurrentView('integrations');
+  };
+
+  const handleNavigateToTemplates = () => {
+    console.log('📋 Navigating to templates');
+    setCurrentView('templates');
+  };
+
   // Render based on current view
   if (currentView === 'loading') {
     return (
@@ -372,6 +390,9 @@ export default function Home() {
       <Dashboard 
         onNavigateToVoice={handleNavigateToVoice}
         onNavigateToTickets={handleNavigateToTickets}
+        onNavigateToSettings={handleNavigateToSettings}
+        onNavigateToIntegrations={handleNavigateToIntegrations}
+        onNavigateToTemplates={handleNavigateToTemplates}
         onStartVoiceSession={startSession}
         onEndVoiceSession={endSession}
         sessionStatus={sessionStatus}
@@ -394,6 +415,24 @@ export default function Home() {
         onToggleListening={toggleListening}
         onNavigateToDashboard={handleNavigateToDashboard}
       />
+    );
+  }
+
+  if (currentView === 'settings') {
+    return (
+      <Settings onNavigateBack={handleNavigateToDashboard} />
+    );
+  }
+
+  if (currentView === 'integrations') {
+    return (
+      <Integrations onNavigateBack={handleNavigateToDashboard} />
+    );
+  }
+
+  if (currentView === 'templates') {
+    return (
+      <TemplateManager onNavigateBack={handleNavigateToDashboard} />
     );
   }
 

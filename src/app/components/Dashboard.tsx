@@ -338,13 +338,20 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                             {/* Right Side - Fixed Width */}
                             <div className="comment-right">
                               <button 
+                                type="button"
                                 className="comment-action-btn quick-reply"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
                                   console.log('🎯 Quick reply selected for:', mention.ticketKey);
                                   selectMentionForReply(mention);
                                   setVoiceReplyMode(true);
                                   if (onNavigateToVoice) {
                                     onNavigateToVoice();
+                                  }
+                                  // Also start voice session if not already connected
+                                  if (sessionStatus === 'DISCONNECTED' && onStartVoiceSession) {
+                                    onStartVoiceSession();
                                   }
                                 }}
                                 title="Quick Reply via Voice"

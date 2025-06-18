@@ -354,7 +354,9 @@ export default function Home() {
   // Navigation handlers
   const handleNavigateToVoice = () => {
     console.log('🎙️ Navigating to voice interface');
+    console.log('🔍 Current view before navigation:', currentView);
     setCurrentView('voice');
+    console.log('✅ Voice view should now be active');
   };
 
   const handleNavigateToTickets = () => {

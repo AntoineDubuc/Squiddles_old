@@ -545,11 +545,13 @@ body {
 
 /* Secondary action removed - redundant with clickable mentions section */
 
-/* Essential Metrics - Only 2 Cards */
+/* Essential Metrics - Single Card */
 .essential-metrics {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .metric-change.normal {

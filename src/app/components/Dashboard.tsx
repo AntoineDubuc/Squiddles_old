@@ -193,7 +193,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
             <main className="main-content">
               {/* Welcome Section */}
               <div className="welcome-section">
-                <h1 className="welcome-title">Welcome back, Jordan</h1>
+                <h1 className="welcome-title">Welcome back, Antoine</h1>
                 <p className="welcome-subtitle">You have 3 mentions waiting for your response</p>
               </div>
 
@@ -240,38 +240,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
                 </div>
               </div>
 
-              {/* Essential Metrics Only */}
-              <div className="essential-metrics">
-                <div className="metric-card">
-                  <div className="metric-header">
-                    <div>
-                      <div className="metric-value">23</div>
-                      <div className="metric-label">Active Tickets</div>
-                    </div>
-                    <div className="metric-icon">📋</div>
-                  </div>
-                  <div className="metric-change normal">
-                    <span>↑</span>
-                    <span>5 from last week</span>
-                  </div>
-                </div>
-                
-                <div className="metric-card">
-                  <div className="metric-header">
-                    <div>
-                      <div className="metric-value">3</div>
-                      <div className="metric-label">Mentions</div>
-                    </div>
-                    <div className="metric-icon">📌</div>
-                  </div>
-                  <div className="metric-change urgent">
-                    <span>⚠️</span>
-                    <span>Need response</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Collapsible Activity Section */}
+              {/* Collapsible Activity Section - Mentions First */}
               <div className="activity-section">
                 <div className="activity-header" onClick={toggleActivity}>
                   <div className="activity-title">
@@ -291,7 +260,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
                         <span>2 hours ago</span>
                       </div>
                       <div className="activity-content-text">
-                        <span className="mention">@JordanKim</span> can you clarify the acceptance criteria for mobile checkout? The team has questions about offline mode handling.
+                        <span className="mention">@AntoineDubuc</span> can you clarify the acceptance criteria for mobile checkout? The team has questions about offline mode handling.
                       </div>
                     </div>
                     
@@ -304,7 +273,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
                         <span>5 hours ago</span>
                       </div>
                       <div className="activity-content-text">
-                        <span className="mention">@JordanKim</span> the research is complete. Key findings: 3 viable auth providers. Recommendation: Auth0 for enterprise features.
+                        <span className="mention">@AntoineDubuc</span> the research is complete. Key findings: 3 viable auth providers. Recommendation: Auth0 for enterprise features.
                       </div>
                     </div>
                     
@@ -323,6 +292,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
                   </div>
                 )}
               </div>
+
             </main>
           </div>
         </div>

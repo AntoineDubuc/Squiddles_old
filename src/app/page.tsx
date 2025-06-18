@@ -17,6 +17,7 @@ import type { RealtimeAgent } from '@openai/agents/realtime';
 // Context providers & hooks
 import { useTranscript } from "./contexts/TranscriptContext";
 import { useEvent } from "./contexts/EventContext";
+import { useReply } from "./contexts/ReplyContext";
 
 // Utilities
 import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
@@ -44,6 +45,7 @@ export default function Home() {
     updateTranscriptItem
   } = useTranscript();
   const { events, addEvent, clearEvents } = useEvent();
+  const { replyState, setReplyStatus, setLastPostedComment, clearSelectedMention } = useReply();
 
   // Check authentication on mount
   useEffect(() => {
@@ -183,6 +185,13 @@ export default function Home() {
         audioElement: sdkAudioElement,
         extraContext: {
           addTranscriptMessage,
+          selectedMention: replyState.selectedMention,
+          setReplyStatus,
+          setLastPostedComment,
+          refreshDashboard: () => {
+            // Trigger dashboard refresh if needed
+            console.log('🔄 Dashboard refresh requested from voice agent');
+          },
         },
       } as any);
 

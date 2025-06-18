@@ -65,9 +65,28 @@ export interface JiraComment {
       '48x48': string;
     };
   };
-  body: string;
+  body: any; // ADF format or string
   created: string;
   updated: string;
+}
+
+// ADF (Atlassian Document Format) types for rich comments
+export interface AdfDocument {
+  type: 'doc';
+  version: 1;
+  content: AdfNode[];
+}
+
+export interface AdfNode {
+  type: string;
+  attrs?: Record<string, any>;
+  content?: AdfNode[];
+  text?: string;
+  marks?: Array<{ type: string; attrs?: Record<string, any> }>;
+}
+
+export interface CommentInput {
+  body: AdfDocument | string;
 }
 
 export interface JiraUser {
@@ -87,6 +106,15 @@ export class JiraClient {
       email: process.env.JIRA_EMAIL || process.env.JIRA_USER_EMAIL || '',
       apiToken: process.env.JIRA_API_TOKEN || '',
     };
+
+    // Debug logging for server-side only
+    if (typeof window === 'undefined') {
+      console.log('🔧 JiraClient initialized:', {
+        host: this.config.host ? 'configured' : 'missing',
+        email: this.config.email ? 'configured' : 'missing',
+        apiToken: this.config.apiToken ? 'configured' : 'missing'
+      });
+    }
 
     if (!this.config.host || !this.config.email || !this.config.apiToken) {
       throw new Error('Missing Jira configuration. Please set JIRA_HOST/JIRA_BASE_URL, JIRA_EMAIL/JIRA_USER_EMAIL, and JIRA_API_TOKEN');
@@ -284,6 +312,168 @@ export class JiraClient {
   isUserMentioned(comment: JiraComment, userAccountId: string): boolean {
     const mentions = this.parseMentions(comment.body);
     return mentions.includes(userAccountId);
+  }
+
+  /**
+   * Create ADF document from plain text
+   */
+  private createPlainTextAdf(text: string): AdfDocument {
+    return {
+      type: 'doc',
+      version: 1,
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: text
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Add a comment to a Jira ticket
+   */
+  async addComment(ticketKey: string, comment: string | AdfDocument): Promise<JiraComment> {
+    const endpoint = `${this.baseUrl}/issue/${ticketKey}/comment`;
+    
+    // Convert string to ADF format if needed
+    const commentBody = typeof comment === 'string' 
+      ? this.createPlainTextAdf(comment)
+      : comment;
+
+    const payload = {
+      body: commentBody
+    };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to add comment to ${ticketKey}: ${response.status} ${errorText}`);
+      }
+
+      const result = await response.json();
+      
+      // Log success for debugging (server-side only)
+      if (typeof window === 'undefined') {
+        console.log(`✅ Comment added to ${ticketKey}:`, {
+          commentId: result.id,
+          author: result.author.displayName,
+          created: result.created
+        });
+      }
+
+      return result;
+    } catch (error) {
+      // Log error for debugging (server-side only)
+      if (typeof window === 'undefined') {
+        console.error(`❌ Failed to add comment to ${ticketKey}:`, error);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing comment
+   */
+  async updateComment(ticketKey: string, commentId: string, comment: string | AdfDocument): Promise<JiraComment> {
+    const endpoint = `${this.baseUrl}/issue/${ticketKey}/comment/${commentId}`;
+    
+    // Convert string to ADF format if needed
+    const commentBody = typeof comment === 'string' 
+      ? this.createPlainTextAdf(comment)
+      : comment;
+
+    const payload = {
+      body: commentBody
+    };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: this.headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update comment ${commentId} on ${ticketKey}: ${response.status} ${errorText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      if (typeof window === 'undefined') {
+        console.error(`❌ Failed to update comment ${commentId} on ${ticketKey}:`, error);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a comment
+   */
+  async deleteComment(ticketKey: string, commentId: string): Promise<void> {
+    const endpoint = `${this.baseUrl}/issue/${ticketKey}/comment/${commentId}`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: this.headers,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to delete comment ${commentId} on ${ticketKey}: ${response.status} ${errorText}`);
+      }
+
+      if (typeof window === 'undefined') {
+        console.log(`✅ Comment ${commentId} deleted from ${ticketKey}`);
+      }
+    } catch (error) {
+      if (typeof window === 'undefined') {
+        console.error(`❌ Failed to delete comment ${commentId} on ${ticketKey}:`, error);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Create a comment with user mention
+   */
+  createMentionComment(text: string, userAccountId: string, userName: string): AdfDocument {
+    return {
+      type: 'doc',
+      version: 1,
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'mention',
+              attrs: {
+                id: userAccountId,
+                text: `@${userName}`,
+                userType: 'DEFAULT'
+              }
+            },
+            {
+              type: 'text',
+              text: ` ${text}`
+            }
+          ]
+        }
+      ]
+    };
   }
 }
 

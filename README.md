@@ -158,16 +158,82 @@ development-archive/
 4. **Guardrails**: `guardrails.ts` moderates AI responses via `/api/responses`
 5. **UI Updates**: Live transcript streaming via React contexts
 
-### Agent System
-```typescript
-// Current: Single minimal agent
-defaultAgentSetKey = 'minimal'  // → minimalProductManager.ts
+### How the Agent System Works
 
-// Available agents (in development-archive/experimental/agents/):
-- productManager.ts     ← Full-featured PM agent  
-- jiraIntegration.ts    ← Jira ticket creation
-- slackIntegration.ts   ← Slack messaging
+The Squiddles agent system is built on OpenAI's Realtime API and follows a **tool-based architecture** for processing voice commands:
+
+#### Core Architecture
+```typescript
+// Agent Definition Pattern
+const agent = new RealtimeAgent({
+  name: 'productManager',
+  voice: 'alloy',              // Voice personality
+  instructions: 'You are...',  // Agent behavior
+  tools: [tool1, tool2],       // Available actions
+  handoffs: [],                // Other agents it can transfer to
+});
 ```
+
+#### Voice Command Processing Flow
+1. **Voice Input** → WebRTC streams audio to OpenAI Realtime API
+2. **Speech Recognition** → Converts voice to text in real-time
+3. **Agent Processing** → Agent analyzes text based on its instructions
+4. **Tool Selection** → Agent chooses appropriate tool to execute
+5. **Action Execution** → Tool executes with typed parameters
+6. **Voice Response** → Agent responds via synthesized speech
+
+#### Tool-Based Actions
+Agents execute actions through **strongly-typed tools**:
+```typescript
+const createUserStoryTool = tool({
+  name: 'createUserStory',
+  description: 'Create a basic user story',
+  parameters: {
+    type: 'object',
+    properties: {
+      title: { type: 'string' },
+      description: { type: 'string' }
+    },
+    required: ['title', 'description']
+  },
+  execute: async (input) => {
+    // Actual implementation here
+    return { success: true, story: `${input.title}: ${input.description}` };
+  }
+});
+```
+
+#### Context and State Management
+- **Conversation History**: Maintained automatically by OpenAI Realtime API
+- **Extra Context**: Pass application state to agents via `extraContext`:
+  ```typescript
+  const client = new RealtimeClient({
+    extraContext: {
+      addTranscriptMessage,    // UI update function
+      dashboardState: {...},   // Current dashboard data
+      apiClients: {...}        // Service integrations
+    }
+  });
+  ```
+- **Tool Access**: Tools can access context through `details` parameter:
+  ```typescript
+  execute: async (input, details) => {
+    const context = details?.context as any;
+    const dashboardData = context?.dashboardState;
+  }
+  ```
+
+#### Current Limitations & Future Enhancements
+**Current State**:
+- Single minimal agent with basic user story creation
+- No access to dashboard data (mentions, tickets)
+- Mock implementations for most tools
+
+**Planned Enhancements** (in development-archive):
+- **Multi-Agent System**: Specialized agents for Jira, Slack, etc.
+- **Context-Aware Commands**: "Reply to the first mention"
+- **Real Service Integration**: Actual Jira/Slack API calls
+- **Agent Handoffs**: Transfer between specialized agents
 
 ### Voice Commands That Work
 ```
@@ -234,6 +300,64 @@ const newTool = tool({
 
 // Add to agent tools array
 tools: [existingTool, newTool]
+```
+
+### Enabling Dashboard-Aware Commands
+To enable commands like "Reply to the first mention":
+
+1. **Pass Dashboard State to Agent** (in `page.tsx`):
+```typescript
+const client = new RealtimeClient({
+  extraContext: {
+    addTranscriptMessage,
+    // Add dashboard data
+    dashboardState: {
+      mentions: activityFeed?.mentions || [],
+      currentPage: currentPage
+    },
+    // Add action functions
+    jiraActions: {
+      replyToComment: async (ticketKey, message) => {
+        // Call Jira API
+      }
+    }
+  }
+});
+```
+
+2. **Create Context-Aware Tool** (in agent file):
+```typescript
+const replyToMentionTool = tool({
+  name: 'replyToMention',
+  description: 'Reply to a mention from the dashboard',
+  parameters: {
+    type: 'object',
+    properties: {
+      position: { type: 'string', description: '"first", "last", or number' },
+      message: { type: 'string', description: 'Reply message' }
+    }
+  },
+  execute: async (input, details) => {
+    const { dashboardState, jiraActions } = details?.context as any;
+    
+    // Resolve position to actual mention
+    let mention;
+    if (input.position === 'first') mention = dashboardState.mentions[0];
+    else if (input.position === 'last') mention = dashboardState.mentions[dashboardState.mentions.length - 1];
+    
+    // Execute reply
+    return await jiraActions.replyToComment(mention.ticketKey, input.message);
+  }
+});
+```
+
+3. **Update Agent Instructions**:
+```typescript
+instructions: `
+You are a product manager assistant. You can see the dashboard mentions.
+When users say "reply to the first mention", use the replyToMention tool with position "first".
+When users say "reply to the last comment", use position "last".
+`
 ```
 
 ### Adding Dashboard Features

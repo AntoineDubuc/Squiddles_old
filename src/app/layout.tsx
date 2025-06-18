@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TranscriptProvider } from "./contexts/TranscriptContext";
 import { EventProvider } from "./contexts/EventContext";
+import { ReplyProvider } from "./contexts/ReplyContext";
 
 export const metadata: Metadata = {
   title: "Squiddles - Voice AI Interface",
@@ -18,7 +19,9 @@ export default function RootLayout({
       <body className="antialiased">
         <EventProvider>
           <TranscriptProvider>
-            {children}
+            <ReplyProvider>
+              {children}
+            </ReplyProvider>
           </TranscriptProvider>
         </EventProvider>
       </body>

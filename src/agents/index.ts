@@ -6,15 +6,18 @@
  */
 
 import { minimalProductManagerScenario, minimalProductManagerAgent } from './minimalProductManager';
+import { jiraIntegrationScenario, jiraIntegrationAgent } from './jiraIntegration';
 
 import type { RealtimeAgent } from '@openai/agents/realtime';
 
 // Map of scenario key -> array of RealtimeAgent objects
 export const allAgentSets: Record<string, RealtimeAgent[]> = {
   minimal: minimalProductManagerScenario,
+  jira: jiraIntegrationScenario,
+  withJira: [...minimalProductManagerScenario, ...jiraIntegrationScenario],
 };
 
-export const defaultAgentSetKey = 'minimal';
+export const defaultAgentSetKey = 'withJira';
 
 // Export active agents for direct access
-export { minimalProductManagerAgent };
+export { minimalProductManagerAgent, jiraIntegrationAgent };

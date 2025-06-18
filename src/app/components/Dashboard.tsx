@@ -245,10 +245,21 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                 </div>
                 
                 <div className="voice-instruction-text">
-                  {sessionStatus === 'CONNECTED' && isListening ? 'Click to stop' :
-                   sessionStatus === 'CONNECTED' ? 'Click to end voice session' : 
-                   sessionStatus === 'CONNECTING' ? 'Please wait...' :
-                   'Press Space or click to speak'}
+                  {replyState.selectedMention ? (
+                    <div style={{ color: '#10B981', fontWeight: 'bold' }}>
+                      ✅ {replyState.selectedMention.ticketKey} selected for reply
+                      <br />
+                      {sessionStatus === 'CONNECTED' && isListening ? 'Say: "Reply to this saying..."' :
+                       sessionStatus === 'CONNECTED' ? 'Click to end voice session' : 
+                       sessionStatus === 'CONNECTING' ? 'Please wait...' :
+                       'Click to start voice reply'}
+                    </div>
+                  ) : (
+                    sessionStatus === 'CONNECTED' && isListening ? 'Click to stop' :
+                    sessionStatus === 'CONNECTED' ? 'Click to end voice session' : 
+                    sessionStatus === 'CONNECTING' ? 'Please wait...' :
+                    'Press Space or click to speak'
+                  )}
                 </div>
               </div>
 
@@ -346,15 +357,10 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                                   console.log('🎯 Quick reply selected for:', mention.ticketKey);
                                   selectMentionForReply(mention);
                                   setVoiceReplyMode(true);
-                                  if (onNavigateToVoice) {
-                                    onNavigateToVoice();
-                                  }
-                                  // Also start voice session if not already connected
-                                  if (sessionStatus === 'DISCONNECTED' && onStartVoiceSession) {
-                                    onStartVoiceSession();
-                                  }
+                                  // Don't navigate immediately - just select the mention
+                                  // User can use voice button in toolbar or navigate manually
                                 }}
-                                title="Quick Reply via Voice"
+                                title="Select for Voice Reply (then use voice button)"
                                 style={{
                                   background: replyState.selectedMention?.ticketKey === mention.ticketKey 
                                     ? 'linear-gradient(135deg, #4ade80, #22c55e)' 

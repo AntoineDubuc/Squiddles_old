@@ -135,4 +135,4 @@ export const useReply = (): ReplyContextValue => {
 };
 
 // Export types for external use
-export type { ReplyContextValue, ReplyContextState };
+export type { ReplyContextValue };

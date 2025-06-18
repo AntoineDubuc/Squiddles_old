@@ -129,6 +129,7 @@ const getSelectedMentionInfoTool = tool({
   parameters: {
     type: 'object',
     properties: {},
+    required: [],
     additionalProperties: false
   },
   execute: async (input: any, details?: any) => {
@@ -164,6 +165,7 @@ const checkJiraStatusTool = tool({
   parameters: {
     type: 'object',
     properties: {},
+    required: [],
     additionalProperties: false
   },
   execute: async (input: any, details?: any) => {

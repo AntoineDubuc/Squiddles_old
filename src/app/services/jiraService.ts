@@ -199,7 +199,7 @@ export class JiraService {
         id: legacyTicket.id,
         key: legacyTicket.key,
         summary: legacyTicket.fields.summary,
-        description: legacyTicket.fields.description,
+        description: legacyTicket.fields.description || undefined,
         
         issueType: {
           id: legacyTicket.fields.issuetype.id,

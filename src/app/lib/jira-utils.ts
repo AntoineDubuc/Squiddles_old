@@ -384,7 +384,7 @@ export function createDashboardMentionItem(
     commentId: comment.id,
     commentAuthor: comment.author,
     commentPreview: truncateText(analysis.text, 150),
-    mentionContext: mentionContext?.contextBefore + mentionContext?.mentionText + mentionContext?.contextAfter || '',
+    mentionContext: (mentionContext?.contextBefore || '') + (mentionContext?.mentionText || '') + (mentionContext?.contextAfter || ''),
     timestamp: new Date(comment.created),
     isRead: false,
     urgency: determineUrgency(analysis.text, ticketTitle),

@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (e) {
-      console.log(`Could not fetch specific tickets: ${e.message}`);
+      console.log(`Could not fetch specific tickets: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
     
     
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
             if (bodyObj.type === 'doc' && bodyObj.content) {
               
               // Function to recursively find mentions in ADF
-              function findMentions(node) {
+              function findMentions(node: any): boolean {
                 if (node.type === 'mention' && node.attrs?.id === currentUser.accountId) {
                   return true;
                 }
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
               mentionsUser = bodyObj.content.some(findMentions);
               
               // Extract text for additional pattern checking
-              function extractText(node) {
+              function extractText(node: any): string {
                 if (node.text) return node.text;
                 if (node.content) return node.content.map(extractText).join(' ');
                 return '';

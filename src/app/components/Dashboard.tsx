@@ -1,24 +1,31 @@
 /**
- * Main Dashboard Component - Simplified with Navigation
+ * Main Dashboard Component - With Real Jira Data Integration
  */
 
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useJiraActivityFeed } from '../services/jiraService';
 
 interface DashboardProps {
   onNavigateToVoice?: () => void;
   onNavigateToTickets?: () => void;
+  onNavigateToSettings?: () => void;
+  onNavigateToIntegrations?: () => void;
+  onNavigateToTemplates?: () => void;
   onStartVoiceSession?: () => void;
   onEndVoiceSession?: () => void;
   sessionStatus?: 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED';
   isListening?: boolean;
 }
 
-export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onStartVoiceSession, onEndVoiceSession, sessionStatus = 'DISCONNECTED', isListening = false }: DashboardProps) {
+export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, sessionStatus = 'DISCONNECTED', isListening = false }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activityExpanded, setActivityExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Real Jira data integration with pagination
+  const { activityFeed, isLoading, error, currentPage, refresh, nextPage, prevPage, loadPage } = useJiraActivityFeed();
 
   // Handle responsive behavior
   useEffect(() => {
@@ -48,6 +55,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [sessionStatus, onStartVoiceSession, onEndVoiceSession]);
+
 
   // Handle clicks outside sidebar on mobile only
   useEffect(() => {
@@ -80,9 +88,49 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
     setActivityExpanded(!activityExpanded);
   };
 
+  // Utility function for relative time formatting
+  const formatRelativeTime = (date: Date | string): string => {
+    const now = new Date();
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    
+    return dateObj.toLocaleDateString();
+  };
+
   return (
     <>
       <div className="background-gradient"></div>
+      
+      {/* Top Header - Full Width */}
+      <header className="header">
+        <div className="header-left">
+          <button className="sidebar-toggle" onClick={toggleSidebar}>
+            <span>{sidebarCollapsed ? '☰' : '✕'}</span>
+          </button>
+          
+          {/* Top Navigation Menu */}
+          <nav className="top-nav">
+            <div className="top-nav-item active">Dashboard</div>
+            <div className="top-nav-item">Projects</div>
+            <div className="top-nav-item">Team</div>
+            <div className="top-nav-item">Reports</div>
+          </nav>
+        </div>
+        
+        <div className="header-right">
+          <div className="notification-button">
+            🔔
+            <div className="notification-badge">3</div>
+          </div>
+          <div className="user-avatar">👤</div>
+        </div>
+      </header>
+
       <div className="container">
         <div className="app-layout">
           {/* Left Sidebar */}
@@ -119,15 +167,11 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
 
             <div className="nav-section">
               <div className="nav-title">Voice Interface</div>
-              <div className="nav-item" onClick={onNavigateToVoice}>
-                <span>🎙️</span>
-                <span>Voice Assistant</span>
-              </div>
               <div className="nav-item">
                 <span>📝</span>
                 <span>Story Creation</span>
               </div>
-              <div className="nav-item">
+              <div className="nav-item" onClick={onNavigateToTemplates}>
                 <span>📋</span>
                 <span>Template Manager</span>
               </div>
@@ -151,11 +195,11 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
 
             <div className="nav-section">
               <div className="nav-title">Configuration</div>
-              <div className="nav-item">
+              <div className="nav-item" onClick={onNavigateToSettings}>
                 <span>⚙️</span>
                 <span>Settings</span>
               </div>
-              <div className="nav-item">
+              <div className="nav-item" onClick={onNavigateToIntegrations}>
                 <span>🔗</span>
                 <span>Integrations</span>
               </div>
@@ -164,33 +208,10 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
 
           {/* Main Content Area */}
           <div className="main-area">
-            {/* Top Header */}
-            <header className="header">
-              <div className="header-left">
-                <button className="sidebar-toggle" onClick={toggleSidebar}>
-                  <span>{sidebarCollapsed ? '☰' : '✕'}</span>
-                </button>
-                
-                {/* Top Navigation Menu */}
-                <nav className="top-nav">
-                  <div className="top-nav-item active">Dashboard</div>
-                  <div className="top-nav-item">Projects</div>
-                  <div className="top-nav-item">Team</div>
-                  <div className="top-nav-item">Reports</div>
-                </nav>
-              </div>
-              
-              <div className="header-right">
-                <div className="notification-button">
-                  🔔
-                  <div className="notification-badge">3</div>
-                </div>
-                <div className="user-avatar">👤</div>
-              </div>
-            </header>
-
-            {/* Main Content - Centered and Spacious */}
-            <main className="main-content">
+            {/* Content Wrapper for Centering */}
+            <div className="content-wrapper">
+              {/* Main Content - Centered and Spacious */}
+              <main className="main-content">
               {/* Welcome Section */}
               <div className="welcome-section">
                 <h1 className="welcome-title">Welcome back, Antoine</h1>
@@ -227,60 +248,149 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onSt
                 </div>
               </div>
 
-              {/* Collapsible Activity Section - Mentions First */}
+              {/* Enhanced Activity Section - Real Jira Comments with Mentions */}
               <div className="activity-section">
                 <div className="activity-header" onClick={toggleActivity}>
                   <div className="activity-title">
                     <span>💬</span>
                     <span>Recent Activity</span>
+                    {isLoading ? (
+                      <div className="loading-badge">Loading...</div>
+                    ) : error ? (
+                      <div className="error-badge">Error</div>
+                    ) : activityFeed ? (
+                      <div className="mention-badge">{activityFeed.unreadCount} mentions</div>
+                    ) : null}
                   </div>
-                  <div className="expand-icon">{activityExpanded ? '▲' : '▼'}</div>
+                  <div className="activity-header-actions">
+                    {!isLoading && (
+                      <button 
+                        className="refresh-btn" 
+                        onClick={(e) => { e.stopPropagation(); refresh(); }}
+                        title="Refresh activity"
+                      >
+                        🔄
+                      </button>
+                    )}
+                    <div className="expand-icon">{activityExpanded ? '▲' : '▼'}</div>
+                  </div>
                 </div>
                 {activityExpanded && (
                   <div className="activity-content">
-                    <div className="activity-item mention">
-                      <div className="activity-meta">
-                        <span>PROD-234</span>
-                        <span>•</span>
-                        <span>Sarah Rodriguez</span>
-                        <span>•</span>
-                        <span>2 hours ago</span>
+                    {isLoading ? (
+                      <div className="activity-loading">
+                        <div className="loading-spinner"></div>
+                        <span>Loading your Jira activity...</span>
                       </div>
-                      <div className="activity-content-text">
-                        <span className="mention">@AntoineDubuc</span> can you clarify the acceptance criteria for mobile checkout? The team has questions about offline mode handling.
+                    ) : error ? (
+                      <div className="activity-error">
+                        <div className="error-icon">⚠️</div>
+                        <div>
+                          <h4>Unable to load Jira activity</h4>
+                          <p>{error}</p>
+                          <button className="retry-btn" onClick={refresh}>Try Again</button>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="activity-item mention">
-                      <div className="activity-meta">
-                        <span>SPIKE-156</span>
-                        <span>•</span>
-                        <span>Alex Chen</span>
-                        <span>•</span>
-                        <span>5 hours ago</span>
-                      </div>
-                      <div className="activity-content-text">
-                        <span className="mention">@AntoineDubuc</span> the research is complete. Key findings: 3 viable auth providers. Recommendation: Auth0 for enterprise features.
-                      </div>
-                    </div>
-                    
-                    <div className="activity-item">
-                      <div className="activity-meta">
-                        <span>TASK-567</span>
-                        <span>•</span>
-                        <span>Engineering Team</span>
-                        <span>•</span>
-                        <span>1 hour ago</span>
-                      </div>
-                      <div className="activity-content-text">
-                        API documentation has been updated. All endpoints now include rate limiting information and error response examples.
-                      </div>
-                    </div>
+                    ) : activityFeed ? (
+                      <>
+                        {/* Real Mention Items - Server-side Paginated */}
+                        {activityFeed.mentions.map((mention) => (
+                          <div 
+                            key={mention.id} 
+                            className={`comment-card mention ${mention.urgency}`}
+                          >
+                            {/* Left Side - Fixed Width */}
+                            <div className="comment-left">
+                              <div className="comment-ticket-key">{mention.ticketKey}</div>
+                              <div className="comment-author">
+                                <img 
+                                  src={mention.commentAuthor.avatarUrls?.['48x48'] || 
+                                       `https://ui-avatars.com/api/?name=${encodeURIComponent(mention.commentAuthor.displayName)}&background=6B7280&color=fff&size=24`}
+                                  alt={mention.commentAuthor.displayName}
+                                  className="comment-avatar"
+                                />
+                                <span>{mention.commentAuthor.displayName}</span>
+                              </div>
+                              <div className="comment-meta">
+                                <span className={`comment-priority ${mention.urgency}`}>
+                                  {mention.urgency.toUpperCase()}
+                                </span>
+                                <span className="comment-time">{formatRelativeTime(mention.timestamp)}</span>
+                              </div>
+                            </div>
+
+                            {/* Center - Flexible Width */}
+                            <div className="comment-center">
+                              <div className="comment-content">
+                                <span dangerouslySetInnerHTML={{ 
+                                  __html: mention.commentPreview.replace(
+                                    /@\w+/g, 
+                                    '<span class="mention-highlight">$&</span>'
+                                  ) 
+                                }} />
+                              </div>
+                            </div>
+
+                            {/* Right Side - Fixed Width */}
+                            <div className="comment-right">
+                              <button 
+                                className="comment-action-btn quick-reply"
+                                onClick={() => console.log('Quick reply to', mention.ticketKey)}
+                                title="Quick Reply"
+                              >
+                                <svg viewBox="0 0 160 160" className="microphone-icon">
+                                  <path d="M72.575813,24.337227 C90.019775,14.899062 111.006821,23.968344 114.820480,43.446560 C115.168907,45.226173 115.311768,47.072208 115.318573,48.888268 C115.360992,60.205475 115.391113,71.523254 115.322739,82.840225 C115.228203,98.486122 102.638100,111.121239 87.093369,111.271851 C71.664284,111.421341 58.822792,98.743019 58.687038,83.095978 C58.593189,72.278694 58.784416,61.458256 58.629086,50.642376 C58.467880,39.417786 62.743896,30.645226 72.575813,24.337227 M93.530128,30.816212 C90.480270,30.120993 87.565414,29.020699 84.251869,29.772255 C74.101601,32.074478 68.030907,38.854221 67.763390,49.406811 C67.489769,60.199940 67.854523,71.000725 67.661629,81.808144 C67.471428,92.464508 75.495987,101.060143 84.921928,101.710281 C96.235840,102.490639 104.370056,96.182739 105.947678,84.446014 C107.523087,72.725769 106.770126,60.866394 106.322441,49.088387 C106.011116,40.897850 102.178101,34.473286 93.530128,30.816212 z" fill="currentColor"/>
+                                </svg>
+                              </button>
+                              <button 
+                                className="comment-action-btn view-ticket"
+                                onClick={() => window.open(mention.directLinkUrl, '_blank')}
+                                title="View Ticket"
+                              >
+                                🔗
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Pagination Controls */}
+                        {(activityFeed.totalPages && activityFeed.totalPages > 1) && (
+                          <div className="pagination-controls">
+                            <button 
+                              className="pagination-btn"
+                              onClick={prevPage}
+                              disabled={currentPage === 0}
+                            >
+                              ← Previous
+                            </button>
+                            <span className="pagination-info">
+                              Page {currentPage + 1} of {activityFeed.totalPages}
+                            </span>
+                            <button 
+                              className="pagination-btn"
+                              onClick={nextPage}
+                              disabled={!activityFeed.hasMore}
+                            >
+                              Next →
+                            </button>
+                          </div>
+                        )}
+                        
+                        {activityFeed.mentions.length === 0 && activityFeed.ticketUpdates.length === 0 && (
+                          <div className="activity-empty">
+                            <div className="empty-icon">📭</div>
+                            <h4>No recent activity</h4>
+                            <p>No mentions or updates in the last 7 days</p>
+                          </div>
+                        )}
+                      </>
+                    ) : null}
                   </div>
                 )}
               </div>
 
             </main>
+            </div>
           </div>
         </div>
       </div>

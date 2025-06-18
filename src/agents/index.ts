@@ -14,7 +14,7 @@ import type { RealtimeAgent } from '@openai/agents/realtime';
 export const allAgentSets: Record<string, RealtimeAgent[]> = {
   minimal: minimalProductManagerScenario,
   jira: jiraIntegrationScenario,
-  withJira: [...minimalProductManagerScenario, ...jiraIntegrationScenario],
+  withJira: [...jiraIntegrationScenario, ...minimalProductManagerScenario],
 };
 
 export const defaultAgentSetKey = 'withJira';

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squiddles - Simplified Dashboard Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0A;
+            color: #FFFFFF;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Subtle Background Effects */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* App Layout */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 200;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-logo-text {
+            font-weight: 700;
+            font-size: 20px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-subtitle {
+            font-size: 14px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-title {
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding: 0 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: #ffffff;
+            border-right: 3px solid #3B82F6;
+        }
+
+        /* Main Content Area */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .header {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            height: 64px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .sidebar-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Top Navigation Menu */
+        .top-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .top-nav-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-weight: 500;
+            color: #A1A1AA;
+            font-size: 14px;
+        }
+
+        .top-nav-item:hover {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .top-nav-item.active {
+            color: #FFFFFF;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .top-nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 1.25rem;
+            right: 1.25rem;
+            height: 2px;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-button {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .notification-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: #EF4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.1rem 0.3rem;
+            border-radius: 1rem;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main Content - Centered and Spacious */
+        .main-content {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            overflow-y: auto;
+        }
+
+        /* Responsive Design Updates */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                height: 100vh;
+                z-index: 300;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-area {
+                width: 100%;
+            }
+        }
+
+        /* Welcome Section - Cleaner */
+        .welcome-section {
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #FFFFFF, #A1A1AA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-subtitle {
+            color: #6B7280;
+            font-size: 1.125rem;
+        }
+
+        /* Hero Voice Section - Prominent and Clean */
+        .hero-voice-section {
+            background: rgba(20, 20, 20, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle shimmer - less distracting */
+        .hero-voice-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+            animation: gentle-shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes gentle-shimmer {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+
+        .hero-voice-button {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border: none;
+            border-radius: 1.5rem;
+            padding: 2rem 3rem;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+        }
+
+        .hero-voice-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+        }
+
+        .voice-icon {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .voice-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .voice-main {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 0.25rem;
+        }
+
+        .voice-sub {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Single Secondary Action */
+        .secondary-action {
+            margin-top: 2rem;
+        }
+
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem 2rem;
+            color: #FFFFFF;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .secondary-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Simplified Metrics - Only Essentials */
+        .essential-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: rgba(20, 20, 20, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .metric-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1;
+        }
+
+        .metric-label {
+            color: #A1A1AA;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .metric-icon {
+            font-size: 1.25rem;
+            opacity: 0.6;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .metric-change.urgent {
+            color: #EF4444;
+        }
+
+        .metric-change.normal {
+            color: #6B7280;
+        }
+
+        /* Collapsible Activity Section */
+        .activity-section {
+            background: rgba(20, 20, 20, 0.2);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .expand-icon {
+            transition: transform 0.2s;
+            color: #A1A1AA;
+        }
+
+        .activity-content {
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .activity-content.expanded {
+            display: block;
+        }
+
+        .activity-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-item.mention {
+            border-left: 3px solid #3B82F6;
+        }
+
+        .activity-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #A1A1AA;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-content-text {
+            color: #E5E7EB;
+            line-height: 1.5;
+        }
+
+        .mention {
+            color: #3B82F6;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 2rem 1rem;
+                gap: 2rem;
+            }
+
+            .hero-voice-section {
+                padding: 3rem 1.5rem;
+            }
+
+            .hero-voice-button {
+                padding: 1.5rem 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .voice-text {
+                text-align: center;
+            }
+
+            .essential-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <div class="container">
+        <div class="app-layout">
+            <!-- Left Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <span style="font-size: 24px;">🦑</span>
+                        <span class="sidebar-logo-text">Squiddles</span>
+                    </div>
+                    <div class="sidebar-subtitle">Product Management Suite</div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Overview</div>
+                    <div class="nav-item active">
+                        <span>🏠</span>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>📊</span>
+                        <span>Analytics</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Voice Interface</div>
+                    <div class="nav-item">
+                        <span>🎙️</span>
+                        <span>Voice Assistant</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>📝</span>
+                        <span>Story Creation</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>📋</span>
+                        <span>Template Manager</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Project Management</div>
+                    <div class="nav-item">
+                        <span>🎫</span>
+                        <span>Tickets</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>👥</span>
+                        <span>Team</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>📈</span>
+                        <span>Reports</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Configuration</div>
+                    <div class="nav-item">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>🔗</span>
+                        <span>Integrations</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-area">
+                <!-- Top Header -->
+                <header class="header">
+                    <div class="header-left">
+                        <button class="sidebar-toggle" onclick="toggleSidebar()">
+                            <span id="sidebarIcon">☰</span>
+                        </button>
+                        
+                        <!-- Top Navigation Menu -->
+                        <nav class="top-nav">
+                            <div class="top-nav-item active">Dashboard</div>
+                            <div class="top-nav-item">Projects</div>
+                            <div class="top-nav-item">Team</div>
+                            <div class="top-nav-item">Reports</div>
+                        </nav>
+                    </div>
+                    
+                    <div class="header-right">
+                        <div class="notification-button">
+                            🔔
+                            <div class="notification-badge">3</div>
+                        </div>
+                        <div class="user-avatar">👤</div>
+                    </div>
+                </header>
+
+        <!-- Main Content - Centered and Spacious -->
+        <main class="main-content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome back, Jordan</h1>
+                <p class="welcome-subtitle">You have 3 mentions waiting for your response</p>
+            </div>
+
+            <!-- Hero Voice Section - Primary Focus -->
+            <div class="hero-voice-section">
+                <div class="hero-voice-button">
+                    <div class="voice-icon">🎙️</div>
+                    <div class="voice-text">
+                        <span class="voice-main">Just ask me</span>
+                        <span class="voice-sub">Press Space or click to speak</span>
+                    </div>
+                </div>
+                <div class="secondary-action">
+                    <button class="secondary-button">
+                        <span>📌</span>
+                        <span>Check Mentions</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Essential Metrics Only -->
+            <div class="essential-metrics">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div>
+                            <div class="metric-value">23</div>
+                            <div class="metric-label">Active Tickets</div>
+                        </div>
+                        <div class="metric-icon">📋</div>
+                    </div>
+                    <div class="metric-change normal">
+                        <span>↑</span>
+                        <span>5 from last week</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div>
+                            <div class="metric-value">3</div>
+                            <div class="metric-label">Mentions</div>
+                        </div>
+                        <div class="metric-icon">📌</div>
+                    </div>
+                    <div class="metric-change urgent">
+                        <span>⚠️</span>
+                        <span>Need response</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collapsible Activity Section -->
+            <div class="activity-section">
+                <div class="activity-header" onclick="toggleActivity()">
+                    <div class="activity-title">
+                        <span>💬</span>
+                        <span>Recent Activity</span>
+                    </div>
+                    <div class="expand-icon" id="expandIcon">▼</div>
+                </div>
+                <div class="activity-content" id="activityContent">
+                    <div class="activity-item mention">
+                        <div class="activity-meta">
+                            <span>PROD-234</span>
+                            <span>•</span>
+                            <span>Sarah Rodriguez</span>
+                            <span>•</span>
+                            <span>2 hours ago</span>
+                        </div>
+                        <div class="activity-content-text">
+                            <span class="mention">@JordanKim</span> can you clarify the acceptance criteria for mobile checkout? The team has questions about offline mode handling.
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item mention">
+                        <div class="activity-meta">
+                            <span>SPIKE-156</span>
+                            <span>•</span>
+                            <span>Alex Chen</span>
+                            <span>•</span>
+                            <span>5 hours ago</span>
+                        </div>
+                        <div class="activity-content-text">
+                            <span class="mention">@JordanKim</span> the research is complete. Key findings: 3 viable auth providers. Recommendation: Auth0 for enterprise features.
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-meta">
+                            <span>TASK-567</span>
+                            <span>•</span>
+                            <span>Engineering Team</span>
+                            <span>•</span>
+                            <span>1 hour ago</span>
+                        </div>
+                        <div class="activity-content-text">
+                            API documentation has been updated. All endpoints now include rate limiting information and error response examples.
+                        </div>
+                    </div>
+                </div>
+            </main>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleActivity() {
+            const content = document.getElementById('activityContent');
+            const icon = document.getElementById('expandIcon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '▼';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '▲';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('sidebarIcon');
+            
+            if (sidebar.classList.contains('collapsed') || sidebar.classList.contains('open')) {
+                sidebar.classList.toggle('collapsed');
+                sidebar.classList.toggle('open');
+            } else {
+                // First time toggle - check screen size
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.add('open');
+                } else {
+                    sidebar.classList.add('collapsed');
+                }
+            }
+            
+            // Update icon
+            if (sidebar.classList.contains('collapsed') || !sidebar.classList.contains('open')) {
+                icon.textContent = '☰';
+            } else {
+                icon.textContent = '✕';
+            }
+        }
+
+        // Handle clicks outside sidebar on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 1024 && 
+                sidebar.classList.contains('open') && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target)) {
+                toggleSidebar();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('open');
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -361,7 +361,7 @@ export interface DashboardMentionItem {
   
   // Actions
   quickReplyEnabled: boolean;
-  directLinkUrl: string;
+  directLinkUrl?: string; // Optional - may be undefined if JIRA_BASE_URL is missing or comment has no ID
 }
 
 export interface DashboardActivityFeed {

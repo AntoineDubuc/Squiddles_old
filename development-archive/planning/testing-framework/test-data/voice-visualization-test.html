@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Visualization Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-start {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #059669;
+        }
+
+        .btn-stop {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #dc2626;
+        }
+
+        .visualization-container {
+            position: relative;
+            height: 60px;
+            background: linear-gradient(90deg, 
+                rgba(100, 116, 139, 0.3) 0%,   /* Muted blue-grey edges */
+                rgba(95, 122, 139, 0.35) 15%,  /* Extended blue transition */
+                rgba(91, 128, 140, 0.4) 30%,   /* Muted blue transition */
+                rgba(72, 148, 100, 0.3) 50%,   /* More muted green center */
+                rgba(91, 128, 140, 0.4) 70%,   /* Muted blue transition */
+                rgba(95, 122, 139, 0.35) 85%,  /* Extended blue transition */
+                rgba(100, 116, 139, 0.3) 100%  /* Muted blue-grey edges */
+            );
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(72, 148, 100, 0.25);
+        }
+
+        #visualizer {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .status.speaking {
+            color: #10b981;
+        }
+
+        .status.idle {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Voice Visualization Test</h1>
+        
+        <div class="controls">
+            <button class="btn btn-start" onclick="startVisualization()">Start Speaking</button>
+            <button class="btn btn-stop" onclick="stopVisualization()">Stop Speaking</button>
+        </div>
+
+        <div class="visualization-container">
+            <canvas id="visualizer"></canvas>
+        </div>
+
+        <div id="status" class="status idle">Idle - Click "Start Speaking" to see visualization</div>
+    </div>
+
+    <script>
+        class VoiceVisualizer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.isActive = false;
+                this.animationId = null;
+                
+                // Visualization parameters for wavy lines
+                this.waveCount = 60; // Even more lines
+                this.pointsPerWave = 300;
+                this.maxAmplitude = 20; // Much more room for movement
+                
+                // Animation parameters
+                this.time = 0;
+                this.waves = [];
+                
+                // Create many waves with varied frequencies including high frequencies
+                this.waves = [];
+                for (let i = 0; i < this.waveCount; i++) {
+                    this.waves.push({
+                        frequency: 0.3 + i * 0.4 + Math.random() * 0.8, // Higher frequency range
+                        speed: 0.01 + Math.random() * 0.03,
+                        amplitude: 0.2 + Math.random() * 0.6,
+                        offset: Math.random() * Math.PI * 2,
+                        alpha: 0.05 + Math.random() * 0.08, // Lower opacity for dense lines
+                        startY: (Math.random() - 0.5) * 12, // Larger vertical start offset
+                        endY: (Math.random() - 0.5) * 12    // Larger vertical end offset
+                    });
+                }
+                
+                this.setupCanvas();
+                this.draw();
+            }
+            
+            setupCanvas() {
+                const rect = this.canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                
+                this.ctx.scale(dpr, dpr);
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+                
+                this.canvasWidth = rect.width;
+                this.canvasHeight = rect.height;
+            }
+            
+            generateWavePoints(waveIndex) {
+                const points = [];
+                const width = this.canvasWidth;
+                const centerY = this.canvasHeight / 2;
+                const wave = this.waves[waveIndex];
+                
+                for (let i = 0; i <= this.pointsPerWave; i++) {
+                    const x = (i / this.pointsPerWave) * width;
+                    const normalizedX = i / this.pointsPerWave;
+                    
+                    if (!this.isActive) {
+                        points.push({ x, y: centerY });
+                        continue;
+                    }
+                    
+                    // Single frequency wave with unique characteristics
+                    const waveValue = Math.sin(
+                        normalizedX * Math.PI * wave.frequency + 
+                        this.time * wave.speed + 
+                        wave.offset
+                    );
+                    
+                    // Add some temporal envelope variation
+                    const envelope = 0.6 + Math.sin(this.time * 0.02 + waveIndex) * 0.4;
+                    
+                    // Create edge fade effect (fade out towards the edges)
+                    const edgeDistance = Math.min(normalizedX, 1 - normalizedX) * 2; // 0 at edges, 1 at center
+                    const edgeFade = Math.pow(edgeDistance, 2.5); // Stronger fade curve
+                    
+                    // Calculate final amplitude with edge fading
+                    let amplitude = waveValue * wave.amplitude * envelope * edgeFade;
+                    
+                    // Add slight randomness for organic feel
+                    amplitude += (Math.random() - 0.5) * 0.02;
+                    
+                    // Interpolate between start and end Y offsets based on position
+                    const yOffset = wave.startY + (wave.endY - wave.startY) * normalizedX;
+                    
+                    const y = centerY + amplitude * this.maxAmplitude + yOffset;
+                    points.push({ x, y });
+                }
+                
+                return points;
+            }
+            
+            createLineGradient(baseAlpha) {
+                // Create longer gradient with vibrant green center
+                const gradient = this.ctx.createLinearGradient(0, 0, this.canvasWidth, 0);
+                gradient.addColorStop(0, `rgba(100, 116, 139, 0)`);                      // Transparent muted blue edges
+                gradient.addColorStop(0.15, `rgba(95, 122, 139, ${baseAlpha * 0.2})`);   // Extended blue transition
+                gradient.addColorStop(0.2, `rgba(100, 116, 139, ${baseAlpha * 0.3})`);   // Start fading in sooner - muted blue
+                gradient.addColorStop(0.35, `rgba(91, 128, 140, ${baseAlpha * 0.8})`);   // Muted blue transition
+                gradient.addColorStop(0.5, `rgba(34, 197, 94, ${baseAlpha})`);           // Vibrant green center - full opacity
+                gradient.addColorStop(0.65, `rgba(91, 128, 140, ${baseAlpha * 0.8})`);   // Muted blue transition
+                gradient.addColorStop(0.8, `rgba(100, 116, 139, ${baseAlpha * 0.3})`);   // Start fading out sooner - muted blue
+                gradient.addColorStop(0.85, `rgba(95, 122, 139, ${baseAlpha * 0.2})`);   // Extended blue transition
+                gradient.addColorStop(1, `rgba(100, 116, 139, 0)`);                      // Transparent muted blue edges
+                return gradient;
+            }
+            
+            drawSmoothCurve(points) {
+                if (points.length < 2) return;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(points[0].x, points[0].y);
+                
+                // Use quadratic curves for smooth connections
+                for (let i = 1; i < points.length - 1; i++) {
+                    const current = points[i];
+                    const next = points[i + 1];
+                    const cpX = (current.x + next.x) / 2;
+                    const cpY = (current.y + next.y) / 2;
+                    this.ctx.quadraticCurveTo(current.x, current.y, cpX, cpY);
+                }
+                
+                // Final point
+                const lastPoint = points[points.length - 1];
+                this.ctx.lineTo(lastPoint.x, lastPoint.y);
+                this.ctx.stroke();
+            }
+            
+            draw() {
+                // Clear canvas
+                this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                
+                // Draw multiple wavy lines
+                for (let waveIndex = 0; waveIndex < this.waveCount; waveIndex++) {
+                    const points = this.generateWavePoints(waveIndex);
+                    const wave = this.waves[waveIndex];
+                    
+                    // Set line properties - very subtle for dense effect
+                    const baseAlpha = this.isActive ? wave.alpha : 0.05;
+                    const lineWidth = 0.3 + Math.random() * 0.2; // Thinner lines for dense effect
+                    
+                    // Use gradient stroke color with opacity gradient
+                    const gradient = this.createLineGradient(baseAlpha);
+                    this.ctx.strokeStyle = gradient;
+                    this.ctx.globalAlpha = 1.0; // Let the gradient handle opacity
+                    this.ctx.lineWidth = lineWidth;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.lineJoin = 'round';
+                    
+                    // Subtle glow for some waves
+                    if (this.isActive && Math.random() > 0.8) {
+                        this.ctx.shadowColor = 'rgba(16, 185, 129, 0.15)';
+                        this.ctx.shadowBlur = 2;
+                    } else {
+                        this.ctx.shadowBlur = 0;
+                    }
+                    
+                    this.drawSmoothCurve(points);
+                    
+                    // Reset for next wave (globalAlpha already 1.0)
+                }
+                
+                // Reset shadow
+                this.ctx.shadowBlur = 0;
+                
+                this.time += 1;
+                this.animationId = requestAnimationFrame(() => this.draw());
+            }
+            
+            start() {
+                this.isActive = true;
+                document.getElementById('status').textContent = 'Speaking - Voice visualization active';
+                document.getElementById('status').className = 'status speaking';
+            }
+            
+            stop() {
+                this.isActive = false;
+                document.getElementById('status').textContent = 'Idle - Click "Start Speaking" to see visualization';
+                document.getElementById('status').className = 'status idle';
+            }
+        }
+        
+        // Initialize visualizer
+        const visualizer = new VoiceVisualizer('visualizer');
+        
+        // Control functions
+        function startVisualization() {
+            visualizer.start();
+        }
+        
+        function stopVisualization() {
+            visualizer.stop();
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            visualizer.setupCanvas();
+        });
+    </script>
+</body>
+</html>

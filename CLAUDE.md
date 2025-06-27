@@ -168,7 +168,13 @@ npm run test:all         # Complete test suite
 - `OPENAI_API_KEY` with Realtime API access
 - Pinecone configuration for vector search
 - Jira API credentials for ticket integration
+- Confluence API credentials for documentation integration
 - HTTPS required for WebRTC in production
+
+### Confluence Configuration
+- `CONFLUENCE_HOST` or `CONFLUENCE_BASE_URL` - Your Confluence instance URL
+- `CONFLUENCE_EMAIL` - User email for authentication (can reuse JIRA_USER_EMAIL)
+- `CONFLUENCE_API_TOKEN` - Confluence API token (can reuse JIRA_API_TOKEN if same Atlassian account)
 
 ### Configuration Specifics
 - **Next.js Config**: `serverExternalPackages: ['@openai/agents']` required for OpenAI agents

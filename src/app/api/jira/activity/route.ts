@@ -41,6 +41,11 @@ export async function GET(request: NextRequest) {
       JIRA_API_TOKEN: requiredEnvVars.JIRA_API_TOKEN ? 'defined' : 'undefined'
     });
 
+    // Specific warning for directLinkUrl construction
+    if (!requiredEnvVars.JIRA_BASE_URL) {
+      console.warn('⚠️ JIRA_BASE_URL is not defined - all comment directLinkUrl fields will be missing!');
+    }
+
     // Get Jira client
     const jiraClient = getJiraClient();
     
@@ -89,6 +94,11 @@ export async function GET(request: NextRequest) {
         const comments = await jiraClient.getTicketComments(ticket.key);
         
         for (const comment of comments) {
+          // Skip comments without IDs (these would cause broken directLinkUrl)
+          if (!comment.id) {
+            console.warn(`⚠️ Skipping comment without ID in ticket ${ticket.key}`);
+            continue;
+          }
           
           // Use comprehensive mention detection like our successful test script
           const commentText = typeof comment.body === 'string' ? comment.body : JSON.stringify(comment.body);
@@ -149,6 +159,26 @@ export async function GET(request: NextRequest) {
               adfAnalysis = analyzeADFContent(comment.body);
             }
 
+            // Validate required fields for directLinkUrl construction
+            const baseUrl = process.env.JIRA_BASE_URL;
+            const commentId = comment.id;
+            
+            if (!baseUrl) {
+              console.warn(`⚠️ JIRA_BASE_URL is not defined - directLinkUrl will be missing for ${ticket.key}-${commentId}`);
+            }
+            if (!commentId) {
+              console.warn(`⚠️ Comment ID is missing for ${ticket.key} - directLinkUrl will be invalid`);
+            }
+            
+            // Construct directLinkUrl only if both required fields are present
+            const directLinkUrl = (baseUrl && commentId) 
+              ? `${baseUrl}/browse/${ticket.key}?focusedCommentId=${commentId}`
+              : undefined;
+              
+            if (!directLinkUrl) {
+              console.warn(`⚠️ Unable to construct directLinkUrl for ${ticket.key}-${commentId}: baseUrl=${baseUrl}, commentId=${commentId}`);
+            }
+
             // Create dashboard mention item
             const mentionItem = {
               id: `${ticket.key}-${comment.id}`,
@@ -172,7 +202,7 @@ export async function GET(request: NextRequest) {
               hasCode: adfAnalysis.codeBlocks.length > 0,
               mediaCount: adfAnalysis.media.length,
               quickReplyEnabled: true,
-              directLinkUrl: `${process.env.JIRA_BASE_URL}/browse/${ticket.key}?focusedCommentId=${comment.id}`
+              directLinkUrl: directLinkUrl
             };
 
             allMentions.push(mentionItem);
@@ -226,8 +256,13 @@ export async function GET(request: NextRequest) {
     };
 
     console.log(`✅ Activity feed created: ${allMentions.length} mentions, ${recentActivity.length} updates`);
-
-    return NextResponse.json(activityFeed);
+    
+    // Add cache control headers to prevent stale data
+    const response = NextResponse.json(activityFeed);
+    response.headers.set('Cache-Control', 'no-cache, no-store, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
 
   } catch (error) {
     console.error('❌ Jira Activity API error:', error);

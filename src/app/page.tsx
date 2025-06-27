@@ -71,10 +71,32 @@ export default function Home() {
     
     return () => clearTimeout(timeout);
   }, [currentView]);
+
+  // Watch for selected mention changes and recreate session if needed
+  useEffect(() => {
+    const currentMentionKey = replyState.selectedMention?.ticketKey || null;
+    const lastMentionKey = lastSelectedMentionKeyRef.current;
+    
+    // Only recreate session if mention actually changed and we're connected
+    if (currentMentionKey !== lastMentionKey && sessionStatus === "CONNECTED") {
+      console.log('🎯 Selected mention changed during session:', {
+        from: lastMentionKey,
+        to: currentMentionKey
+      });
+      
+      // We'll handle session recreation by setting a flag that the startSession can use
+      // This is better than trying to call functions that might not be defined yet
+      console.log('🔄 Session will be recreated on next voice activation with updated context');
+    }
+    
+    // Update the ref
+    lastSelectedMentionKeyRef.current = currentMentionKey;
+  }, [replyState.selectedMention?.ticketKey]);
   
   // Refs
   const clientRef = useRef<RealtimeClient | null>(null);
   const sessionIdRef = useRef<string>("");
+  const lastSelectedMentionKeyRef = useRef<string | null>(null);
 
   // Refs for audio element (exactly like reference)
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -141,6 +163,20 @@ export default function Home() {
       // Request microphone permissions first with optimal audio constraints
       console.log("🎤 Requesting microphone permissions...");
       try {
+        // Basic check before attempting to use getUserMedia
+        if (!navigator.mediaDevices) {
+          console.error('🔍 Browser environment debug:', {
+            userAgent: navigator.userAgent,
+            isSecureContext: window.isSecureContext,
+            protocol: window.location.protocol,
+            hostname: window.location.hostname,
+            hasNavigator: !!navigator,
+            hasMediaDevices: !!navigator.mediaDevices,
+            hasGetUserMedia: !!((navigator as any).getUserMedia || (navigator as any).webkitGetUserMedia || (navigator as any).mozGetUserMedia)
+          });
+          throw new Error('MediaDevices API not available - this usually happens in non-secure contexts or when another app is blocking microphone access');
+        }
+        
         const stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
             echoCancellation: true,
@@ -175,7 +211,17 @@ export default function Home() {
       console.log("✅ Got ephemeral key:", EPHEMERAL_KEY.slice(0, 10) + "...");
 
       console.log("🤖 Setting up agents...");
-      const agents = allAgentSets[selectedAgentSet];
+      // Dynamic agent selection based on reply context
+      let agents;
+      if (replyState.selectedMention) {
+        // Reply mode: Use only Jira agent for focused comment replies
+        agents = allAgentSets.jira;
+        console.log("🎯 Reply mode: Using Jira agent only for", replyState.selectedMention.ticketKey);
+      } else {
+        // Normal mode: Use full agent set
+        agents = allAgentSets[selectedAgentSet];
+        console.log("🤖 Normal mode: Using full agent set");
+      }
       console.log("🤖 Selected agents:", agents.map(a => a.name));
       
       console.log("🔌 Creating RealtimeClient...");
@@ -229,8 +275,16 @@ export default function Home() {
             if (!existingItem) {
               addTranscriptMessage(itemId, 'assistant', '');
             }
+            
+            // Filter JSON from streaming assistant responses
+            let filteredDelta = delta;
+            if (delta.includes('"success":true') || delta.includes('"pages":[')) {
+              // If this looks like JSON, don't stream it - wait for complete message
+              return;
+            }
+            
             // Append the latest delta so the UI streams
-            updateTranscriptMessage(itemId, delta, true);
+            updateTranscriptMessage(itemId, filteredDelta, true);
             updateTranscriptItem(itemId, { status: 'IN_PROGRESS' });
             return;
           }
@@ -300,7 +354,33 @@ export default function Home() {
           }
           
           if (text) {
-            addTranscriptMessage(item.itemId, role, text);
+            // Filter raw JSON responses for better UX
+            let displayText = text;
+            if (role === 'assistant' && text.includes('"success":true') && text.includes('"pages":[')) {
+              try {
+                const parsed = JSON.parse(text);
+                if (parsed.pages && Array.isArray(parsed.pages)) {
+                  const pageCount = parsed.pages.length;
+                  const query = parsed.message?.match(/matching "([^"]+)"/)?.[1];
+                  if (query) {
+                    displayText = `I found ${pageCount} Confluence pages matching "${query}".`;
+                  } else {
+                    displayText = `I found ${pageCount} Confluence pages.`;
+                  }
+                }
+              } catch (e) {
+                displayText = "I found some Confluence pages for you.";
+              }
+            }
+            
+            addTranscriptMessage(item.itemId, role, displayText);
+            
+            // Store original data if it was filtered
+            if (displayText !== text && role === 'assistant') {
+              updateTranscriptItem(item.itemId, { 
+                data: { content: text, text: text }
+              });
+            }
           }
         }
       });
@@ -384,6 +464,27 @@ export default function Home() {
     setCurrentView('templates');
   };
 
+  // Text input handler - sends text to the realtime client like voice
+  const handleTextInput = (text: string) => {
+    if (!clientRef.current || sessionStatus !== "CONNECTED") {
+      console.warn('⚠️ Cannot send text: not connected');
+      return;
+    }
+
+    console.log('💬 Sending text input:', text);
+    
+    // Add to transcript immediately
+    const itemId = uuidv4();
+    addTranscriptMessage(itemId, 'user', text);
+
+    try {
+      // Send text to the realtime client (same as voice)
+      clientRef.current.sendUserText(text);
+    } catch (error) {
+      console.error('❌ Failed to send text:', error);
+    }
+  };
+
   // Render based on current view
   if (currentView === 'loading') {
     return (
@@ -406,6 +507,7 @@ export default function Home() {
         onNavigateToTemplates={handleNavigateToTemplates}
         onStartVoiceSession={startSession}
         onEndVoiceSession={endSession}
+        onTextInput={handleTextInput}
         sessionStatus={sessionStatus}
         isListening={isListening}
       />
@@ -424,6 +526,7 @@ export default function Home() {
         onStartSession={startSession}
         onEndSession={endSession}
         onToggleListening={toggleListening}
+        onTextInput={handleTextInput}
         onNavigateToDashboard={handleNavigateToDashboard}
       />
     );

@@ -26,6 +26,7 @@ interface VoiceInterfaceProps {
   onStartSession: () => void;
   onEndSession: () => void;
   onToggleListening: () => void;
+  onTextInput?: (text: string) => void;
   onNavigateToDashboard: () => void;
 }
 
@@ -39,6 +40,7 @@ export default function VoiceInterface({
   onStartSession,
   onEndSession,
   onToggleListening,
+  onTextInput,
   onNavigateToDashboard
 }: VoiceInterfaceProps) {
   return (
@@ -187,6 +189,7 @@ export default function VoiceInterface({
           onStartSession={onStartSession}
           onEndSession={onEndSession}
           onToggleListening={onToggleListening}
+          onTextInput={onTextInput}
           selectedAgentSet={selectedAgentSet}
           agentSets={allAgentSets}
         />

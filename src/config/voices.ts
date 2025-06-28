@@ -3,7 +3,7 @@
  * Centralized voice and tone settings
  */
 
-export type OpenAIVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' | 'sage';
+export type OpenAIVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
 
 export interface VoiceProfile {
   voice: OpenAIVoice;
@@ -13,7 +13,7 @@ export interface VoiceProfile {
 
 export const VOICE_PROFILES: Record<string, VoiceProfile> = {
   professional: {
-    voice: 'sage',
+    voice: 'alloy',
     tonality: 'professional',
     style: 'Be professional, clear, and concise. Use formal language and focus on efficiency.'
   },
@@ -50,8 +50,49 @@ export const AGENT_VOICES: Record<string, keyof typeof VOICE_PROFILES> = {
 
 // Get voice configuration for an agent
 export function getAgentVoiceConfig(agentName: string): VoiceProfile {
+  // Check if we're in a browser environment and try to load saved settings
+  if (typeof window !== 'undefined') {
+    try {
+      const savedSettings = localStorage.getItem('squiddles-settings');
+      console.log(`🎵 Loading voice config for ${agentName}:`, savedSettings ? 'Found saved settings' : 'No saved settings');
+      
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings);
+        console.log(`🎵 Parsed settings:`, parsed.voice);
+        
+        // Use global voice if set, or specific agent voice if available
+        if (parsed.voice?.globalVoice && parsed.voice?.globalTone) {
+          const globalProfile = VOICE_PROFILES[parsed.voice.globalTone];
+          if (globalProfile) {
+            const config = {
+              ...globalProfile,
+              voice: parsed.voice.globalVoice
+            };
+            console.log(`🎵 Using global voice config for ${agentName}:`, config);
+            return config;
+          }
+        }
+        
+        // Check for agent-specific voice setting
+        if (parsed.voice?.agentVoices?.[agentName]) {
+          const agentTone = parsed.voice.agentVoices[agentName];
+          const agentProfile = VOICE_PROFILES[agentTone];
+          if (agentProfile) {
+            console.log(`🎵 Using agent-specific voice config for ${agentName}:`, agentProfile);
+            return agentProfile;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load voice settings from localStorage:', error);
+    }
+  }
+  
+  // Fallback to default configuration
   const profileKey = AGENT_VOICES[agentName] || 'professional';
-  return VOICE_PROFILES[profileKey];
+  const defaultConfig = VOICE_PROFILES[profileKey];
+  console.log(`🎵 Using default voice config for ${agentName}:`, defaultConfig);
+  return defaultConfig;
 }
 
 // Generate instruction text for an agent's communication style

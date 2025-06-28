@@ -72,7 +72,12 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
       // This would ideally update the live agents' voice settings
       console.log('💾 Settings saved:', settingsData);
       
-      setSaveMessage('Settings saved successfully!');
+      // Trigger voice settings reload event
+      window.dispatchEvent(new CustomEvent('voiceSettingsChanged', { 
+        detail: voiceSettings 
+      }));
+      
+      setSaveMessage('Settings saved! Voice changes will take effect on next conversation.');
       
     } catch (error) {
       console.error('❌ Failed to save settings:', error);
@@ -398,7 +403,7 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                     </div>
                     
                     <div className="voice-testing-grid">
-                      {(['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer', 'sage'] as OpenAIVoice[]).map((voice) => (
+                      {(['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'] as OpenAIVoice[]).map((voice) => (
                         <div key={voice} className="voice-test-section">
                           <h4 className="voice-test-title">
                             {voice.charAt(0).toUpperCase() + voice.slice(1)}

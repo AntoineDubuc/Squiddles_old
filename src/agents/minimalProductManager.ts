@@ -3,6 +3,7 @@
  */
 
 import { RealtimeAgent, tool } from '@openai/agents/realtime';
+import { getAgentVoiceConfig, generateStyleInstructions } from '../config/voices';
 
 // Enhanced ticket creation tool with all required fields
 const createTicketTool = tool({
@@ -57,28 +58,73 @@ const createTicketTool = tool({
       productReviewDataPoints: string; 
     };
 
-    // TODO: Integrate with actual Jira API to create the ticket
-    // For now, return structured response
-    return { 
-      success: true, 
-      ticket: {
-        name: ticketName,
-        type: ticketType,
-        businessValue,
-        context,
-        acceptanceCriteria,
-        productReviewDataPoints,
-        created: new Date().toISOString()
-      },
-      message: `${ticketType.toUpperCase()} ticket "${ticketName}" created successfully!`
-    };
+    try {
+      // Format the description with all the gathered information
+      const description = `## Business Value
+${businessValue}
+
+## Context
+${context}
+
+## Acceptance Criteria
+${acceptanceCriteria}
+
+## Product Review Data Points
+${productReviewDataPoints}`;
+
+      // Map ticketType to Jira issue type
+      const issueTypeMap: Record<string, string> = {
+        'story': 'Story',
+        'bug': 'Bug',
+        'task': 'Task',
+        'spike': 'Spike'
+      };
+
+      // Create ticket via Jira API
+      const response = await fetch('/api/jira/tickets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          summary: ticketName,
+          description,
+          projectKey: 'DE', // Default project
+          issueType: issueTypeMap[ticketType] || 'Story',
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      return {
+        success: true,
+        ticket: result.ticket,
+        message: `✅ Jira ticket ${result.ticket.key} created successfully!`
+      };
+
+    } catch (error) {
+      console.error('❌ Failed to create Jira ticket:', error);
+      return {
+        success: false,
+        error: `Failed to create ticket: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
   }
 });
 
+const voiceConfig = getAgentVoiceConfig('productManager');
+
 export const minimalProductManagerAgent = new RealtimeAgent({
   name: 'productManager',
-  voice: 'sage',
+  voice: voiceConfig.voice,
   instructions: `You are Antoine's personal technical product management assistant and brainstorming partner. You help refine ideas and create well-structured tickets through collaborative conversation.
+
+${generateStyleInstructions('productManager')}
 
 # Your Brainstorming Style:
 - Think like a senior PM who asks the right questions
@@ -126,7 +172,11 @@ Start with open exploration, then guide toward these required fields:
 - The user seems satisfied with the refinement
 - You've helped them think through alternatives
 
-Be Antoine's thought partner, not just a form-filler. Help him create better tickets through real collaboration.`,
+Be Antoine's thought partner, not just a form-filler. Help him create better tickets through real collaboration.
+
+# When the user is ready to create the ticket in Jira:
+- Use the createTicket tool to capture all the refined information
+- The ticket will be created directly in Jira with all the details we discussed`,
   handoffs: [],
   tools: [createTicketTool],
   handoffDescription: 'Collaborative product manager agent for brainstorming and creating refined tickets',

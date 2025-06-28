@@ -9,13 +9,13 @@ import { getAgentVoiceConfig, generateStyleInstructions } from '../config/voices
 // Search Jira tickets tool
 const searchJiraTicketsTool = tool({
   name: 'searchJiraTickets',
-  description: 'Search for Jira tickets using JQL query or keywords',
+  description: 'Search for Jira tickets using JQL query or simple keywords (keywords are automatically converted to JQL text search)',
   parameters: {
     type: 'object',
     properties: {
       query: {
         type: 'string',
-        description: 'Search query or JQL expression (e.g., "project = DE AND sprint in openSprints()", "AFS", "assignee = currentUser()")'
+        description: 'Search query - either JQL expression (e.g., "project = DE AND sprint in openSprints()") or simple keywords (e.g., "LinkedIn", "AFS") which will be converted to text search'
       },
       maxResults: {
         type: 'number',
@@ -35,9 +35,23 @@ const searchJiraTicketsTool = tool({
     try {
       console.log('🔍 Jira search requested:', { query, maxResults });
 
+      // Convert simple keywords to proper JQL if needed
+      let jqlQuery = query;
+      
+      // Check if it's already a JQL query (contains JQL operators or functions)
+      const jqlPattern = /(\b(AND|OR|NOT|IN|=|!=|~|>|<|>=|<=|is|was|changed|ORDER BY|project|assignee|status|priority|type|sprint|created|updated|resolved|currentUser|openSprints)\b)|(\(|\))/i;
+      
+      if (!jqlPattern.test(query)) {
+        // Simple keyword search - convert to JQL text search
+        console.log('🔄 Converting simple keyword to JQL text search:', query);
+        jqlQuery = `text ~ "${query}"`;
+      }
+      
+      console.log('🔍 Final JQL query:', jqlQuery);
+
       // Build search parameters
       const searchParams = new URLSearchParams();
-      searchParams.append('jql', query);
+      searchParams.append('jql', jqlQuery);
       searchParams.append('maxResults', maxResults.toString());
 
       // Search tickets via API
@@ -52,11 +66,28 @@ const searchJiraTicketsTool = tool({
 
       const result = await response.json();
 
+      // Format a user-friendly response with structured data
+      const messageText = `Found ${result.issues.length} tickets${result.total > result.issues.length ? ` (showing first ${result.issues.length} of ${result.total})` : ''}`;
+      
+      // Create human-readable ticket list
+      const ticketList = result.issues.map((ticket: any) => {
+        const statusEmoji = ticket.status === 'In Progress' ? '🔄' : 
+                          ticket.status === 'Done' || ticket.status === 'RELEASED' ? '✅' : 
+                          ticket.status === 'To Do' ? '📋' : '🎫';
+        const priorityText = ticket.priority ? ` (${ticket.priority})` : '';
+        const assigneeText = ticket.assignee && ticket.assignee !== 'Unassigned' ? ` - ${ticket.assignee}` : '';
+        
+        return `${statusEmoji} ${ticket.key}: ${ticket.summary}${priorityText}${assigneeText}`;
+      }).join('\n');
+
+      const displayText = `${messageText}\n\n${ticketList}`;
+
       return {
         success: true,
+        message: messageText,
         issues: result.issues,
         total: result.total,
-        message: `Found ${result.issues.length} tickets${result.total > result.issues.length ? ` (showing first ${result.issues.length} of ${result.total})` : ''}`
+        displayText: displayText
       };
 
     } catch (error) {
@@ -160,7 +191,7 @@ const createJiraTicketTool = tool({
       return {
         success: true,
         ticket: result.ticket,
-        message: `Ticket ${result.ticket.key} created successfully`
+        message: `✅ Ticket ${result.ticket.key} created successfully: ${result.ticket.summary}`
       };
 
     } catch (error) {

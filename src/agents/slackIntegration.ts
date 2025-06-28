@@ -4,6 +4,7 @@
  */
 
 import { RealtimeAgent, tool } from '@openai/agents/realtime';
+import { getAgentVoiceConfig, generateStyleInstructions } from '../config/voices';
 
 // Send Slack message tool using real API
 const sendSlackMessageTool = tool({
@@ -350,10 +351,12 @@ const scheduleSlackReminderTool = tool({
   }
 });
 
+const voiceConfig = getAgentVoiceConfig('slackIntegration');
+
 // Main Slack Integration Agent
 export const slackIntegrationAgent = new RealtimeAgent({
   name: 'slackIntegration',
-  voice: 'sage', // Updated to match other agents
+  voice: voiceConfig.voice,
   instructions: `
 # Identity
 You are a Slack integration specialist that manages team communication and notifications efficiently.

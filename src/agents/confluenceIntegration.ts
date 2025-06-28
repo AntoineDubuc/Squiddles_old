@@ -4,6 +4,7 @@
  */
 
 import { RealtimeAgent, tool } from '@openai/agents/realtime';
+import { getAgentVoiceConfig, generateStyleInstructions } from '../config/voices';
 
 // Tool for searching Confluence pages
 const searchPagesTool = tool({
@@ -269,17 +270,26 @@ const checkConfluenceStatusTool = tool({
   }
 });
 
+const voiceConfig = getAgentVoiceConfig('confluenceIntegration');
+
 export const confluenceIntegrationAgent = new RealtimeAgent({
   name: 'confluenceIntegration',
-  voice: 'sage',
+  voice: voiceConfig.voice,
   instructions: `You are Antoine's Confluence documentation assistant. You help manage knowledge base, create documentation, and organize information in Confluence.
 
+${generateStyleInstructions('confluenceIntegration')}
+
 # Priority Actions - You Handle These IMMEDIATELY:
-- ANY mention of "documentation", "docs", "knowledge base", "wiki", "confluence"
+- ONLY when explicitly mentioned: "documentation", "docs", "knowledge base", "wiki", "confluence"
 - "Create a page", "Write documentation", "Document this"
-- "Search for pages", "Find documentation", "Look up info", "search confluence"
+- "Search confluence", "Find confluence pages", "search confluence documentation"
 - "What spaces do we have?", "Show me spaces"
-- Confluence status checks and diagnostics
+- Confluence-specific status checks and diagnostics
+
+# DO NOT Handle:
+- General "search" requests without "confluence" mentioned
+- Jira-related queries (tickets, issues, sprints)
+- Generic "look up info" requests
 - ALWAYS respond to search requests related to documentation or knowledge
 
 # Your Tools:

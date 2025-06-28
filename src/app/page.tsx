@@ -72,6 +72,37 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [currentView]);
 
+  // Listen for voice settings changes
+  useEffect(() => {
+    const handleVoiceSettingsChange = (event: CustomEvent) => {
+      console.log('🎵 Voice settings changed:', event.detail);
+      console.log('🎵 Current session status:', sessionStatus);
+      
+      // If we have an active session, we need to restart it for voice changes to take effect
+      if (sessionStatus === "CONNECTED" && clientRef.current) {
+        console.log('🔄 Restarting session to apply new voice settings...');
+        console.log('🔄 Ending current session...');
+        
+        // End current session
+        endSession();
+        
+        // Start new session after a brief delay
+        setTimeout(() => {
+          console.log('🔄 Starting new session with updated voice...');
+          startSession();
+        }, 1000);
+      } else {
+        console.log('🎵 No active session to restart, voice will be applied on next connection');
+      }
+    };
+
+    window.addEventListener('voiceSettingsChanged', handleVoiceSettingsChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('voiceSettingsChanged', handleVoiceSettingsChange as EventListener);
+    };
+  }, [sessionStatus]);
+
   // Watch for selected mention changes and recreate session if needed
   useEffect(() => {
     const currentMentionKey = replyState.selectedMention?.ticketKey || null;
@@ -106,7 +137,20 @@ export default function Home() {
     const el = document.createElement('audio');
     el.autoplay = true;
     el.style.display = 'none';
+    el.controls = true; // Add controls for debugging
+    
+    // Add event listeners for debugging
+    el.addEventListener('loadstart', () => console.log('🔊 Audio: loadstart'));
+    el.addEventListener('loadeddata', () => console.log('🔊 Audio: loadeddata'));
+    el.addEventListener('canplay', () => console.log('🔊 Audio: canplay'));
+    el.addEventListener('play', () => console.log('🔊 Audio: play started, volume:', el.volume, 'muted:', el.muted));
+    el.addEventListener('pause', () => console.log('🔊 Audio: pause'));
+    el.addEventListener('ended', () => console.log('🔊 Audio: ended'));
+    el.addEventListener('error', (e) => console.error('🔊 Audio error:', e));
+    el.addEventListener('volumechange', () => console.log('🔊 Audio: volume changed to', el.volume, 'muted:', el.muted));
+    
     document.body.appendChild(el);
+    console.log('🔊 Audio element created and added to DOM:', el);
     return el;
   }, []);
 
@@ -211,20 +255,28 @@ export default function Home() {
       console.log("✅ Got ephemeral key:", EPHEMERAL_KEY.slice(0, 10) + "...");
 
       console.log("🤖 Setting up agents...");
-      // Dynamic agent selection based on reply context
-      let agents;
-      if (replyState.selectedMention) {
-        // Reply mode: Use only Jira agent for focused comment replies
-        agents = allAgentSets.jira;
-        console.log("🎯 Reply mode: Using Jira agent only for", replyState.selectedMention.ticketKey);
-      } else {
-        // Normal mode: Use full agent set
-        agents = allAgentSets[selectedAgentSet];
-        console.log("🤖 Normal mode: Using full agent set");
-      }
-      console.log("🤖 Selected agents:", agents.map(a => a.name));
+      console.log("🤖 Current selectedAgentSet:", selectedAgentSet);
+      console.log("🤖 Available agent sets:", Object.keys(allAgentSets));
+      console.log("🤖 Reply state selected mention:", replyState.selectedMention);
+      
+      // Use the full agent set to include Jira integration
+      const agents = allAgentSets[selectedAgentSet] || allAgentSets.full;
+      console.log("🔍 DEBUG: Using agent set:", selectedAgentSet);
+      console.log("🤖 Selected agents:", agents?.map(a => a.name) || 'NO AGENTS!');
       
       console.log("🔌 Creating RealtimeClient...");
+      console.log("🔍 DEBUG: Agent details:", agents?.map(a => ({
+        name: a.name,
+        voice: a.voice,
+        instructions: a.instructions?.slice(0, 100) + '...',
+        toolCount: a.tools?.length || 0
+      })));
+      console.log("🔍 DEBUG: Audio element:", sdkAudioElement);
+      console.log("🔍 DEBUG: Extra context:", {
+        selectedMention: replyState.selectedMention,
+        hasAddTranscriptMessage: !!addTranscriptMessage
+      });
+      
       const client = new RealtimeClient({
         getEphemeralKey: async () => EPHEMERAL_KEY,
         initialAgents: agents,
@@ -250,6 +302,19 @@ export default function Home() {
         else setSessionStatus("DISCONNECTED");
       });
 
+      // Handle errors like connection failures
+      client.on("error", (event) => {
+        console.error("❌ Realtime client error:", event);
+        addEvent({
+          id: uuidv4(),
+          type: 'error.realtime_client',
+          timestamp: new Date().toISOString(),
+          data: { error: event },
+          source: 'client'
+        });
+        // Don't immediately disconnect on error - let the connection_change handler deal with it
+      });
+
       client.on("message", (ev) => {
         addEvent({
           id: uuidv4(),
@@ -258,6 +323,33 @@ export default function Home() {
           data: ev,
           source: 'server'
         });
+
+        // Log audio events
+        if (ev.type?.includes('audio')) {
+          console.log('🔊 Audio event:', ev.type, (ev as any).delta ? `${(ev as any).delta.length} bytes` : '');
+        }
+
+        // Log transcription failures with details
+        if (ev.type === 'conversation.item.input_audio_transcription.failed') {
+          console.error('❌ Audio transcription failed:', ev);
+          console.error('❌ Transcription error details:', JSON.stringify(ev.error, null, 2));
+          console.error('❌ Item ID:', ev.item_id);
+          console.error('❌ Content index:', ev.content_index);
+        }
+
+        // Log tool calls and responses
+        if (ev.type?.includes('function_call')) {
+          console.log('🔧 Tool event:', ev.type, (ev as any).name || 'unknown', (ev as any).arguments || '');
+        }
+
+        // Log all response events for debugging
+        if (ev.type?.startsWith('response')) {
+          console.log('🤖 Response event:', ev.type, (ev as any).response_id || '');
+        }
+        
+        if (ev.type === 'response.done') {
+          console.log('🤖 Full response completed');
+        }
 
         // Process real-time events for streaming responses
         try {
@@ -274,14 +366,21 @@ export default function Home() {
             const existingItem = transcriptItems.find(item => item.itemId === itemId);
             if (!existingItem) {
               addTranscriptMessage(itemId, 'assistant', '');
+              console.log('🤖 New assistant message started:', itemId);
             }
             
-            // Filter JSON from streaming assistant responses
+            // Filter raw JSON from streaming assistant responses (but allow formatted tool responses)
             let filteredDelta = delta;
-            if (delta.includes('"success":true') || delta.includes('"pages":[')) {
-              // If this looks like JSON, don't stream it - wait for complete message
+            if ((delta.includes('"success":true') && delta.includes('"pages":[')) || 
+                (delta.includes('"success":true') && delta.includes('"spaces":[')) ||
+                (delta.includes('{"') && delta.includes('"}') && delta.length > 100 && !delta.includes('Found '))) {
+              // If this looks like raw JSON data, don't stream it - wait for complete message
+              console.log('🤖 Filtering raw JSON from response:', delta.slice(0, 100));
               return;
             }
+            
+            // Log assistant responses to console
+            console.log('🤖 Assistant delta:', delta);
             
             // Append the latest delta so the UI streams
             updateTranscriptMessage(itemId, filteredDelta, true);
@@ -472,6 +571,8 @@ export default function Home() {
     }
 
     console.log('💬 Sending text input:', text);
+    console.log('💬 Current agent set:', selectedAgentSet);
+    console.log('💬 Available agents:', clientRef.current ? 'Client exists' : 'No client');
     
     // Add to transcript immediately
     const itemId = uuidv4();
@@ -480,6 +581,7 @@ export default function Home() {
     try {
       // Send text to the realtime client (same as voice)
       clientRef.current.sendUserText(text);
+      console.log('✅ Text sent successfully to realtime client');
     } catch (error) {
       console.error('❌ Failed to send text:', error);
     }

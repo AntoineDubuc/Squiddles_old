@@ -5,6 +5,12 @@
  * Uses true multi-agent collaboration with handoffs between specialists
  */
 
+// Import unified scenario (no transfers)
+import { 
+  unifiedSquiddlesScenario,
+  unifiedSquiddlesAgent
+} from './unifiedSquiddles';
+
 // Import collaborative scenario with proper handoff relationships
 import { 
   collaborativeSquiddlesScenario,
@@ -25,8 +31,11 @@ import type { RealtimeAgent } from '@openai/agents/realtime';
 
 // Map of scenario key -> array of RealtimeAgent objects
 export const allAgentSets: Record<string, RealtimeAgent[]> = {
-  // NEW: True collaborative multi-agent system (RECOMMENDED)
-  squiddles: collaborativeSquiddlesScenario,
+  // NEW: Single unified agent - direct execution, no transfers (RECOMMENDED)
+  squiddles: unifiedSquiddlesScenario,
+  
+  // Multi-agent with transfers (for testing)
+  collaborative: collaborativeSquiddlesScenario,
   
   // Legacy isolated scenarios (for backwards compatibility)
   minimal: minimalProductManagerScenario,
@@ -43,8 +52,8 @@ export const allAgentSets: Record<string, RealtimeAgent[]> = {
   full: [...confluenceIntegrationScenario, ...jiraIntegrationScenario, ...slackIntegrationScenario, ...gmailIntegrationScenario, ...minimalProductManagerScenario],
 };
 
-// Use the new collaborative system as default
+// Use the unified agent as default (no transfers)
 export const defaultAgentSetKey = 'squiddles';
 
 // Export active agents for direct access
-export { minimalProductManagerAgent, jiraIntegrationAgent, confluenceIntegrationAgent, slackIntegrationAgent, gmailIntegrationAgent };
+export { unifiedSquiddlesAgent, minimalProductManagerAgent, jiraIntegrationAgent, confluenceIntegrationAgent, slackIntegrationAgent, gmailIntegrationAgent };

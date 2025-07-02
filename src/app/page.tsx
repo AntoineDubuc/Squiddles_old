@@ -131,6 +131,7 @@ export default function Home() {
   const clientRef = useRef<RealtimeClient | null>(null);
   const sessionIdRef = useRef<string>("");
   const lastSelectedMentionKeyRef = useRef<string | null>(null);
+  const responseAccumulator = useRef<Map<string, string>>(new Map());
 
   // Refs for audio element (exactly like reference)
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -338,30 +339,27 @@ export default function Home() {
           source: 'server'
         });
 
-        // Log audio events
-        if (ev.type?.includes('audio')) {
-          console.log('🔊 Audio event:', ev.type, (ev as any).delta ? `${(ev as any).delta.length} bytes` : '');
+        // Log only important audio events
+        if (ev.type === 'input_audio_buffer.speech_started') {
+          console.log('🎤 User started speaking');
+        } else if (ev.type === 'input_audio_buffer.speech_stopped') {
+          console.log('🎤 User finished speaking');
         }
 
-        // Log transcription failures with details
+        // Log transcription failures (simplified)
         if (ev.type === 'conversation.item.input_audio_transcription.failed') {
-          console.error('❌ Audio transcription failed:', ev);
-          console.error('❌ Transcription error details:', JSON.stringify(ev.error, null, 2));
-          console.error('❌ Item ID:', ev.item_id);
-          console.error('❌ Content index:', ev.content_index);
+          console.error('❌ Audio transcription failed');
         }
 
-        // Log tool calls and responses
-        if (ev.type?.includes('function_call')) {
-          console.log('🔧 Tool event:', ev.type, (ev as any).name || 'unknown', (ev as any).arguments || '');
+        // Log tool calls (simplified)
+        if (ev.type === 'response.function_call_arguments.done') {
+          console.log('🔧 Tool executed:', (ev as any).name);
         }
 
         // Handle function call outputs for ticket display
         if (ev.type === 'response.function_call_arguments.done') {
           const functionName = (ev as any).name;
           const args = (ev as any).arguments;
-          
-          console.log('🔧 Function call completed:', functionName, args);
           
           // Store function call info for later processing
           if (functionName === 'searchJiraTickets') {
@@ -384,7 +382,6 @@ export default function Home() {
               
               // Check if this is a Jira search result
               if (parsed.success && parsed.issues && Array.isArray(parsed.issues)) {
-                console.log('🎫 Jira search results received:', parsed.issues.length);
                 
                 // Format tickets for display
                 const tickets = parsed.issues.map((issue: any) => ({
@@ -413,13 +410,24 @@ export default function Home() {
           }
         }
 
-        // Log all response events for debugging
-        if (ev.type?.startsWith('response')) {
-          console.log('🤖 Response event:', ev.type, (ev as any).response_id || '');
+        // Response handling (minimal logging)
+        if (ev.type === 'response.created') {
+          console.log('🤖 Agent is responding...');
+        } else if (ev.type === 'response.done') {
+          console.log('🤖 Agent finished responding');
         }
-        
-        if (ev.type === 'response.done') {
-          console.log('🤖 Full response completed');
+
+        // Log complete response when text/audio response is done
+        if (ev.type === 'response.text.done' || ev.type === 'response.audio_transcript.done') {
+          const itemId: string | undefined = (ev as any).item_id ?? (ev as any).itemId;
+          if (itemId && responseAccumulator.current.has(itemId)) {
+            const completeResponse = responseAccumulator.current.get(itemId);
+            if (completeResponse && completeResponse.trim()) {
+              console.log('🤖 Agent said:', completeResponse.trim());
+            }
+            // Clean up the accumulator
+            responseAccumulator.current.delete(itemId);
+          }
         }
 
         // Process real-time events for streaming responses
@@ -437,7 +445,7 @@ export default function Home() {
             const existingItem = transcriptItems.find(item => item.itemId === itemId);
             if (!existingItem) {
               addTranscriptMessage(itemId, 'assistant', '');
-              console.log('🤖 New assistant message started:', itemId);
+              console.log('🤖 Agent started speaking');
             }
             
             // Filter raw JSON from streaming assistant responses (but allow formatted tool responses)
@@ -450,8 +458,10 @@ export default function Home() {
               return;
             }
             
-            // Log assistant responses to console
-            console.log('🤖 Assistant delta:', delta);
+            // Accumulate the response fragments for complete logging
+            const currentAccumulated = responseAccumulator.current.get(itemId) || '';
+            const newAccumulated = currentAccumulated + filteredDelta;
+            responseAccumulator.current.set(itemId, newAccumulated);
             
             // Append the latest delta so the UI streams
             updateTranscriptMessage(itemId, filteredDelta, true);
@@ -500,6 +510,11 @@ export default function Home() {
               updateTranscriptMessage(itemId, transcriptText.trim(), false);
             }
             updateTranscriptItem(itemId, { status: 'DONE' });
+            
+            // Clean up response accumulator for completed user messages
+            if (responseAccumulator.current.has(itemId)) {
+              responseAccumulator.current.delete(itemId);
+            }
           }
         } catch (error) {
           console.error('Error processing message event:', error);
@@ -685,35 +700,22 @@ export default function Home() {
 
   // End session
   const endSession = async () => {
-    console.log("🛑 Ending session and cleaning up...");
-    console.log("🛑 Current session status:", sessionStatus);
-    console.log("🛑 Current isListening:", isListening);
-    console.log("🛑 Client ref exists:", !!clientRef.current);
-    
+    console.log("🛑 Session ended");
     if (clientRef.current) {
-      // Cancel any ongoing responses first
       try {
-        console.log("🛑 Attempting to cancel response...");
         clientRef.current.cancelResponse();
-        console.log("🛑 Response canceled successfully");
       } catch (error) {
-        console.log("⚠️ No response to cancel during session end:", error);
+        // Ignore cancellation errors
       }
-      
-      // Then disconnect
-      console.log("🛑 Disconnecting client...");
       clientRef.current.disconnect();
       clientRef.current = null;
-      console.log("🛑 Client disconnected and cleared");
     }
     
-    console.log("🛑 Setting status to DISCONNECTED...");
+    // Clean up response accumulator
+    responseAccumulator.current.clear();
+    
     setSessionStatus("DISCONNECTED");
-    console.log("🛑 Setting isListening to false...");
     setIsListening(false);
-    console.log("✅ Session ended and cleaned up");
-    // clearTranscript();
-    // clearEvents();
   };
 
   // Push-to-talk handlers
@@ -741,26 +743,18 @@ export default function Home() {
 
   // Toggle listening - when red (listening), clicking should end the session
   const toggleListening = async () => {
-    console.log("🎤 Toggle listening clicked. Current state:", isListening);
-    console.log("🎤 Session status:", sessionStatus);
-    console.log("🎤 Client ref exists:", !!clientRef.current);
-    
     if (sessionStatus === "CONNECTED" && isListening) {
       // If we're currently listening (red microphone), end the session completely
-      console.log("🎤 Ending session because microphone was clicked while listening");
-      console.log("🎤 About to call endSession()...");
+      console.log("🎤 Ending session");
       await endSession();
-      console.log("🎤 endSession() completed");
     } else if (sessionStatus === "CONNECTED" && !isListening) {
       // If connected but not listening, start listening again
-      console.log("🎤 Starting to listen again");
+      console.log("🎤 Starting to listen");
       setIsListening(true);
     } else if (sessionStatus === "DISCONNECTED") {
       // If disconnected, start a new session
-      console.log("🎤 Starting new session");
+      console.log("🎤 Starting session");
       await startSession();
-    } else {
-      console.log("🎤 No action - session is connecting or in invalid state");
     }
   };
 

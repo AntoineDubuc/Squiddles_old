@@ -98,9 +98,9 @@ export class RealtimeClient {
     const transport: any = this.#session.transport;
 
     transport.on('*', (ev: any) => {
-      // Surface raw session.updated to console for debugging missing instructions.
+      // Log session updates (minimal)
       if (ev?.type === 'session.updated') {
-        console.log('🔧 SESSION UPDATED:', JSON.stringify(ev, null, 2));
+        console.log('🔧 Session configured');
       }
       this.#events.emit('message', ev);
     });
@@ -162,7 +162,7 @@ export class RealtimeClient {
       type: 'session.update',
       session: {
         turn_detection: {
-          type: 'server_vad',        // Use server VAD instead of semantic for better control
+          type: 'server_vad',
           threshold: vadConfig.threshold,
           prefix_padding_ms: vadConfig.prefix_padding_ms,
           silence_duration_ms: vadConfig.silence_duration_ms,
@@ -170,7 +170,7 @@ export class RealtimeClient {
           interrupt_response: true
         },
         input_audio_transcription: {
-          model: 'whisper-1'         // Use standard Whisper instead of mini-transcribe for cost
+          model: 'whisper-1'
         }
       }
     } as any);
@@ -212,8 +212,6 @@ export class RealtimeClient {
 
   cancelResponse() {
     if (!this.#session) return;
-    // Cancel any ongoing response generation
     this.#session.transport.sendEvent({ type: 'response.cancel' } as any);
-    console.log('🛑 Sent response.cancel event');
   }
 }

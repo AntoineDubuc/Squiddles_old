@@ -67,7 +67,8 @@ export default function TicketList({ tickets, totalCount, voiceMessage, onTicket
     return '○';
   };
 
-  const getInitials = (name: string): string => {
+  const getInitials = (name: string | null | undefined): string => {
+    if (!name || typeof name !== 'string') return '??';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
@@ -130,8 +131,8 @@ export default function TicketList({ tickets, totalCount, voiceMessage, onTicket
                 </div>
                 <div className="ticket-footer">
                   <div className="ticket-reporter">
-                    <div className="reporter-avatar">{getInitials(ticket.reporter)}</div>
-                    <span>{ticket.reporter}</span>
+                    <div className="reporter-avatar">{getInitials(typeof ticket.reporter === 'object' ? ticket.reporter?.displayName : ticket.reporter)}</div>
+                    <span>{typeof ticket.reporter === 'object' ? ticket.reporter?.displayName || 'Unknown' : ticket.reporter || 'Unknown'}</span>
                   </div>
                   <div className="ticket-time">
                     <span>⏱</span>

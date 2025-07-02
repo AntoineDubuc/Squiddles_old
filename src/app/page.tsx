@@ -9,6 +9,7 @@ import VoiceInterface from "./components/VoiceInterface";
 import Settings from "./components/Settings";
 import Integrations from "./components/Integrations";
 import TemplateManager from "./components/TemplateManager";
+import TicketList from "./components/TicketList";
 
 // Types
 import { SessionStatus, TranscriptItem } from "./types";
@@ -18,6 +19,7 @@ import type { RealtimeAgent } from '@openai/agents/realtime';
 import { useTranscript } from "./contexts/TranscriptContext";
 import { useEvent } from "./contexts/EventContext";
 import { useReply } from "./contexts/ReplyContext";
+import { useTicketDisplay } from "./contexts/TicketDisplayContext";
 
 // Utilities
 import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
@@ -46,6 +48,7 @@ export default function Home() {
   } = useTranscript();
   const { events, addEvent, clearEvents } = useEvent();
   const { replyState, setReplyStatus, setLastPostedComment, clearSelectedMention } = useReply();
+  const { ticketDisplay, showTickets, hideTickets, clearTickets } = useTicketDisplay();
 
   // Check authentication on mount
   useEffect(() => {
@@ -297,9 +300,15 @@ export default function Home() {
 
       client.on("connection_change", (status) => {
         console.log("🔌 Connection status changed:", status);
-        if (status === "connected") setSessionStatus("CONNECTED");
-        else if (status === "connecting") setSessionStatus("CONNECTING");
-        else setSessionStatus("DISCONNECTED");
+        if (status === "connected") {
+          setSessionStatus("CONNECTED");
+          setIsListening(true); // Set listening to true when connected
+        } else if (status === "connecting") {
+          setSessionStatus("CONNECTING");
+        } else {
+          setSessionStatus("DISCONNECTED");
+          setIsListening(false); // Set listening to false when disconnected
+        }
       });
 
       // Handle errors like connection failures
@@ -340,6 +349,63 @@ export default function Home() {
         // Log tool calls and responses
         if (ev.type?.includes('function_call')) {
           console.log('🔧 Tool event:', ev.type, (ev as any).name || 'unknown', (ev as any).arguments || '');
+        }
+
+        // Handle function call outputs for ticket display
+        if (ev.type === 'response.function_call_arguments.done') {
+          const functionName = (ev as any).name;
+          const args = (ev as any).arguments;
+          
+          console.log('🔧 Function call completed:', functionName, args);
+          
+          // Store function call info for later processing
+          if (functionName === 'searchJiraTickets') {
+            try {
+              const parsedArgs = typeof args === 'string' ? JSON.parse(args) : args;
+              // Store the search query for when we get the output
+              (window as any).__pendingJiraSearch = parsedArgs.query;
+            } catch (e) {
+              console.error('Failed to parse function args:', e);
+            }
+          }
+        }
+
+        // Handle function outputs
+        if (ev.type === 'response.output_item.done') {
+          const output = (ev as any).output;
+          if (output && typeof output === 'string') {
+            try {
+              const parsed = JSON.parse(output);
+              
+              // Check if this is a Jira search result
+              if (parsed.success && parsed.issues && Array.isArray(parsed.issues)) {
+                console.log('🎫 Jira search results received:', parsed.issues.length);
+                
+                // Format tickets for display
+                const tickets = parsed.issues.map((issue: any) => ({
+                  key: issue.key,
+                  summary: issue.summary,
+                  description: issue.description,
+                  status: issue.status,
+                  priority: issue.priority || 'Medium',
+                  assignee: issue.assignee,
+                  reporter: issue.reporter || 'Unknown',
+                  created: issue.created,
+                  type: issue.type || 'Story',
+                  url: issue.url
+                }));
+                
+                // Show tickets in UI with the voice message
+                const voiceMessage = parsed.message || `Found ${tickets.length} tickets`;
+                showTickets(tickets, parsed.total || tickets.length, voiceMessage, (window as any).__pendingJiraSearch);
+                
+                // Clear the pending search
+                delete (window as any).__pendingJiraSearch;
+              }
+            } catch (e) {
+              // Not JSON or not a ticket result, ignore
+            }
+          }
         }
 
         // Log all response events for debugging
@@ -436,6 +502,47 @@ export default function Home() {
       });
 
       client.on("history_added", (item) => {
+        // Handle function calls and their outputs
+        if (item.type === 'function_call') {
+          const functionName = (item as any).name;
+          const args = (item as any).arguments;
+          const output = (item as any).output;
+          
+          console.log('📋 Function call in history:', functionName, { args, output });
+          
+          // Check if this is a Jira search with output
+          if (functionName === 'searchJiraTickets' && output) {
+            try {
+              const result = typeof output === 'string' ? JSON.parse(output) : output;
+              
+              if (result.success && result.issues && Array.isArray(result.issues)) {
+                console.log('🎫 Jira search results from history:', result.issues.length);
+                
+                // Format tickets for display
+                const tickets = result.issues.map((issue: any) => ({
+                  key: issue.key,
+                  summary: issue.summary,
+                  description: issue.description,
+                  status: issue.status,
+                  priority: issue.priority || 'Medium',
+                  assignee: issue.assignee,
+                  reporter: issue.reporter || 'Unknown',
+                  created: issue.created,
+                  type: issue.type || 'Story',
+                  url: issue.url
+                }));
+                
+                // Show tickets in UI with the voice message
+                const voiceMessage = result.message || `Found ${tickets.length} tickets`;
+                const searchQuery = typeof args === 'string' ? JSON.parse(args).query : args.query;
+                showTickets(tickets, result.total || tickets.length, voiceMessage, searchQuery);
+              }
+            } catch (e) {
+              console.error('Failed to parse function output:', e);
+            }
+          }
+        }
+        
         // Handle different item types from OpenAI Realtime API
         if (item.itemId) {
           let text = '';
@@ -484,6 +591,83 @@ export default function Home() {
         }
       });
 
+      // Also handle history updates to catch function outputs that come later
+      client.on("history_updated", (history) => {
+        history.forEach((item: any) => {
+          if (item.type === 'function_call' && item.output) {
+            const functionName = item.name;
+            const args = item.arguments;
+            const output = item.output;
+            
+            console.log('📋 Function call updated in history:', functionName, { args, output });
+            
+            // Check if this is a Jira search with output
+            if (functionName === 'searchJiraTickets') {
+              try {
+                const result = typeof output === 'string' ? JSON.parse(output) : output;
+                
+                if (result.success && result.issues && Array.isArray(result.issues)) {
+                  console.log('🎫 Jira search results from history update:', result.issues.length);
+                  
+                  // Format tickets for display
+                  const tickets = result.issues.map((issue: any) => ({
+                    key: issue.key,
+                    summary: issue.summary,
+                    description: issue.description,
+                    status: issue.status,
+                    priority: issue.priority || 'Medium',
+                    assignee: issue.assignee,
+                    reporter: issue.reporter || 'Unknown',
+                    created: issue.created,
+                    type: issue.type || 'Story',
+                    url: issue.url
+                  }));
+                  
+                  // Show tickets in UI with the voice message
+                  const voiceMessage = result.message || `Found ${tickets.length} tickets`;
+                  const searchQuery = typeof args === 'string' ? JSON.parse(args).query : args.query;
+                  showTickets(tickets, result.total || tickets.length, voiceMessage, searchQuery);
+                }
+              } catch (e) {
+                console.error('Failed to parse function output:', e);
+              }
+            }
+            
+            // Check if this is a Confluence search with output
+            if (functionName === 'searchPages') {
+              try {
+                const result = typeof output === 'string' ? JSON.parse(output) : output;
+                
+                if (result.success && result.pages && Array.isArray(result.pages)) {
+                  console.log('📄 Confluence search results from history update:', result.pages.length);
+                  
+                  // Format pages for display (similar to tickets)
+                  const pages = result.pages.map((page: any) => ({
+                    key: page.id,
+                    summary: page.title,
+                    description: page.excerpt || 'No excerpt available',
+                    status: 'Published',
+                    priority: 'Medium',
+                    assignee: page.author || 'Unknown',
+                    reporter: page.author || 'Unknown',
+                    created: page.created,
+                    type: 'Page',
+                    url: page.url
+                  }));
+                  
+                  // Show pages in UI with the voice message
+                  const voiceMessage = result.message || `Found ${pages.length} pages`;
+                  const searchQuery = typeof args === 'string' ? JSON.parse(args).query : args.query || 'recent pages';
+                  showTickets(pages, result.total || pages.length, voiceMessage, searchQuery);
+                }
+              } catch (e) {
+                console.error('Failed to parse Confluence function output:', e);
+              }
+            }
+          }
+        });
+      });
+
       console.log("🚀 Connecting to OpenAI Realtime API...");
       await client.connect();
       console.log("✅ Successfully connected to OpenAI Realtime API!");
@@ -506,27 +690,44 @@ export default function Home() {
     // clearEvents();
   };
 
-  // Toggle listening - simplified since WebRTC handles audio automatically
-  const toggleListening = async () => {
-    console.log("🎤 Toggle listening clicked. Current state:", isListening);
-    console.log("🎤 Client exists:", !!clientRef.current);
-    console.log("🎤 Session status:", sessionStatus);
-    
+  // Push-to-talk handlers
+  const pushToTalkStart = () => {
     if (!clientRef.current || sessionStatus !== "CONNECTED") {
-      console.log("❌ Cannot toggle listening - not connected");
+      console.log("❌ Cannot start push-to-talk - not connected");
       return;
     }
     
-    // With WebRTC, listening is always active when connected
-    // This button now just indicates if we're actively in a conversation
-    const newState = !isListening;
-    console.log("🎤 Setting listening state to:", newState);
-    setIsListening(newState);
+    console.log("🎤 Push-to-talk START");
+    setIsListening(true);
+    clientRef.current.pushToTalkStart();
+  };
+
+  const pushToTalkStop = () => {
+    if (!clientRef.current || sessionStatus !== "CONNECTED") {
+      console.log("❌ Cannot stop push-to-talk - not connected");
+      return;
+    }
     
-    if (newState) {
-      console.log("🎤 Starting to listen...");
+    console.log("🎤 Push-to-talk STOP");
+    setIsListening(false);
+    clientRef.current.pushToTalkStop();
+  };
+
+  // Toggle listening - when red (listening), clicking should end the session
+  const toggleListening = async () => {
+    console.log("🎤 Toggle listening clicked. Current state:", isListening);
+    console.log("🎤 Session status:", sessionStatus);
+    
+    if (sessionStatus === "CONNECTED" && isListening) {
+      // If we're currently listening, end the session
+      console.log("🎤 Ending session because microphone was clicked while listening");
+      await endSession();
+    } else if (sessionStatus === "DISCONNECTED") {
+      // If disconnected, start a new session
+      console.log("🎤 Starting new session");
+      await startSession();
     } else {
-      console.log("🎤 Stopping listening...");
+      console.log("🎤 No action - session is connecting or in invalid state");
     }
   };
 
@@ -601,18 +802,43 @@ export default function Home() {
 
   if (currentView === 'dashboard') {
     return (
-      <Dashboard 
-        onNavigateToVoice={handleNavigateToVoice}
-        onNavigateToTickets={handleNavigateToTickets}
-        onNavigateToSettings={handleNavigateToSettings}
-        onNavigateToIntegrations={handleNavigateToIntegrations}
-        onNavigateToTemplates={handleNavigateToTemplates}
-        onStartVoiceSession={startSession}
-        onEndVoiceSession={endSession}
-        onTextInput={handleTextInput}
-        sessionStatus={sessionStatus}
-        isListening={isListening}
-      />
+      <>
+        <Dashboard 
+          onNavigateToVoice={handleNavigateToVoice}
+          onNavigateToTickets={handleNavigateToTickets}
+          onNavigateToSettings={handleNavigateToSettings}
+          onNavigateToIntegrations={handleNavigateToIntegrations}
+          onNavigateToTemplates={handleNavigateToTemplates}
+          onStartVoiceSession={startSession}
+          onEndVoiceSession={endSession}
+          onTextInput={handleTextInput}
+          onPushToTalkStart={pushToTalkStart}
+          onPushToTalkStop={pushToTalkStop}
+          sessionStatus={sessionStatus}
+          isListening={isListening}
+        />
+        {ticketDisplay && ticketDisplay.isVisible && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="relative bg-[#0A0A0B] rounded-3xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+              <button
+                onClick={hideTickets}
+                className="absolute top-4 right-4 z-10 w-10 h-10 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full flex items-center justify-center text-white transition-all"
+              >
+                ✕
+              </button>
+              <TicketList
+                tickets={ticketDisplay.tickets}
+                totalCount={ticketDisplay.totalCount}
+                voiceMessage={ticketDisplay.voiceMessage}
+                onTicketClick={(ticket) => {
+                  console.log('Ticket clicked:', ticket.key);
+                  window.open(ticket.url, '_blank');
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Debug Test</title>
+</head>
+<body>
+    <h1>WebRTC Connection Debug</h1>
+    <button id="testWebRTC">Test WebRTC Capabilities</button>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById('testWebRTC').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.innerHTML = '<h3>WebRTC Diagnostics:</h3>';
+            
+            // Test 1: Check WebRTC support
+            if (typeof RTCPeerConnection !== 'undefined') {
+                output.innerHTML += '<p>✅ RTCPeerConnection supported</p>';
+            } else {
+                output.innerHTML += '<p>❌ RTCPeerConnection NOT supported</p>';
+                return;
+            }
+            
+            // Test 2: Check getUserMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                output.innerHTML += '<p>✅ getUserMedia supported</p>';
+                
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    output.innerHTML += '<p>✅ Microphone access granted</p>';
+                    stream.getTracks().forEach(track => track.stop());
+                } catch (err) {
+                    output.innerHTML += `<p>❌ Microphone access failed: ${err.message}</p>`;
+                }
+            } else {
+                output.innerHTML += '<p>❌ getUserMedia NOT supported</p>';
+            }
+            
+            // Test 3: Create peer connection and check STUN/TURN
+            try {
+                const pc = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
+                });
+                
+                output.innerHTML += '<p>✅ RTCPeerConnection created with STUN servers</p>';
+                
+                // Test ICE gathering
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        output.innerHTML += `<p>🔍 ICE Candidate: ${event.candidate.type} - ${event.candidate.address || 'hidden'}</p>`;
+                    } else {
+                        output.innerHTML += '<p>✅ ICE gathering complete</p>';
+                    }
+                };
+                
+                pc.onicegatheringstatechange = () => {
+                    output.innerHTML += `<p>🔍 ICE Gathering State: ${pc.iceGatheringState}</p>`;
+                };
+                
+                pc.oniceconnectionstatechange = () => {
+                    output.innerHTML += `<p>🔍 ICE Connection State: ${pc.iceConnectionState}</p>`;
+                };
+                
+                // Create offer to trigger ICE gathering
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                
+                setTimeout(() => {
+                    pc.close();
+                    output.innerHTML += '<p>🔍 Test completed - check ICE candidates above</p>';
+                }, 5000);
+                
+            } catch (err) {
+                output.innerHTML += `<p>❌ WebRTC test failed: ${err.message}</p>`;
+            }
+            
+            // Test 4: Check if behind NAT/firewall
+            output.innerHTML += '<p>🔍 Network info:</p>';
+            output.innerHTML += `<p>User Agent: ${navigator.userAgent}</p>`;
+            output.innerHTML += `<p>Online: ${navigator.onLine}</p>`;
+        });
+    </script>
+</body>
+</html>

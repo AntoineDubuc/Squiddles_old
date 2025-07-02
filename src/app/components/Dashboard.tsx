@@ -20,11 +20,13 @@ interface DashboardProps {
   onStartVoiceSession?: () => void;
   onEndVoiceSession?: () => void;
   onTextInput?: (text: string) => void;
+  onPushToTalkStart?: () => void;
+  onPushToTalkStop?: () => void;
   sessionStatus?: 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED';
   isListening?: boolean;
 }
 
-export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, sessionStatus = 'DISCONNECTED', isListening = false }: DashboardProps) {
+export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, onPushToTalkStart, onPushToTalkStop, sessionStatus = 'DISCONNECTED', isListening = false }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activityExpanded, setActivityExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -86,7 +88,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
     }
   };
 
-  // Handle spacebar for voice activation (only when not typing)
+  // Handle spacebar for push-to-talk (only when not typing)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Don't trigger spacebar if user is typing in an input field
@@ -97,15 +99,31 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
         event.preventDefault();
         if (sessionStatus === 'DISCONNECTED' && onStartVoiceSession) {
           onStartVoiceSession();
-        } else if (sessionStatus === 'CONNECTED' && onEndVoiceSession) {
-          onEndVoiceSession();
+        } else if (sessionStatus === 'CONNECTED' && onPushToTalkStart) {
+          onPushToTalkStart();
+        }
+      }
+    };
+    
+    const handleKeyUp = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+      
+      if (event.code === 'Space' && !isTyping) {
+        event.preventDefault();
+        if (sessionStatus === 'CONNECTED' && onPushToTalkStop) {
+          onPushToTalkStop();
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sessionStatus, onStartVoiceSession, onEndVoiceSession]);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [sessionStatus, onStartVoiceSession, onPushToTalkStart, onPushToTalkStop]);
 
 
   // Handle clicks outside sidebar on mobile only
@@ -273,7 +291,13 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
               <div className="hero-voice-section">
                 <div 
                   className={`svg-microphone-button ${sessionStatus === 'CONNECTED' && isListening ? 'listening' : ''}`}
-                  onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : onEndVoiceSession}
+                  onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : undefined}
+                  onMouseDown={sessionStatus === 'CONNECTED' ? onPushToTalkStart : undefined}
+                  onMouseUp={sessionStatus === 'CONNECTED' ? onPushToTalkStop : undefined}
+                  onMouseLeave={sessionStatus === 'CONNECTED' ? onPushToTalkStop : undefined}
+                  onTouchStart={sessionStatus === 'CONNECTED' ? onPushToTalkStart : undefined}
+                  onTouchEnd={sessionStatus === 'CONNECTED' ? onPushToTalkStop : undefined}
+                  style={{ cursor: sessionStatus === 'DISCONNECTED' ? 'pointer' : 'grab' }}
                 >
                   <svg viewBox="0 0 160 160" className="microphone-svg">
                     {/* Microphone capsule */}
@@ -297,7 +321,7 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                       🎯 {replyState.selectedMention.ticketKey} selected
                       <br />
                       {sessionStatus === 'CONNECTED' && isListening ? 'Listening...' :
-                       sessionStatus === 'CONNECTED' ? 'Click to end voice session' : 
+                       sessionStatus === 'CONNECTED' ? 'Hold to speak' : 
                        sessionStatus === 'CONNECTING' ? 'Please wait...' :
                        'Ask me about this ticket, reply to it, or find related docs'}
                     </div>
@@ -305,9 +329,9 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                     <>
                       <div className="voice-main-instruction">
                         {sessionStatus === 'CONNECTED' && isListening ? 'Listening...' :
-                         sessionStatus === 'CONNECTED' ? 'Click to end voice session' : 
+                         sessionStatus === 'CONNECTED' ? 'Hold button or press Space to speak' : 
                          sessionStatus === 'CONNECTING' ? 'Please wait...' :
-                         'Press Space or click to speak'}
+                         'Click to start voice session'}
                       </div>
                       {sessionStatus === 'DISCONNECTED' && (
                         <div className="voice-capabilities">

@@ -24,7 +24,7 @@ export const allAgentSets: Record<string, RealtimeAgent[]> = {
   withConfluence: [...confluenceIntegrationScenario, ...minimalProductManagerScenario],
   withSlack: [...slackIntegrationScenario, ...minimalProductManagerScenario],
   withGmail: [...gmailIntegrationScenario, ...minimalProductManagerScenario],
-  full: [...jiraIntegrationScenario, ...confluenceIntegrationScenario, ...slackIntegrationScenario, ...gmailIntegrationScenario, ...minimalProductManagerScenario],
+  full: [...confluenceIntegrationScenario, ...jiraIntegrationScenario, ...slackIntegrationScenario, ...gmailIntegrationScenario, ...minimalProductManagerScenario],
 };
 
 export const defaultAgentSetKey = 'full';

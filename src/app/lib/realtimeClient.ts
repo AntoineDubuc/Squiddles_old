@@ -78,23 +78,10 @@ export class RealtimeClient {
         })
       : 'webrtc';
 
-    // Configure VAD and transcription using correct API
     this.#session = new RealtimeSession(rootAgent, {
       transport: transportValue,
       outputGuardrails: [moderationGuardrail as any],
       context: this.#options.extraContext ?? {},
-      config: {
-        turnDetection: {
-          type: 'server_vad',
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 1000,
-          create_response: true
-        },
-        inputAudioTranscription: {
-          model: 'gpt-4o-mini-transcribe'
-        }
-      }
     });
 
     // Immediately notify UI that we've started connecting.
@@ -106,56 +93,11 @@ export class RealtimeClient {
     const transport: any = this.#session.transport;
 
     transport.on('*', (ev: any) => {
-      // EXTENSIVE DEBUGGING - Log ALL transport events
-      console.log('🔍 TRANSPORT EVENT:', ev?.type, ev);
-      
       // Surface raw session.updated to console for debugging missing instructions.
       if (ev?.type === 'session.updated') {
         console.log('🔧 SESSION UPDATED:', JSON.stringify(ev, null, 2));
       }
-      
-      // Log transcription events specifically
-      if (ev?.type?.includes('transcription')) {
-        console.log('📝 TRANSCRIPTION EVENT:', ev?.type, ev);
-      }
-      
-      // Log when speech stops (should trigger transcription)
-      if (ev?.type === 'input_audio_buffer.speech_stopped') {
-        console.log('🛑 SPEECH STOPPED - transcription should start:', ev);
-      }
-      
-      // Log when audio is committed
-      if (ev?.type === 'input_audio_buffer.committed') {
-        console.log('✅ AUDIO COMMITTED - transcription should happen:', ev);
-      }
-      
-      // Log conversation item creation
-      if (ev?.type === 'conversation.item.created') {
-        console.log('📝 CONVERSATION ITEM CREATED:', ev?.type, ev);
-      }
-      
-      // Log audio buffer events
-      if (ev?.type?.includes('audio_buffer')) {
-        console.log('🎙️ AUDIO BUFFER EVENT:', ev?.type, ev);
-      }
-      
-      // Log conversation events
-      if (ev?.type?.includes('conversation')) {
-        console.log('💬 CONVERSATION EVENT:', ev?.type, ev);
-      }
-      
-      // Log response events
-      if (ev?.type?.includes('response')) {
-        console.log('🤖 RESPONSE EVENT:', ev?.type, ev);
-      }
-      
-      // Handle error events specifically
-      if (ev?.type === 'error') {
-        console.error('❌ TRANSPORT ERROR:', ev);
-        this.#events.emit('error', ev);
-      } else {
-        this.#events.emit('message', ev);
-      }
+      this.#events.emit('message', ev);
     });
 
     transport.on('connection_change', (status: any) => {
@@ -164,10 +106,6 @@ export class RealtimeClient {
       }
     });
 
-    // Also listen for direct transport errors
-    transport.on('error', (error: any) => {
-      this.#events.emit('error', error);
-    });
 
     // Track seen items so we can re-emit granular additions.
     const seenItems = new Map<string, string>(); // itemId -> serialized status marker
@@ -192,27 +130,11 @@ export class RealtimeClient {
       this.#events.emit('message', { type: 'guardrail_tripped', info });
     });
 
-    try {
-      console.log('🔍 DEBUG: About to connect with session config:', {
-        rootAgent: rootAgent.name,
-        voice: rootAgent.voice,
-        transportType: typeof transportValue,
-        hasAudioElement: !!this.#options.audioElement
-      });
-      
-      // Wait for full connection establishment (data channel open).
-      await this.#session.connect({ apiKey: ek });
+    // Wait for full connection establishment (data channel open).
+    await this.#session.connect({ apiKey: ek });
 
-      console.log('🔍 DEBUG: Session connected successfully');
-      // Now we are truly connected.
-      this.#events.emit('connection_change', 'connected');
-    } catch (error) {
-      console.error('🔍 DEBUG: Session connection failed:', error);
-      // Handle connection errors
-      this.#events.emit('error', error);
-      this.#events.emit('connection_change', 'disconnected');
-      throw error; // Re-throw so the caller can handle it
-    }
+    // Now we are truly connected.
+    this.#events.emit('connection_change', 'connected');
   }
 
   disconnect() {

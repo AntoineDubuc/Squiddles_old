@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Realtime API Test</title>
+</head>
+<body>
+    <h1>Minimal OpenAI Realtime API Test</h1>
+    <button id="testBtn">Test Connection</button>
+    <div id="output"></div>
+
+    <script type="module">
+        import { RealtimeSession } from 'https://unpkg.com/@openai/agents-realtime/dist/index.mjs';
+        
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>Testing connection...</p>';
+            
+            try {
+                // Get ephemeral key from our API
+                const response = await fetch('/api/session');
+                const sessionData = await response.json();
+                
+                if (sessionData.error) {
+                    throw new Error(sessionData.error);
+                }
+                
+                output.innerHTML += '<p>✅ Got ephemeral key</p>';
+                
+                // Create minimal session
+                const session = new RealtimeSession();
+                
+                // Set up connection timeout
+                const connectPromise = session.connect({ 
+                    apiKey: sessionData.client_secret.value 
+                });
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Connection timeout')), 10000)
+                );
+                
+                output.innerHTML += '<p>🔌 Attempting connection...</p>';
+                
+                await Promise.race([connectPromise, timeoutPromise]);
+                
+                output.innerHTML += '<p>✅ Connection successful!</p>';
+                
+                session.close();
+                
+            } catch (error) {
+                output.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+                console.error('Detailed error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

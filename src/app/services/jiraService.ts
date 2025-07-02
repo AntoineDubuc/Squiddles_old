@@ -447,22 +447,23 @@ export function getJiraService(): JiraService {
   return jiraService;
 }
 
-// React hook for dashboard integration with pagination
+// React hook for dashboard integration with client-side pagination
 export function useJiraActivityFeed() {
-  const [activityFeed, setActivityFeed] = React.useState<DashboardActivityFeed | null>(null);
+  const [fullActivityFeed, setFullActivityFeed] = React.useState<DashboardActivityFeed | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [currentPage, setCurrentPage] = React.useState(0);
+  const pageSize = 5;
 
-  const loadActivityFeed = React.useCallback(async (page = 0, limit = 5) => {
+  const loadAllActivityFeed = React.useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       
-      console.log(`🔧 Fetching Jira activity from API... Page ${page}`);
+      console.log('🔧 Fetching all Jira activity from API...');
       
-      // Use the server-side API route with pagination
-      const response = await fetch(`/api/jira/activity?page=${page}&limit=${limit}`);
+      // Fetch ALL mentions at once (up to 100)
+      const response = await fetch('/api/jira/activity?page=0&limit=100');
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -470,9 +471,9 @@ export function useJiraActivityFeed() {
       }
       
       const feed = await response.json();
-      console.log('✅ Activity feed loaded:', feed);
-      setActivityFeed(feed);
-      setCurrentPage(page);
+      console.log('✅ Full activity feed loaded:', feed.mentions.length, 'mentions');
+      setFullActivityFeed(feed);
+      setCurrentPage(0);
       
     } catch (err) {
       console.error('❌ Failed to load Jira activity feed:', err);
@@ -482,24 +483,47 @@ export function useJiraActivityFeed() {
     }
   }, []);
 
+  // Calculate paginated view from full data
+  const activityFeed = React.useMemo(() => {
+    if (!fullActivityFeed) return null;
+
+    const startIndex = currentPage * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedMentions = fullActivityFeed.mentions.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(fullActivityFeed.mentions.length / pageSize);
+
+    return {
+      ...fullActivityFeed,
+      mentions: paginatedMentions,
+      hasMore: currentPage < totalPages - 1,
+      totalPages,
+      currentPage,
+      totalMentions: fullActivityFeed.mentions.length
+    };
+  }, [fullActivityFeed, currentPage, pageSize]);
+
   const loadPage = React.useCallback((page: number) => {
-    loadActivityFeed(page, 5);
-  }, [loadActivityFeed]);
+    if (!fullActivityFeed) return;
+    const totalPages = Math.ceil(fullActivityFeed.mentions.length / pageSize);
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
+  }, [fullActivityFeed, pageSize]);
 
   const nextPage = React.useCallback(() => {
     if (activityFeed?.hasMore) {
-      loadPage(currentPage + 1);
+      setCurrentPage(current => current + 1);
     }
-  }, [currentPage, activityFeed?.hasMore, loadPage]);
+  }, [activityFeed?.hasMore]);
 
   const prevPage = React.useCallback(() => {
     if (currentPage > 0) {
-      loadPage(currentPage - 1);
+      setCurrentPage(current => current - 1);
     }
-  }, [currentPage, loadPage]);
+  }, [currentPage]);
 
   React.useEffect(() => {
-    loadActivityFeed(0, 5);
+    loadAllActivityFeed();
   }, []);
 
   return {
@@ -507,7 +531,7 @@ export function useJiraActivityFeed() {
     isLoading,
     error,
     currentPage,
-    refresh: () => loadActivityFeed(currentPage, 5),
+    refresh: loadAllActivityFeed,
     loadPage,
     nextPage,
     prevPage

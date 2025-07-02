@@ -3,6 +3,7 @@ import "./globals.css";
 import { TranscriptProvider } from "./contexts/TranscriptContext";
 import { EventProvider } from "./contexts/EventContext";
 import { ReplyProvider } from "./contexts/ReplyContext";
+import { TicketDisplayProvider } from "./contexts/TicketDisplayContext";
 
 export const metadata: Metadata = {
   title: "Squiddles - Voice AI Interface",
@@ -20,7 +21,9 @@ export default function RootLayout({
         <EventProvider>
           <TranscriptProvider>
             <ReplyProvider>
-              {children}
+              <TicketDisplayProvider>
+                {children}
+              </TicketDisplayProvider>
             </ReplyProvider>
           </TranscriptProvider>
         </EventProvider>

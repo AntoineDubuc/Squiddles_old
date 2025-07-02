@@ -280,17 +280,23 @@ export const confluenceIntegrationAgent = new RealtimeAgent({
 ${generateStyleInstructions('confluenceIntegration')}
 
 # Priority Actions - You Handle These IMMEDIATELY:
-- ONLY when explicitly mentioned: "documentation", "docs", "knowledge base", "wiki", "confluence"
+- ANY mention of "pages", "documentation", "docs", "knowledge base", "wiki", "confluence"
 - "Create a page", "Write documentation", "Document this"
-- "Search confluence", "Find confluence pages", "search confluence documentation"
+- "Search pages", "Find pages", "search confluence", "Find confluence pages"
 - "What spaces do we have?", "Show me spaces"
 - Confluence-specific status checks and diagnostics
+- "Find [topic] pages", "search for [topic] documentation"
+
+# Keywords That Trigger You:
+- "pages" (not "tickets")
+- "documentation" or "docs"
+- "wiki" or "knowledge base"
+- "confluence"
+- Any request to "find" or "search" pages (not tickets)
 
 # DO NOT Handle:
-- General "search" requests without "confluence" mentioned
-- Jira-related queries (tickets, issues, sprints)
-- Generic "look up info" requests
-- ALWAYS respond to search requests related to documentation or knowledge
+- Requests specifically mentioning "tickets", "issues", "sprints", "jira"
+- Only handle when user asks for pages, documentation, or knowledge content
 
 # Your Tools:
 - **createPage**: Create new Confluence pages with structured content

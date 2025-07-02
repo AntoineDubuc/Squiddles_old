@@ -46,6 +46,11 @@ export interface RealtimeClientOptions {
   initialAgents: RealtimeAgent[]; // first item is root agent
   audioElement?: HTMLAudioElement;
   extraContext?: Record<string, any>;
+  vadConfig?: {
+    threshold?: number;
+    prefix_padding_ms?: number;
+    silence_duration_ms?: number;
+  };
 }
 
 export class RealtimeClient {
@@ -133,8 +138,42 @@ export class RealtimeClient {
     // Wait for full connection establishment (data channel open).
     await this.#session.connect({ apiKey: ek });
 
+    // Configure VAD settings to reduce costs
+    this.configureVAD();
+
     // Now we are truly connected.
     this.#events.emit('connection_change', 'connected');
+  }
+
+  private configureVAD() {
+    if (!this.#session) return;
+
+    // Configure VAD settings to reduce costs and improve performance
+    const vadConfig = this.#options.vadConfig || {
+      threshold: 0.5,           // Higher threshold = less sensitive (default ~0.2)
+      prefix_padding_ms: 300,   // Shorter padding = less audio processed
+      silence_duration_ms: 500  // Longer silence before stopping = fewer triggers
+    };
+
+    console.log('🔧 Configuring VAD for cost optimization:', vadConfig);
+
+    // Send session.update with optimized VAD settings
+    this.#session.transport.sendEvent({
+      type: 'session.update',
+      session: {
+        turn_detection: {
+          type: 'server_vad',        // Use server VAD instead of semantic for better control
+          threshold: vadConfig.threshold,
+          prefix_padding_ms: vadConfig.prefix_padding_ms,
+          silence_duration_ms: vadConfig.silence_duration_ms,
+          create_response: true,
+          interrupt_response: true
+        },
+        input_audio_transcription: {
+          model: 'whisper-1'         // Use standard Whisper instead of mini-transcribe for cost
+        }
+      }
+    } as any);
   }
 
   disconnect() {
@@ -169,5 +208,12 @@ export class RealtimeClient {
 
   mute(muted: boolean) {
     this.#session?.mute(muted);
+  }
+
+  cancelResponse() {
+    if (!this.#session) return;
+    // Cancel any ongoing response generation
+    this.#session.transport.sendEvent({ type: 'response.cancel' } as any);
+    console.log('🛑 Sent response.cancel event');
   }
 }

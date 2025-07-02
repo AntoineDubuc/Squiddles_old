@@ -322,6 +322,94 @@ const getCurrentSprintTool = tool({
   }
 });
 
+// Transfer tools for multi-agent handoffs
+const transferToConfluenceTool = tool({
+  name: 'transfer_to_confluence',
+  description: 'Transfer the conversation to the Confluence documentation agent for documentation-related tasks',
+  parameters: {
+    type: 'object',
+    properties: {
+      topic: {
+        type: 'string',
+        description: 'The documentation topic or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['topic', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { topic, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'confluenceIntegration',
+      assistant_response: `Let me connect you with our documentation specialist for help with ${topic}.`,
+      additionalInstructions: `The user was working with Jira tickets and now needs help with documentation about ${topic}. Previous context: ${context}`
+    };
+  }
+});
+
+const transferToSlackTool = tool({
+  name: 'transfer_to_slack',
+  description: 'Transfer the conversation to the Slack communication agent for team notifications and messaging',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The communication purpose or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'slackIntegration',
+      assistant_response: `I'll connect you with our team communication specialist for ${purpose}.`,
+      additionalInstructions: `The user was managing Jira tickets and now needs help with team communication for ${purpose}. Previous context: ${context}`
+    };
+  }
+});
+
+const transferToProductManagerTool = tool({
+  name: 'transfer_to_product_manager',
+  description: 'Transfer the conversation to the Product Manager agent for strategic planning and brainstorming',
+  parameters: {
+    type: 'object',
+    properties: {
+      task: {
+        type: 'string',
+        description: 'The planning or brainstorming task'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['task', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { task, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'minimalProductManager',
+      assistant_response: `Let me connect you with our product strategy specialist for ${task}.`,
+      additionalInstructions: `The user was working with Jira tickets and now needs help with product planning for ${task}. Previous context: ${context}`
+    };
+  }
+});
+
 const voiceConfig = getAgentVoiceConfig('jiraIntegration');
 
 export const jiraIntegrationAgent = new RealtimeAgent({
@@ -395,9 +483,18 @@ When using searchJiraTickets or getCurrentSprint:
 - Provide ticket URLs when available for easy access
 - Suggest related actions after searches (create ticket, update status, etc.)
 
-You take priority over other agents for ANY ticket or sprint-related questions.`,
+# Agent Collaboration - HANDOFF WHEN NEEDED:
+- For documentation needs: "I'll connect you with our documentation specialist" → transfer_to_confluence
+- For team notifications: "Let me get our communication specialist" → transfer_to_slack  
+- For strategic planning: "Our product manager can help with that" → transfer_to_product_manager
+- Examples:
+  * "Document this API" → transfer_to_confluence
+  * "Notify the team about this bug" → transfer_to_slack
+  * "Should we prioritize this feature?" → transfer_to_product_manager
+
+You specialize in Jira tickets and sprints, but collaborate with other agents for broader needs.`,
   handoffs: [],
-  tools: [searchJiraTicketsTool, createJiraTicketTool, getCurrentSprintTool, getSelectedTicketTool],
+  tools: [searchJiraTicketsTool, createJiraTicketTool, getCurrentSprintTool, getSelectedTicketTool, transferToConfluenceTool, transferToSlackTool, transferToProductManagerTool],
   handoffDescription: 'Jira integration agent for ticket management and sprint queries',
 });
 

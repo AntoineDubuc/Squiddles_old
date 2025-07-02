@@ -294,6 +294,11 @@ export default function Home() {
             console.log('🔄 Dashboard refresh requested from voice agent');
           },
         },
+        vadConfig: {
+          threshold: 0.6,           // Higher threshold = less sensitive to background noise
+          prefix_padding_ms: 200,   // Shorter padding = less audio processed
+          silence_duration_ms: 800  // Longer silence required before stopping = fewer false triggers
+        }
       } as any);
 
       clientRef.current = client;
@@ -680,12 +685,33 @@ export default function Home() {
 
   // End session
   const endSession = async () => {
+    console.log("🛑 Ending session and cleaning up...");
+    console.log("🛑 Current session status:", sessionStatus);
+    console.log("🛑 Current isListening:", isListening);
+    console.log("🛑 Client ref exists:", !!clientRef.current);
+    
     if (clientRef.current) {
+      // Cancel any ongoing responses first
+      try {
+        console.log("🛑 Attempting to cancel response...");
+        clientRef.current.cancelResponse();
+        console.log("🛑 Response canceled successfully");
+      } catch (error) {
+        console.log("⚠️ No response to cancel during session end:", error);
+      }
+      
+      // Then disconnect
+      console.log("🛑 Disconnecting client...");
       clientRef.current.disconnect();
       clientRef.current = null;
+      console.log("🛑 Client disconnected and cleared");
     }
+    
+    console.log("🛑 Setting status to DISCONNECTED...");
     setSessionStatus("DISCONNECTED");
+    console.log("🛑 Setting isListening to false...");
     setIsListening(false);
+    console.log("✅ Session ended and cleaned up");
     // clearTranscript();
     // clearEvents();
   };
@@ -717,11 +743,18 @@ export default function Home() {
   const toggleListening = async () => {
     console.log("🎤 Toggle listening clicked. Current state:", isListening);
     console.log("🎤 Session status:", sessionStatus);
+    console.log("🎤 Client ref exists:", !!clientRef.current);
     
     if (sessionStatus === "CONNECTED" && isListening) {
-      // If we're currently listening, end the session
+      // If we're currently listening (red microphone), end the session completely
       console.log("🎤 Ending session because microphone was clicked while listening");
+      console.log("🎤 About to call endSession()...");
       await endSession();
+      console.log("🎤 endSession() completed");
+    } else if (sessionStatus === "CONNECTED" && !isListening) {
+      // If connected but not listening, start listening again
+      console.log("🎤 Starting to listen again");
+      setIsListening(true);
     } else if (sessionStatus === "DISCONNECTED") {
       // If disconnected, start a new session
       console.log("🎤 Starting new session");

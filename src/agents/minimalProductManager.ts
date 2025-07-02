@@ -117,6 +117,94 @@ ${productReviewDataPoints}`;
   }
 });
 
+// Transfer tools for multi-agent handoffs
+const transferToJiraTool = tool({
+  name: 'transfer_to_jira',
+  description: 'Transfer the conversation to the Jira agent for ticket implementation and management',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The specific Jira task or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context and planning details to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'jiraIntegration',
+      assistant_response: `Perfect! Let me connect you with our Jira specialist to ${purpose}.`,
+      additionalInstructions: `The user has been brainstorming and planning with the Product Manager and now needs help with ${purpose}. Planning context: ${context}`
+    };
+  }
+});
+
+const transferToConfluenceTool = tool({
+  name: 'transfer_to_confluence',
+  description: 'Transfer the conversation to the Confluence agent for documentation creation',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The documentation task or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context and planning details to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'confluenceIntegration',
+      assistant_response: `Great idea! Let me connect you with our documentation specialist to ${purpose}.`,
+      additionalInstructions: `The user has been planning with the Product Manager and now needs help with documentation for ${purpose}. Planning context: ${context}`
+    };
+  }
+});
+
+const transferToSlackTool = tool({
+  name: 'transfer_to_slack',
+  description: 'Transfer the conversation to the Slack agent for team communication and updates',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The communication task or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context and planning details to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'slackIntegration',
+      assistant_response: `Excellent! I'll connect you with our communication specialist to ${purpose}.`,
+      additionalInstructions: `The user has been planning with the Product Manager and now needs help with team communication for ${purpose}. Planning context: ${context}`
+    };
+  }
+});
+
 const voiceConfig = getAgentVoiceConfig('productManager');
 
 export const minimalProductManagerAgent = new RealtimeAgent({
@@ -176,9 +264,20 @@ Be Antoine's thought partner, not just a form-filler. Help him create better tic
 
 # When the user is ready to create the ticket in Jira:
 - Use the createTicket tool to capture all the refined information
-- The ticket will be created directly in Jira with all the details we discussed`,
+- The ticket will be created directly in Jira with all the details we discussed
+
+# Agent Collaboration - HANDOFF WHEN APPROPRIATE:
+- For ticket management: "Let me connect you with our Jira specialist" → transfer_to_jira
+- For documentation creation: "I'll get our documentation expert" → transfer_to_confluence
+- For team communication: "Our communication specialist can help" → transfer_to_slack
+- Examples:
+  * "Now let's implement this" → transfer_to_jira
+  * "We should document this approach" → transfer_to_confluence
+  * "Let's inform the team about this plan" → transfer_to_slack
+
+You lead strategic thinking and planning, then collaborate with specialists for implementation.`,
   handoffs: [],
-  tools: [createTicketTool],
+  tools: [createTicketTool, transferToJiraTool, transferToConfluenceTool, transferToSlackTool],
   handoffDescription: 'Collaborative product manager agent for brainstorming and creating refined tickets',
 });
 

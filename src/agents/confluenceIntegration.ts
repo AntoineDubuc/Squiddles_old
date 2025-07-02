@@ -270,6 +270,94 @@ const checkConfluenceStatusTool = tool({
   }
 });
 
+// Transfer tools for multi-agent handoffs
+const transferToJiraTool = tool({
+  name: 'transfer_to_jira',
+  description: 'Transfer the conversation to the Jira agent for ticket creation and management',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The ticket-related purpose or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'jiraIntegration',
+      assistant_response: `Let me connect you with our Jira specialist for ${purpose}.`,
+      additionalInstructions: `The user was working with documentation and now needs help with Jira tickets for ${purpose}. Previous context: ${context}`
+    };
+  }
+});
+
+const transferToSlackTool = tool({
+  name: 'transfer_to_slack',
+  description: 'Transfer the conversation to the Slack communication agent for sharing documentation or team updates',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The communication purpose or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'slackIntegration',
+      assistant_response: `I'll connect you with our team communication specialist for ${purpose}.`,
+      additionalInstructions: `The user was working with documentation and now needs help with team communication for ${purpose}. Previous context: ${context}`
+    };
+  }
+});
+
+const transferToProductManagerTool = tool({
+  name: 'transfer_to_product_manager',
+  description: 'Transfer the conversation to the Product Manager agent for strategic content planning',
+  parameters: {
+    type: 'object',
+    properties: {
+      task: {
+        type: 'string',
+        description: 'The planning or strategy task'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['task', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { task, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'minimalProductManager',
+      assistant_response: `Let me connect you with our product strategy specialist for ${task}.`,
+      additionalInstructions: `The user was working with documentation and now needs help with product planning for ${task}. Previous context: ${context}`
+    };
+  }
+});
+
 const voiceConfig = getAgentVoiceConfig('confluenceIntegration');
 
 export const confluenceIntegrationAgent = new RealtimeAgent({
@@ -341,9 +429,18 @@ When using searchPages tool:
 - Reference existing pages when relevant
 - Format all responses in natural language, not technical output
 
-You take priority over other agents for ANY documentation or Confluence actions.`,
+# Agent Collaboration - HANDOFF WHEN NEEDED:
+- For ticket creation: "I'll connect you with our Jira specialist" → transfer_to_jira
+- For team notifications: "Let me get our communication specialist" → transfer_to_slack
+- For strategic planning: "Our product manager can help with that" → transfer_to_product_manager
+- Examples:
+  * "Create a ticket to implement this" → transfer_to_jira
+  * "Share this documentation with the team" → transfer_to_slack
+  * "Should we create documentation for this feature?" → transfer_to_product_manager
+
+You specialize in documentation and knowledge management, but collaborate with other agents for broader needs.`,
   handoffs: [],
-  tools: [createPageTool, searchPagesTool, getSpacesTool, checkConfluenceStatusTool],
+  tools: [createPageTool, searchPagesTool, getSpacesTool, checkConfluenceStatusTool, transferToJiraTool, transferToSlackTool, transferToProductManagerTool],
   handoffDescription: 'Confluence integration agent for documentation and knowledge management',
 });
 

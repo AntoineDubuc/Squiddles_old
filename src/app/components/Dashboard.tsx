@@ -99,31 +99,19 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
         event.preventDefault();
         if (sessionStatus === 'DISCONNECTED' && onStartVoiceSession) {
           onStartVoiceSession();
-        } else if (sessionStatus === 'CONNECTED' && onPushToTalkStart) {
+        } else if (sessionStatus === 'CONNECTED' && isListening && onEndVoiceSession) {
+          onEndVoiceSession();
+        } else if (sessionStatus === 'CONNECTED' && !isListening && onPushToTalkStart) {
           onPushToTalkStart();
         }
       }
     };
     
-    const handleKeyUp = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement;
-      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-      
-      if (event.code === 'Space' && !isTyping) {
-        event.preventDefault();
-        if (sessionStatus === 'CONNECTED' && onPushToTalkStop) {
-          onPushToTalkStop();
-        }
-      }
-    };
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [sessionStatus, onStartVoiceSession, onPushToTalkStart, onPushToTalkStop]);
+  }, [sessionStatus, onStartVoiceSession, onPushToTalkStart, onEndVoiceSession, isListening]);
 
 
   // Handle clicks outside sidebar on mobile only
@@ -291,13 +279,13 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
               <div className="hero-voice-section">
                 <div 
                   className={`svg-microphone-button ${sessionStatus === 'CONNECTED' && isListening ? 'listening' : ''}`}
-                  onClick={sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : undefined}
-                  onMouseDown={sessionStatus === 'CONNECTED' ? onPushToTalkStart : undefined}
-                  onMouseUp={sessionStatus === 'CONNECTED' ? onPushToTalkStop : undefined}
-                  onMouseLeave={sessionStatus === 'CONNECTED' ? onPushToTalkStop : undefined}
-                  onTouchStart={sessionStatus === 'CONNECTED' ? onPushToTalkStart : undefined}
-                  onTouchEnd={sessionStatus === 'CONNECTED' ? onPushToTalkStop : undefined}
-                  style={{ cursor: sessionStatus === 'DISCONNECTED' ? 'pointer' : 'grab' }}
+                  onClick={
+                    sessionStatus === 'DISCONNECTED' ? onStartVoiceSession : 
+                    sessionStatus === 'CONNECTED' && isListening ? onEndVoiceSession :
+                    sessionStatus === 'CONNECTED' && !isListening ? onPushToTalkStart :
+                    undefined
+                  }
+                  style={{ cursor: 'pointer' }}
                 >
                   <svg viewBox="0 0 160 160" className="microphone-svg">
                     {/* Microphone capsule */}

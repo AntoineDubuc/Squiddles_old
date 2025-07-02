@@ -351,6 +351,94 @@ const scheduleSlackReminderTool = tool({
   }
 });
 
+// Transfer tools for multi-agent handoffs
+const transferToJiraTool = tool({
+  name: 'transfer_to_jira',
+  description: 'Transfer the conversation to the Jira agent for ticket creation and management',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The ticket-related task or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'jiraIntegration',
+      assistant_response: `I'll connect you with our Jira specialist to ${purpose}.`,
+      additionalInstructions: `The user was working with team communication and now needs help with ${purpose}. Previous context: ${context}`
+    };
+  }
+});
+
+const transferToConfluenceTool = tool({
+  name: 'transfer_to_confluence',
+  description: 'Transfer the conversation to the Confluence agent for documentation tasks',
+  parameters: {
+    type: 'object',
+    properties: {
+      purpose: {
+        type: 'string',
+        description: 'The documentation task or reason for transfer'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['purpose', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { purpose, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'confluenceIntegration',
+      assistant_response: `Let me connect you with our documentation specialist for ${purpose}.`,
+      additionalInstructions: `The user was working with team communication and now needs help with documentation for ${purpose}. Previous context: ${context}`
+    };
+  }
+});
+
+const transferToProductManagerTool = tool({
+  name: 'transfer_to_product_manager',
+  description: 'Transfer the conversation to the Product Manager agent for strategic planning',
+  parameters: {
+    type: 'object',
+    properties: {
+      task: {
+        type: 'string',
+        description: 'The planning or strategy task'
+      },
+      context: {
+        type: 'string',
+        description: 'Current conversation context to pass along'
+      }
+    },
+    required: ['task', 'context'],
+    additionalProperties: false
+  },
+  execute: async (input: any) => {
+    const { task, context } = input;
+    return {
+      transfer: true,
+      targetAgent: 'minimalProductManager',
+      assistant_response: `I'll connect you with our product strategy specialist for ${task}.`,
+      additionalInstructions: `The user was working with team communication and now needs help with product planning for ${task}. Previous context: ${context}`
+    };
+  }
+});
+
 const voiceConfig = getAgentVoiceConfig('slackIntegration');
 
 // Main Slack Integration Agent
@@ -387,6 +475,17 @@ Handle team communication through Slack messages, automated notifications, chann
 - Suggest next steps: "Would you like me to schedule a follow-up reminder?"
 - Acknowledge integrations: "I've notified the team about the new ticket SQUID-123"
 - Report errors helpfully: "I had trouble sending that message, let me try again"
+
+# Agent Collaboration - HANDOFF WHEN NEEDED:
+- For ticket creation: "Let me connect you with our Jira specialist" → transfer_to_jira
+- For documentation: "I'll get our documentation expert" → transfer_to_confluence
+- For strategic planning: "Our product manager can help with that" → transfer_to_product_manager
+- Examples:
+  * "Create a ticket about this issue" → transfer_to_jira
+  * "Document this process" → transfer_to_confluence
+  * "Should we change our approach?" → transfer_to_product_manager
+
+You handle team communication and notifications, but collaborate with specialists for other needs.
   `,
   handoffs: [],
   tools: [
@@ -394,7 +493,10 @@ Handle team communication through Slack messages, automated notifications, chann
     notifyTicketCreatedTool, 
     searchSlackHistoryTool, 
     createSlackChannelTool, 
-    scheduleSlackReminderTool
+    scheduleSlackReminderTool,
+    transferToJiraTool,
+    transferToConfluenceTool,
+    transferToProductManagerTool
   ],
   handoffDescription: 'Team communication and Slack workspace management with real-time notifications'
 });

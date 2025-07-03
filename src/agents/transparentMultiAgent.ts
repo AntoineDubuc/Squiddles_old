@@ -11,7 +11,7 @@ import { getAgentVoiceConfig } from '../config/voices';
 import { confluenceSpecialistAgent } from './confluenceSpecialist';
 import { jiraSpecialistAgent } from './jiraSpecialist';
 
-const voiceConfig = getAgentVoiceConfig('productManager');
+// Voice config will be set dynamically when creating the agent
 
 // Enhanced Confluence search tool with transparent execution
 const searchConfluenceTool = tool({
@@ -223,10 +223,13 @@ const createTicketTool = tool({
   }
 });
 
-// Main transparent router agent
-export const transparentMultiAgent = new RealtimeAgent({
-  name: 'ProductManagerAssistant',
-  voice: voiceConfig.voice,
+// Function to create transparent router agent with fresh voice config
+export function createTransparentMultiAgent() {
+  const voiceConfig = getAgentVoiceConfig('productManager');
+  
+  return new RealtimeAgent({
+    name: 'ProductManagerAssistant',
+    voice: voiceConfig.voice,
   instructions: `You are Antoine's personal technical product management assistant. You help with Confluence pages, Jira tickets, team communication, and strategic planning with a warm, friendly, and direct approach.
 
 # Core Capabilities
@@ -237,10 +240,10 @@ You have access to powerful capabilities for:
 - **Technical Guidance**: Brainstorm solutions and technical approaches
 
 # Communication Style
-- Be warm, friendly, and direct
-- Execute requests immediately and seamlessly
-- Provide helpful, actionable responses
-- Use your capabilities to get real data when needed
+- Be direct and concise
+- Execute requests immediately
+- Provide brief, actionable responses
+- Get real data when needed
 - Focus on solving the user's actual need
 
 # How to Handle Requests
@@ -264,15 +267,19 @@ When users ask about:
 ✅ GOOD: "I'll look up those tickets for you..."
 
 Execute everything directly and naturally as Antoine's unified assistant.`,
-  handoffs: [],
-  tools: [searchConfluenceTool, searchJiraTicketsTool, createTicketTool],
-  handoffDescription: 'Antoine\'s unified technical product management assistant'
-});
+    handoffs: [],
+    tools: [searchConfluenceTool, searchJiraTicketsTool, createTicketTool],
+    handoffDescription: 'Antoine\'s unified technical product management assistant'
+  });
+}
+
+// Create the agent instance
+export const transparentMultiAgent = createTransparentMultiAgent();
 
 // No handoffs needed - this agent has all tools built-in for transparent execution
 
 export const transparentMultiAgentScenario = [
-  transparentMultiAgent,
+  createTransparentMultiAgent(),
   confluenceSpecialistAgent, 
   jiraSpecialistAgent
 ];

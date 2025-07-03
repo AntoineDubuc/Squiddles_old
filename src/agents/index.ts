@@ -9,7 +9,8 @@
 // Import transparent multi-agent system (RECOMMENDED)
 import {
   transparentMultiAgentScenario,
-  transparentMultiAgent
+  transparentMultiAgent,
+  createTransparentMultiAgent
 } from './transparentMultiAgent';
 
 // Import unified scenario (single agent fallback)
@@ -36,7 +37,42 @@ import { gmailIntegrationScenario, gmailIntegrationAgent } from './gmailIntegrat
 
 import type { RealtimeAgent } from '@openai/agents/realtime';
 
-// Map of scenario key -> array of RealtimeAgent objects
+// Function to create fresh agent sets with current voice settings
+export function createFreshAgentSets(): Record<string, RealtimeAgent[]> {
+  // Create fresh transparent multi-agent scenario with current voice settings
+  const freshTransparentScenario = [
+    createTransparentMultiAgent(),
+    confluenceIntegrationAgent, 
+    jiraIntegrationAgent
+  ];
+
+  return {
+    // NEW: Transparent multi-agent - seamless handoffs, invisible to users (RECOMMENDED)
+    squiddles: freshTransparentScenario,
+    
+    // Single unified agent - fallback option
+    unified: unifiedSquiddlesScenario,
+    
+    // Multi-agent with visible transfers (for testing)
+    collaborative: collaborativeSquiddlesScenario,
+    
+    // Legacy isolated scenarios (for backwards compatibility)
+    minimal: minimalProductManagerScenario,
+    jira: jiraIntegrationScenario,
+    confluence: confluenceIntegrationScenario,
+    slack: slackIntegrationScenario,
+    gmail: gmailIntegrationScenario,
+    
+    // Legacy combined scenarios (just concatenated arrays - no handoffs)
+    withJira: [...jiraIntegrationScenario, ...minimalProductManagerScenario],
+    withConfluence: [...confluenceIntegrationScenario, ...minimalProductManagerScenario],
+    withSlack: [...slackIntegrationScenario, ...minimalProductManagerScenario],
+    withGmail: [...gmailIntegrationScenario, ...minimalProductManagerScenario],
+    full: [...confluenceIntegrationScenario, ...jiraIntegrationScenario, ...slackIntegrationScenario, ...gmailIntegrationScenario, ...minimalProductManagerScenario],
+  };
+}
+
+// Map of scenario key -> array of RealtimeAgent objects (legacy for backwards compatibility)
 export const allAgentSets: Record<string, RealtimeAgent[]> = {
   // NEW: Transparent multi-agent - seamless handoffs, invisible to users (RECOMMENDED)
   squiddles: transparentMultiAgentScenario,

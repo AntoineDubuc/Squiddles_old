@@ -24,9 +24,16 @@ interface DashboardProps {
   onPushToTalkStop?: () => void;
   sessionStatus?: 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED';
   isListening?: boolean;
+  searchResults?: {
+    isVisible: boolean;
+    tickets: any[];
+    totalCount: number;
+    voiceMessage?: string;
+  };
+  onClearSearchResults?: () => void;
 }
 
-export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, onPushToTalkStart, onPushToTalkStop, sessionStatus = 'DISCONNECTED', isListening = false }: DashboardProps) {
+export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, onPushToTalkStart, onPushToTalkStop, sessionStatus = 'DISCONNECTED', isListening = false, searchResults, onClearSearchResults }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activityExpanded, setActivityExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -41,6 +48,9 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
   
   // Transcript context for conversation display
   const { transcriptItems } = useTranscript();
+
+  // Debug log for search results
+  console.log('Dashboard searchResults:', searchResults);
 
   // Handle responsive behavior
   useEffect(() => {
@@ -542,6 +552,61 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                   </div>
                 )}
               </div>
+
+              {/* Search Results Section - Show search results inline */}
+              {searchResults && searchResults.isVisible && (
+                <div className="search-results-section">
+                  <div className="search-results-header">
+                    <div className="search-results-title">
+                      <span>🔍</span>
+                      <span>Search Results</span>
+                      <div className="search-results-badge">{searchResults.totalCount} results</div>
+                    </div>
+                    <button 
+                      onClick={onClearSearchResults}
+                      className="search-results-close"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="search-results-content">
+                    {searchResults.voiceMessage && (
+                      <div className="search-results-message">
+                        {searchResults.voiceMessage}
+                      </div>
+                    )}
+                    <div className="search-results-list">
+                      {searchResults.tickets.map((ticket, index) => (
+                        <div key={ticket.id || index} className="search-result-item">
+                          <div className="search-result-header">
+                            <span className="search-result-key">{ticket.key}</span>
+                            <span className={`search-result-priority priority-${(ticket.priority?.name || ticket.priority || 'medium').toLowerCase()}`}>
+                              {ticket.priority?.name || ticket.priority || 'Medium'}
+                            </span>
+                          </div>
+                          <div className="search-result-summary">
+                            {ticket.summary}
+                          </div>
+                          <div className="search-result-meta">
+                            <span className="search-result-status">{ticket.status?.name || ticket.status || 'Unknown'}</span>
+                            <span className="search-result-assignee">
+                              {ticket.assignee?.displayName || ticket.assignee || 'Unassigned'}
+                            </span>
+                          </div>
+                          <div className="search-result-actions">
+                            <button 
+                              onClick={() => window.open(ticket.url, '_blank')}
+                              className="search-result-action"
+                            >
+                              Open
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Conversation Section - Show when there are transcript items */}
               {transcriptItems.length > 0 && (

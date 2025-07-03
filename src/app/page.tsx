@@ -26,7 +26,7 @@ import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
 import { getCurrentUser } from "../lib/auth";
 
 // Agent configs - Following OpenAI Advanced Agent Example pattern
-import { allAgentSets, defaultAgentSetKey } from "../agents";
+import { allAgentSets, defaultAgentSetKey, createFreshAgentSets } from "../agents";
 
 export default function Home() {
   // App state
@@ -263,8 +263,9 @@ export default function Home() {
       console.log("🤖 Available agent sets:", Object.keys(allAgentSets));
       console.log("🤖 Reply state selected mention:", replyState.selectedMention);
       
-      // Use the full agent set to include Jira integration
-      const agents = allAgentSets[selectedAgentSet] || allAgentSets.full;
+      // Use fresh agent sets to get current voice settings
+      const freshAgentSets = createFreshAgentSets();
+      const agents = freshAgentSets[selectedAgentSet] || freshAgentSets.full;
       console.log("🔍 DEBUG: Using agent set:", selectedAgentSet);
       console.log("🤖 Selected agents:", agents?.map(a => a.name) || 'NO AGENTS!');
       
@@ -843,28 +844,9 @@ export default function Home() {
           onPushToTalkStop={pushToTalkStop}
           sessionStatus={sessionStatus}
           isListening={isListening}
+          searchResults={ticketDisplay}
+          onClearSearchResults={hideTickets}
         />
-        {ticketDisplay && ticketDisplay.isVisible && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="relative bg-[#0A0A0B] rounded-3xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
-              <button
-                onClick={hideTickets}
-                className="absolute top-4 right-4 z-10 w-10 h-10 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full flex items-center justify-center text-white transition-all"
-              >
-                ✕
-              </button>
-              <TicketList
-                tickets={ticketDisplay.tickets}
-                totalCount={ticketDisplay.totalCount}
-                voiceMessage={ticketDisplay.voiceMessage}
-                onTicketClick={(ticket) => {
-                  console.log('Ticket clicked:', ticket.key);
-                  window.open(ticket.url, '_blank');
-                }}
-              />
-            </div>
-          </div>
-        )}
       </>
     );
   }

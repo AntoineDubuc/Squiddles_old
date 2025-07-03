@@ -15,7 +15,7 @@ export const VOICE_PROFILES: Record<string, VoiceProfile> = {
   professional: {
     voice: 'alloy',
     tonality: 'professional',
-    style: 'Be professional, clear, and concise. Use formal language and focus on efficiency.'
+    style: 'Be brief, clear, and direct. Use minimal words and focus on efficiency.'
   },
   friendly: {
     voice: 'echo',
@@ -44,7 +44,7 @@ export const AGENT_VOICES: Record<string, keyof typeof VOICE_PROFILES> = {
   confluenceIntegration: 'professional', // Documentation needs clarity
   jiraIntegration: 'friendly',           // Ticket management should be supportive
   slackIntegration: 'casual',            // Messaging is conversational
-  productManager: 'enthusiastic',       // Brainstorming needs energy
+  productManager: 'professional',       // Clear, concise responses
   gmailIntegration: 'professional',     // Email communication needs professionalism
 };
 

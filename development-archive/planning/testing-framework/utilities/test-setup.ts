@@ -9,7 +9,7 @@ import * as fs from 'fs';
 
 // Global test configuration
 global.TEST_CONFIG = {
-  SQUIDDLES_BASE_URL: process.env.SQUIDDLES_BASE_URL || 'http://localhost:3000',
+  SQUIDDLES_BASE_URL: process.env.SQUIDDLES_BASE_URL || 'http://localhost:3002',
   TEST_TIMEOUT: parseInt(process.env.TEST_TIMEOUT || '60000'),
   VOICE_RESPONSE_TIMEOUT: parseInt(process.env.VOICE_RESPONSE_TIMEOUT || '15000'),
   OPENAI_TEST_MODE: process.env.OPENAI_TEST_MODE === 'true',

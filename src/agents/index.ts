@@ -1,11 +1,18 @@
 /**
- * Agent Registry - Collaborative Multi-Agent System
+ * Agent Registry - Transparent Multi-Agent System
  * Based on: OpenAI Advanced Agent Example Pattern
  * 
- * Uses true multi-agent collaboration with handoffs between specialists
+ * Uses transparent handoffs for seamless user experience - users think
+ * they're talking to one agent while getting specialized capabilities
  */
 
-// Import unified scenario (no transfers)
+// Import transparent multi-agent system (RECOMMENDED)
+import {
+  transparentMultiAgentScenario,
+  transparentMultiAgent
+} from './transparentMultiAgent';
+
+// Import unified scenario (single agent fallback)
 import { 
   unifiedSquiddlesScenario,
   unifiedSquiddlesAgent
@@ -31,10 +38,13 @@ import type { RealtimeAgent } from '@openai/agents/realtime';
 
 // Map of scenario key -> array of RealtimeAgent objects
 export const allAgentSets: Record<string, RealtimeAgent[]> = {
-  // NEW: Single unified agent - direct execution, no transfers (RECOMMENDED)
-  squiddles: unifiedSquiddlesScenario,
+  // NEW: Transparent multi-agent - seamless handoffs, invisible to users (RECOMMENDED)
+  squiddles: transparentMultiAgentScenario,
   
-  // Multi-agent with transfers (for testing)
+  // Single unified agent - fallback option
+  unified: unifiedSquiddlesScenario,
+  
+  // Multi-agent with visible transfers (for testing)
   collaborative: collaborativeSquiddlesScenario,
   
   // Legacy isolated scenarios (for backwards compatibility)
@@ -52,8 +62,16 @@ export const allAgentSets: Record<string, RealtimeAgent[]> = {
   full: [...confluenceIntegrationScenario, ...jiraIntegrationScenario, ...slackIntegrationScenario, ...gmailIntegrationScenario, ...minimalProductManagerScenario],
 };
 
-// Use the unified agent as default (no transfers)
+// Use the transparent multi-agent system (fixed to work with voice interface)
 export const defaultAgentSetKey = 'squiddles';
 
 // Export active agents for direct access
-export { unifiedSquiddlesAgent, minimalProductManagerAgent, jiraIntegrationAgent, confluenceIntegrationAgent, slackIntegrationAgent, gmailIntegrationAgent };
+export { 
+  transparentMultiAgent,
+  unifiedSquiddlesAgent, 
+  minimalProductManagerAgent, 
+  jiraIntegrationAgent, 
+  confluenceIntegrationAgent, 
+  slackIntegrationAgent, 
+  gmailIntegrationAgent 
+};

@@ -61,6 +61,22 @@
         }
       ],
       "timeoutMs": 30000
+    },
+    {
+      "id": "confluence-linkedin-search",
+      "name": "Confluence LinkedIn Search Test",
+      "description": "Test voice-driven Confluence page search functionality",
+      "audioFile": "confluence-linkedin-search.wav",
+      "expectedUserTranscript": "I'd like to see Confluence pages about LinkedIn",
+      "expectedAIResponsePatterns": [
+        "confluence",
+        "pages", 
+        "linkedin",
+        "found"
+      ],
+      "expectedToolCalls": ["searchPages"],
+      "expectedUIElements": [".confluence-results"],
+      "timeoutMs": 20000
     }
   ],
   "performanceScenarios": [

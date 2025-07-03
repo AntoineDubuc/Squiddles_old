@@ -81,6 +81,12 @@ const TEST_AUDIO_CASES: AudioTestCase[] = [
     text: 'Are you still there? I was asking about creating a user story',
     voice: 'alloy',
     description: 'Speech after connection recovery'
+  },
+  {
+    filename: 'confluence-linkedin-search.wav',
+    text: 'I\'d like to see Confluence pages about LinkedIn',
+    voice: 'alloy',
+    description: 'Confluence search for LinkedIn pages'
   }
 ];
 

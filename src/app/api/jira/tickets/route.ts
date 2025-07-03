@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateJiraConfig } from '@/lib/jira/config';
 import { jiraClient } from '@/lib/jira';
-import type { JiraTicket } from '@/app/types/jira';
+import type { JiraTicket } from '@/lib/jira/jiraClient';
 
 export async function POST(request: NextRequest) {
   try {

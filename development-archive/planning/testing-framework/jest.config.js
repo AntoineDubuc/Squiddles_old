@@ -10,7 +10,7 @@ module.exports = {
   testTimeout: 120000, // 2 minutes for voice tests
   verbose: true,
   collectCoverage: false, // We're testing external app
-  testSequencer: '<rootDir>/utilities/voice-test-sequencer.js',
+  // testSequencer: '<rootDir>/utilities/voice-test-sequencer.js', // Disabled temporarily
   reporters: [
     'default',
     ['jest-html-reporter', {
@@ -22,7 +22,7 @@ module.exports = {
   ],
   // Custom test environment variables
   globals: {
-    SQUIDDLES_BASE_URL: 'http://localhost:3000',
+    SQUIDDLES_BASE_URL: 'http://localhost:3002',
     TEST_TIMEOUT: 60000,
     VOICE_RESPONSE_TIMEOUT: 15000,
     OPENAI_TEST_MODE: true

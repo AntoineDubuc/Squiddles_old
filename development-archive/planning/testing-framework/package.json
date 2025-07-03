@@ -27,18 +27,6 @@
     "typescript": "^5.3.2",
     "jest-html-reporter": "^3.10.2"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/**/*.test.ts"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/utilities/test-setup.ts"
-    ],
-    "testTimeout": 60000,
-    "verbose": true
-  },
   "author": "Claude Code Testing Framework",
   "license": "MIT"
 }

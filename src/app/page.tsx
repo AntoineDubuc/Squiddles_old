@@ -23,6 +23,7 @@ import { useTicketDisplay } from "./contexts/TicketDisplayContext";
 
 // Utilities
 import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
+import { UnifiedVoiceClient, UnifiedVoiceClientOptions } from "../lib/unifiedVoiceClient";
 import { getCurrentUser } from "../lib/auth";
 
 // Agent configs - Following OpenAI Advanced Agent Example pattern
@@ -128,7 +129,7 @@ export default function Home() {
   }, [replyState.selectedMention?.ticketKey]);
   
   // Refs
-  const clientRef = useRef<RealtimeClient | null>(null);
+  const clientRef = useRef<UnifiedVoiceClient | null>(null);
   const sessionIdRef = useRef<string>("");
   const lastSelectedMentionKeyRef = useRef<string | null>(null);
   const responseAccumulator = useRef<Map<string, string>>(new Map());
@@ -269,7 +270,7 @@ export default function Home() {
       console.log("🔍 DEBUG: Using agent set:", selectedAgentSet);
       console.log("🤖 Selected agents:", agents?.map(a => a.name) || 'NO AGENTS!');
       
-      console.log("🔌 Creating RealtimeClient...");
+      console.log("🔌 Creating UnifiedVoiceClient...");
       console.log("🔍 DEBUG: Agent details:", agents?.map(a => ({
         name: a.name,
         voice: a.voice,
@@ -282,7 +283,8 @@ export default function Home() {
         hasAddTranscriptMessage: !!addTranscriptMessage
       });
       
-      const client = new RealtimeClient({
+      const client = new UnifiedVoiceClient({
+        // OpenAI options
         getEphemeralKey: async () => EPHEMERAL_KEY,
         initialAgents: agents,
         audioElement: sdkAudioElement,
@@ -291,6 +293,7 @@ export default function Home() {
           selectedMention: replyState.selectedMention,
           setReplyStatus,
           setLastPostedComment,
+          fallbackEnabled: true,
           refreshDashboard: () => {
             // Trigger dashboard refresh if needed
             console.log('🔄 Dashboard refresh requested from voice agent');
@@ -300,8 +303,15 @@ export default function Home() {
           threshold: 0.6,           // Higher threshold = less sensitive to background noise
           prefix_padding_ms: 200,   // Shorter padding = less audio processed
           silence_duration_ms: 800  // Longer silence required before stopping = fewer false triggers
+        },
+        // Nova Sonic options
+        novaSonicConfig: {
+          region: process.env.AWS_BEDROCK_REGION || 'us-east-1',
+          voiceId: process.env.NOVA_SONIC_VOICE_ID || 'matthew',
+          sampleRate: parseInt(process.env.NOVA_SONIC_SAMPLE_RATE || '24000'),
+          sessionTimeout: parseInt(process.env.NOVA_SONIC_SESSION_TIMEOUT || '480000'),
         }
-      } as any);
+      });
 
       clientRef.current = client;
 

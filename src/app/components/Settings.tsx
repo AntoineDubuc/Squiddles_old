@@ -5,7 +5,19 @@
 "use client";
 
 import React, { useState } from 'react';
-import { VOICE_PROFILES, AGENT_VOICES, type OpenAIVoice } from '../../config/voices';
+import { 
+  AGENT_VOICES, 
+  NOVA_SONIC_VOICES, 
+  OPENAI_VOICES,
+  isNovaSonicVoice,
+  isOpenAIVoice,
+  getDefaultVoiceForProvider,
+  getVoiceProfilesForProvider,
+  type OpenAIVoice,
+  type NovaSonicVoice,
+  type UnifiedVoice
+} from '../../config/voices';
+import { getProviderDisplayName, getProviderCostInfo } from '../../config/voiceProvider';
 import GmailConfig from './GmailConfig';
 
 interface SettingsProps {
@@ -24,16 +36,27 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
   });
 
   const [voiceSettings, setVoiceSettings] = useState({
-    globalVoice: 'echo' as OpenAIVoice,
-    globalTone: 'friendly' as keyof typeof VOICE_PROFILES,
+    globalVoice: 'echo' as UnifiedVoice,
+    globalTone: 'friendly' as string,
     globalSpeed: 1.0,
     agentVoices: { ...AGENT_VOICES }
   });
 
+  const [voiceProviderSettings, setVoiceProviderSettings] = useState({
+    provider: 'openai' as 'openai' | 'nova-sonic',
+    fallbackEnabled: true
+  });
+
+  const [providerStatus, setProviderStatus] = useState({
+    openaiAvailable: false,
+    novaSonicAvailable: false,
+    loading: true
+  });
+
   const [voiceTesting, setVoiceTesting] = useState({
     isPlaying: false,
-    currentVoice: null as OpenAIVoice | null,
-    currentTone: null as keyof typeof VOICE_PROFILES | null,
+    currentVoice: null as UnifiedVoice | null,
+    currentTone: null as string | null,
     speed: 1.0
   });
 
@@ -44,6 +67,29 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
   React.useEffect(() => {
     setVoiceTesting(prev => ({ ...prev, speed: voiceSettings.globalSpeed }));
   }, [voiceSettings.globalSpeed]);
+
+  // Update voice selection when provider changes
+  React.useEffect(() => {
+    const currentVoice = voiceSettings.globalVoice;
+    
+    if (voiceProviderSettings.provider === 'openai') {
+      // If current voice is not an OpenAI voice, reset to default
+      if (!isOpenAIVoice(currentVoice)) {
+        setVoiceSettings(prev => ({ 
+          ...prev, 
+          globalVoice: getDefaultVoiceForProvider('openai')
+        }));
+      }
+    } else {
+      // If current voice is not a Nova Sonic voice, reset to default
+      if (!isNovaSonicVoice(currentVoice)) {
+        setVoiceSettings(prev => ({ 
+          ...prev, 
+          globalVoice: getDefaultVoiceForProvider('nova-sonic')
+        }));
+      }
+    }
+  }, [voiceProviderSettings.provider]);
 
   // Clear save message after 3 seconds
   React.useEffect(() => {
@@ -62,6 +108,7 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
       // Save to localStorage for now (could be extended to API later)
       const settingsData = {
         voice: voiceSettings,
+        voiceProvider: voiceProviderSettings,
         confluence: confluenceSettings,
         timestamp: Date.now()
       };
@@ -72,12 +119,36 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
       // This would ideally update the live agents' voice settings
       console.log('💾 Settings saved:', settingsData);
       
+      // Save voice provider settings to environment via API
+      let providerSaved = false;
+      if (voiceProviderSettings) {
+        try {
+          const response = await fetch('/api/settings/voice-provider', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(voiceProviderSettings)
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            providerSaved = true;
+            console.log('✅ Voice provider settings saved:', result);
+          }
+        } catch (error) {
+          console.warn('⚠️ Could not save voice provider to environment:', error);
+        }
+      }
+
       // Trigger voice settings reload event
       window.dispatchEvent(new CustomEvent('voiceSettingsChanged', { 
-        detail: voiceSettings 
+        detail: { voiceSettings, voiceProvider: voiceProviderSettings }
       }));
       
-      setSaveMessage('Settings saved! Voice changes will take effect on next conversation.');
+      if (providerSaved) {
+        setSaveMessage('Settings saved! Restart the app to use the new voice provider.');
+      } else {
+        setSaveMessage('Voice settings saved! Voice changes will take effect on next conversation.');
+      }
       
     } catch (error) {
       console.error('❌ Failed to save settings:', error);
@@ -87,8 +158,33 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
     }
   };
 
+  // Load provider status from API
+  const loadProviderStatus = async () => {
+    try {
+      const response = await fetch('/api/settings/voice-provider');
+      if (response.ok) {
+        const data = await response.json();
+        setProviderStatus({
+          openaiAvailable: data.openaiAvailable,
+          novaSonicAvailable: data.novaSonicAvailable,
+          loading: false
+        });
+        setVoiceProviderSettings({
+          provider: data.provider,
+          fallbackEnabled: data.fallbackEnabled
+        });
+      }
+    } catch (error) {
+      console.error('❌ Failed to load provider status:', error);
+      setProviderStatus(prev => ({ ...prev, loading: false }));
+    }
+  };
+
   // Load settings on component mount
   React.useEffect(() => {
+    // Load provider status from API
+    loadProviderStatus();
+    
     try {
       const savedSettings = localStorage.getItem('squiddles-settings');
       if (savedSettings) {
@@ -96,6 +192,10 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
         
         if (parsed.voice) {
           setVoiceSettings(prev => ({ ...prev, ...parsed.voice }));
+        }
+
+        if (parsed.voiceProvider) {
+          setVoiceProviderSettings(prev => ({ ...prev, ...parsed.voiceProvider }));
         }
         
         if (parsed.confluence) {
@@ -119,8 +219,8 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
   ];
 
   // Sample text for different tones
-  const getSampleText = (tone: keyof typeof VOICE_PROFILES): string => {
-    const samples = {
+  const getSampleText = (tone: string): string => {
+    const samples: Record<string, string> = {
       professional: "I've found 3 tickets in your current sprint. The highest priority item is DE-3293 which requires immediate attention.",
       friendly: "Great! I found 3 tickets for you in the current sprint. Let's take a look at what we've got - the top priority one looks really important!",
       casual: "Hey! So I checked out your sprint and found 3 tickets. The main one you should probably look at is DE-3293.",
@@ -131,50 +231,78 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
   };
 
   // Test voice function
-  const testVoice = async (voice: OpenAIVoice, tone: keyof typeof VOICE_PROFILES) => {
-    setVoiceTesting({ isPlaying: true, currentVoice: voice, currentTone: tone });
+  const testVoice = async (voice: UnifiedVoice, tone: string) => {
+    setVoiceTesting({ isPlaying: true, currentVoice: voice, currentTone: tone, speed: voiceTesting.speed });
     
     try {
-      // Create a test message using OpenAI TTS
+      // Create a test message using the appropriate TTS service
       const sampleText = getSampleText(tone);
       
       console.log(`🎵 Testing voice: ${voice} with tone: ${tone}`);
       console.log(`Sample text: ${sampleText}`);
       
-      // Call OpenAI TTS API with the selected voice
+      // Determine if this is a Nova Sonic or OpenAI voice
+      const provider = isNovaSonicVoice(voice) ? 'nova-sonic' : 'openai';
+      
+      // Call TTS API with the selected voice and provider
       const response = await fetch('/api/tts/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ voice, text: sampleText, speed: voiceTesting.speed })
+        body: JSON.stringify({ 
+          voice, 
+          text: sampleText, 
+          speed: voiceTesting.speed,
+          provider 
+        })
       });
       
       if (!response.ok) {
         throw new Error(`TTS API error: ${response.status}`);
       }
       
-      // Create audio from response
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      // Check if response is audio (both OpenAI and Nova Sonic should return audio)
+      const contentType = response.headers.get('content-type');
+      const isFallback = response.headers.get('x-fallback');
       
-      // Play the audio
-      await audio.play();
-      
-      // Clean up when audio ends
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-        setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null });
-      };
-      
-      // Also handle errors during playback
-      audio.onerror = () => {
-        URL.revokeObjectURL(audioUrl);
-        setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null });
-      };
+      if (contentType?.includes('audio')) {
+        // Handle audio response (both OpenAI and Nova Sonic)
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        // Show fallback message if Nova Sonic fell back to OpenAI
+        if (provider === 'nova-sonic' && isFallback === 'openai') {
+          console.log('🔄 Nova Sonic fell back to OpenAI for testing');
+        }
+        
+        // Play the audio
+        await audio.play();
+        
+        // Clean up when audio ends
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null, speed: voiceTesting.speed });
+        };
+        
+        // Also handle errors during playback
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl);
+          setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null, speed: voiceTesting.speed });
+        };
+        
+      } else {
+        // Handle JSON response (fallback case)
+        const result = await response.json();
+        console.log('🔊 TTS result:', result);
+        
+        // Show a message for JSON responses
+        alert(`Voice Test: ${result.message || 'Audio playback not available'}`);
+        setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null, speed: voiceTesting.speed });
+      }
       
     } catch (error) {
       console.error('Failed to test voice:', error);
-      setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null });
+      setVoiceTesting({ isPlaying: false, currentVoice: null, currentTone: null, speed: voiceTesting.speed });
     }
   };
 
@@ -254,6 +382,98 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
               {activeSection === 'voice' && (
                 <div className="settings-section">
                   <div className="setting-group">
+                    <h3 className="setting-group-title">Voice Provider</h3>
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <label className="setting-label">AI Voice Service</label>
+                        <p className="setting-description">
+                          Choose between OpenAI Realtime API and AWS Nova Sonic
+                          {voiceProviderSettings.provider === 'nova-sonic' && (
+                            <span className="cost-savings"> (80% cost savings)</span>
+                          )}
+                        </p>
+                      </div>
+                      <select 
+                        className="setting-control"
+                        value={voiceProviderSettings.provider}
+                        onChange={(e) => setVoiceProviderSettings(prev => ({ ...prev, provider: e.target.value as 'openai' | 'nova-sonic' }))}
+                      >
+                        <option value="openai">
+                          {getProviderDisplayName('openai')} - ${getProviderCostInfo('openai').costPerHour}/hour
+                        </option>
+                        <option value="nova-sonic">
+                          {getProviderDisplayName('nova-sonic')} - ${getProviderCostInfo('nova-sonic').costPerHour}/hour
+                        </option>
+                      </select>
+                    </div>
+
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <label className="setting-label">Provider Status</label>
+                        <p className="setting-description">Current availability of voice providers</p>
+                      </div>
+                      <div className="provider-status-grid">
+                        <div className={`provider-status ${providerStatus.openaiAvailable ? 'available' : 'unavailable'}`}>
+                          <span className="provider-icon">🤖</span>
+                          <span className="provider-name">OpenAI</span>
+                          <span className={`status-indicator ${providerStatus.openaiAvailable ? 'green' : 'red'}`}>
+                            {providerStatus.loading ? '⏳ Checking...' : 
+                             providerStatus.openaiAvailable ? '✅ Available' : '❌ Not configured'}
+                          </span>
+                        </div>
+                        <div className={`provider-status ${providerStatus.novaSonicAvailable ? 'available' : 'unavailable'}`}>
+                          <span className="provider-icon">🔊</span>
+                          <span className="provider-name">Nova Sonic</span>
+                          <span className={`status-indicator ${providerStatus.novaSonicAvailable ? 'green' : 'red'}`}>
+                            {providerStatus.loading ? '⏳ Checking...' : 
+                             providerStatus.novaSonicAvailable ? '✅ Available' : '❌ Not configured'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <label className="setting-label">Enable Fallback</label>
+                        <p className="setting-description">
+                          Automatically switch to backup provider if primary fails
+                        </p>
+                      </div>
+                      <label className="toggle-switch">
+                        <input 
+                          type="checkbox" 
+                          checked={voiceProviderSettings.fallbackEnabled}
+                          onChange={(e) => setVoiceProviderSettings(prev => ({ ...prev, fallbackEnabled: e.target.checked }))}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    {voiceProviderSettings.provider === 'nova-sonic' && (
+                      <div className="cost-savings-info">
+                        <div className="savings-header">
+                          <span className="savings-icon">💰</span>
+                          <span className="savings-title">Cost Savings with Nova Sonic</span>
+                        </div>
+                        <div className="savings-details">
+                          <div className="savings-row">
+                            <span>Hourly cost reduction:</span>
+                            <span className="savings-amount">$59.30 (80% savings)</span>
+                          </div>
+                          <div className="savings-row">
+                            <span>Daily savings (8 hours):</span>
+                            <span className="savings-amount">$474.40</span>
+                          </div>
+                          <div className="savings-row">
+                            <span>Annual savings:</span>
+                            <span className="savings-amount">$125,241</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="setting-group">
                     <h3 className="setting-group-title">Global Voice Settings</h3>
                     <div className="setting-item">
                       <div className="setting-info">
@@ -264,15 +484,21 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                         <select 
                           className="setting-control" 
                           value={voiceSettings.globalVoice}
-                          onChange={(e) => setVoiceSettings(prev => ({ ...prev, globalVoice: e.target.value as OpenAIVoice }))}
+                          onChange={(e) => setVoiceSettings(prev => ({ ...prev, globalVoice: e.target.value as UnifiedVoice }))}
                         >
-                          <option value="alloy">Alloy - Neutral, balanced</option>
-                          <option value="echo">Echo - Friendly, warm</option>
-                          <option value="fable">Fable - Expressive, dynamic</option>
-                          <option value="onyx">Onyx - Deep, authoritative</option>
-                          <option value="nova">Nova - Bright, engaging</option>
-                          <option value="shimmer">Shimmer - Gentle, soft</option>
-                          <option value="sage">Sage - Calm, wise</option>
+                          {voiceProviderSettings.provider === 'openai' ? (
+                            <>
+                              {Object.entries(OPENAI_VOICES).map(([key, description]) => (
+                                <option key={key} value={key}>{description}</option>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              {Object.entries(NOVA_SONIC_VOICES).map(([key, description]) => (
+                                <option key={key} value={key}>{description}</option>
+                              ))}
+                            </>
+                          )}
                         </select>
                         <button 
                           className="test-voice-btn"
@@ -292,9 +518,9 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                       <select 
                         className="setting-control"
                         value={voiceSettings.globalTone}
-                        onChange={(e) => setVoiceSettings(prev => ({ ...prev, globalTone: e.target.value as keyof typeof VOICE_PROFILES }))}
+                        onChange={(e) => setVoiceSettings(prev => ({ ...prev, globalTone: e.target.value }))}
                       >
-                        {Object.entries(VOICE_PROFILES).map(([key, profile]) => (
+                        {Object.entries(getVoiceProfilesForProvider(voiceProviderSettings.provider)).map(([key, profile]) => (
                           <option key={key} value={key}>
                             {key.charAt(0).toUpperCase() + key.slice(1)} - {profile.style}
                           </option>
@@ -345,7 +571,10 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                     
                     {Object.entries(AGENT_VOICES).map(([agentName, currentTone]) => {
                       const agentDisplayName = agentName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                      const currentProfile = VOICE_PROFILES[currentTone];
+                      
+                      // Get the appropriate voice profiles based on selected provider
+                      const currentVoiceProfiles = getVoiceProfilesForProvider(voiceProviderSettings.provider);
+                      const currentProfile = currentVoiceProfiles[currentTone] || currentVoiceProfiles['professional'];
                       
                       return (
                         <div key={agentName} className="setting-item">
@@ -354,7 +583,10 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                               {agentDisplayName.replace('Integration', '')} Agent
                             </label>
                             <p className="setting-description">
-                              Currently: {currentProfile.voice} voice with {currentProfile.tonality} tone
+                              Currently: {currentProfile?.voice || 'default'} voice with {currentProfile?.tonality || 'professional'} tone
+                              {voiceProviderSettings.provider === 'nova-sonic' && (
+                                <span className="nova-sonic-note"> (Nova Sonic)</span>
+                              )}
                             </p>
                           </div>
                           <select 
@@ -364,11 +596,11 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                               ...prev,
                               agentVoices: {
                                 ...prev.agentVoices,
-                                [agentName]: e.target.value as keyof typeof VOICE_PROFILES
+                                [agentName]: e.target.value
                               }
                             }))}
                           >
-                            {Object.entries(VOICE_PROFILES).map(([key, profile]) => (
+                            {Object.entries(currentVoiceProfiles).map(([key, profile]) => (
                               <option key={key} value={key}>
                                 {key.charAt(0).toUpperCase() + key.slice(1)} ({profile.voice})
                               </option>
@@ -381,7 +613,12 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
 
                   <div className="setting-group">
                     <h3 className="setting-group-title">Voice Testing</h3>
-                    <p className="setting-group-description">Preview any voice and tone combination</p>
+                    <p className="setting-group-description">
+                      Preview any voice and tone combination
+                      {voiceProviderSettings.provider === 'nova-sonic' && (
+                        <span className="nova-sonic-note"> (Nova Sonic with OpenAI fallback for testing)</span>
+                      )}
+                    </p>
                     
                     <div className="setting-item">
                       <div className="setting-info">
@@ -403,32 +640,61 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                     </div>
                     
                     <div className="voice-testing-grid">
-                      {(['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'] as OpenAIVoice[]).map((voice) => (
-                        <div key={voice} className="voice-test-section">
-                          <h4 className="voice-test-title">
-                            {voice.charAt(0).toUpperCase() + voice.slice(1)}
-                          </h4>
-                          <div className="voice-test-buttons">
-                            {Object.keys(VOICE_PROFILES).map((tone) => {
-                              const isPlaying = voiceTesting.isPlaying && 
-                                               voiceTesting.currentVoice === voice && 
-                                               voiceTesting.currentTone === tone;
-                              
-                              return (
-                                <button
-                                  key={tone}
-                                  className={`voice-test-btn ${isPlaying ? 'playing' : ''}`}
-                                  onClick={() => testVoice(voice, tone as keyof typeof VOICE_PROFILES)}
-                                  disabled={voiceTesting.isPlaying}
-                                  title={`Test ${voice} voice with ${tone} tone`}
-                                >
-                                  {isPlaying ? '🔊' : '🎵'} {tone}
-                                </button>
-                              );
-                            })}
+                      {voiceProviderSettings.provider === 'openai' ? (
+                        (Object.keys(OPENAI_VOICES) as OpenAIVoice[]).map((voice) => (
+                          <div key={voice} className="voice-test-section">
+                            <h4 className="voice-test-title">
+                              {voice.charAt(0).toUpperCase() + voice.slice(1)}
+                            </h4>
+                            <div className="voice-test-buttons">
+                              {Object.keys(getVoiceProfilesForProvider(voiceProviderSettings.provider)).map((tone) => {
+                                const isPlaying = voiceTesting.isPlaying && 
+                                                 voiceTesting.currentVoice === voice && 
+                                                 voiceTesting.currentTone === tone;
+                                
+                                return (
+                                  <button
+                                    key={tone}
+                                    className={`voice-test-btn ${isPlaying ? 'playing' : ''}`}
+                                    onClick={() => testVoice(voice, tone)}
+                                    disabled={voiceTesting.isPlaying}
+                                    title={`Test ${voice} voice with ${tone} tone`}
+                                  >
+                                    {isPlaying ? '🔊' : '🎵'} {tone}
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        (Object.keys(NOVA_SONIC_VOICES) as NovaSonicVoice[]).map((voice) => (
+                          <div key={voice} className="voice-test-section">
+                            <h4 className="voice-test-title">
+                              {voice.charAt(0).toUpperCase() + voice.slice(1)}
+                            </h4>
+                            <div className="voice-test-buttons">
+                              {Object.keys(getVoiceProfilesForProvider(voiceProviderSettings.provider)).map((tone) => {
+                                const isPlaying = voiceTesting.isPlaying && 
+                                                 voiceTesting.currentVoice === voice && 
+                                                 voiceTesting.currentTone === tone;
+                                
+                                return (
+                                  <button
+                                    key={tone}
+                                    className={`voice-test-btn ${isPlaying ? 'playing' : ''}`}
+                                    onClick={() => testVoice(voice, tone)}
+                                    disabled={voiceTesting.isPlaying}
+                                    title={`Test ${voice} voice with ${tone} tone`}
+                                  >
+                                    {isPlaying ? '🔊' : '🎵'} {tone}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
 
                     <div className="setting-item">

@@ -29,7 +29,9 @@
   "homepage": "https://github.com/AntoineDubuc/Squiddles#readme",
   "description": "Extensible voice AI interface with specialized agent tentacles",
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.842.0",
     "@aws-sdk/client-s3": "^3.837.0",
+    "@aws-sdk/credential-providers": "^3.840.0",
     "@heroicons/react": "^2.2.0",
     "@openai/agents": "^0.0.1",
     "@pinecone-database/pinecone": "^6.1.1",

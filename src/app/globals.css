@@ -2167,6 +2167,115 @@ input:checked + .toggle-slider:before {
     background: rgba(59, 130, 246, 0.3);
 }
 
+/* Voice Provider Settings */
+.provider-status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.provider-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.provider-status.available {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.provider-status.unavailable {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.provider-icon {
+    font-size: 1.5rem;
+}
+
+.provider-name {
+    font-weight: 500;
+    color: #FFFFFF;
+    flex: 1;
+}
+
+.status-indicator {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-indicator.green {
+    color: #10B981;
+}
+
+.status-indicator.red {
+    color: #EF4444;
+}
+
+.cost-savings {
+    color: #10B981;
+    font-weight: 500;
+}
+
+.cost-savings-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 0.5rem;
+}
+
+.savings-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.savings-icon {
+    font-size: 1.25rem;
+}
+
+.savings-title {
+    font-weight: 600;
+    color: #10B981;
+}
+
+.savings-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.savings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.savings-row span:first-child {
+    color: #A1A1AA;
+}
+
+.savings-amount {
+    font-weight: 600;
+    color: #10B981;
+}
+
+.nova-sonic-note {
+    color: #8B5CF6;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
 .settings-footer {
     padding: 1.5rem 2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);

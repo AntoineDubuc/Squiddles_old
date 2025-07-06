@@ -102,8 +102,15 @@ const searchJiraTicketsTool = tool({
     const { query, limit = 20 } = input as { query: string; limit?: number; };
 
     try {
+      // Format simple search terms as proper JQL text search
+      let jqlQuery = query;
+      if (!query.includes('~') && !query.includes('=') && !query.includes('ORDER BY')) {
+        // Simple search term - convert to text search
+        jqlQuery = `text ~ "${query}"`;
+      }
+
       const searchParams = new URLSearchParams();
-      searchParams.append('jql', query);
+      searchParams.append('jql', jqlQuery);
       searchParams.append('maxResults', limit.toString());
 
       const response = await fetch(`/api/jira/search?${searchParams.toString()}`, {
@@ -259,12 +266,22 @@ When users ask about:
 - Present results naturally as part of your response
 - If something requires multiple steps, handle them seamlessly
 
+# Visual Results Guidelines
+When search results are displayed visually on screen:
+- **Be concise**: Simply confirm what was found (e.g., "Found 5 tickets matching your search")
+- **Don't read details**: Users can see the ticket information displayed
+- **Provide context only**: Mention relevant patterns or next steps if helpful
+- **Save time**: Let the visual display do the work
+
 # Examples of Natural Responses
 ❌ BAD: "Let me transfer you to the Confluence expert..."
 ✅ GOOD: "I'll search our Confluence pages for that information..."
 
 ❌ BAD: "I need to delegate this to the Jira specialist..."  
 ✅ GOOD: "I'll look up those tickets for you..."
+
+❌ BAD: "I found 5 tickets: First ticket is DE-123 about login bug..."
+✅ GOOD: "Found 5 tickets matching your search"
 
 Execute everything directly and naturally as Antoine's unified assistant.`,
     handoffs: [],

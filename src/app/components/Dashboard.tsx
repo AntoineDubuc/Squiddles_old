@@ -49,9 +49,6 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
   // Transcript context for conversation display
   const { transcriptItems } = useTranscript();
 
-  // Debug log for search results
-  console.log('Dashboard searchResults:', searchResults);
-
   // Handle responsive behavior
   useEffect(() => {
     const checkMobile = () => {

@@ -16,7 +16,7 @@ Squiddles is a voice-activated multi-agent web system built with Next.js 15 and 
 
 ```bash
 # Development
-npm run dev          # Start development server (port 8888)
+npm run dev          # Start development server (port 3002)
 npm run build        # Build for production
 npm run start        # Start production server
 
@@ -25,19 +25,8 @@ npm run lint         # ESLint checking
 npm test            # Run Jest tests
 
 # Service Testing
-npm run test:pinecone         # Test Pinecone connection
-npm run test:pinecone-service # Test Pinecone service layer
-npm run test:pinecone-api     # Test Pinecone API endpoints
 npm run test:jira-api         # Test Jira API endpoints
-
-# Voice Testing Framework (in testing-framework/)
-cd testing-framework
-npm install                   # Install isolated test dependencies
-npm run generate-audio        # Generate test audio files
-npm run test:voice           # Voice interaction tests
-npm run test:integration     # UI integration tests
-npm run test:performance     # Performance validation
-./scripts/run-all-tests.sh   # Complete automated test suite
+npm run test:pinecone         # Test Pinecone connection
 ```
 
 ## Key Technical Patterns
@@ -55,24 +44,42 @@ Agents are configured in `src/agents/` with this pattern:
 - Event-driven architecture processes real-time deltas
 - Uses `gpt-4o-realtime-preview-2024-12-17` model
 
+### Multi-Agent Registry Pattern
+The system follows OpenAI's Advanced Agent Example architecture:
+```typescript
+export const allAgentSets: Record<string, RealtimeAgent[]> = {
+  squiddles: transparentMultiAgentScenario,    // Seamless handoffs (recommended)
+  unified: unifiedSquiddlesScenario,           // Single agent fallback
+  collaborative: collaborativeSquiddlesScenario, // Visible transfers
+}
+```
+
+### Smart Model Routing System
+**Voice vs Text Input Optimization**:
+- **Voice Input**: Automatically routes to Nova Sonic for natural conversation and real-time interaction
+- **Text Input**: Automatically routes to Nova Pro for cost-effective text processing
+- **Auto-Detection**: Intelligently detects input type based on content patterns and context
+- **Fallback Strategy**: Graceful degradation to OpenAI if Nova models are unavailable
+
+**Cost Optimization**:
+- Nova Sonic: ~$0.70/hour for voice interactions
+- Nova Pro: ~$0.0008 per 1K tokens for text interactions  
+- OpenAI Realtime: ~$60/hour (used as fallback only)
+
+**Input Type Detection**:
+```typescript
+// Explicit context (recommended)
+client.sendUserText("Hello", { isTextInput: true, source: 'keyboard' });
+
+// Auto-detection based on content patterns
+client.sendUserText("Hello"); // Analyzes for voice vs text characteristics
+```
+
 ### Voice Interface Components
 - Glass-themed UI with gradient borders matching design mockups
 - Real-time transcript updates via React contexts
 - Connection state management with animated indicators
 - Audio element configuration for optimal playback
-
-### Jira Integration Architecture
-**Production-Ready ADF Processing Pipeline**:
-- `src/app/api/jira/activity/route.ts` - Server-side API for secure Jira access
-- `src/app/lib/jira-utils.ts` - Comprehensive ADF parsing utilities (12/14 content types)
-- `src/app/types/jira-models.ts` - Complete TypeScript interfaces for Jira data
-- `src/app/services/jiraService.ts` - React hooks for dashboard integration
-
-**Mention Detection Strategy**:
-1. **ADF Mentions**: Recursive parsing of structured mention nodes with account ID matching
-2. **Legacy Patterns**: Fallback text pattern matching for `[~accountid:xxx]`, `@antoine`, `@dubuc`
-3. **Rich Content**: Table, media, and code block detection for enhanced UI presentation
-4. **Urgency Classification**: Keyword-based priority detection (critical, high, medium, low)
 
 ## Project Structure
 
@@ -80,111 +87,159 @@ Agents are configured in `src/agents/` with this pattern:
 src/
 ├── agents/           # Agent implementations with handoff patterns
 │   ├── index.ts     # Agent registry following OpenAI example
-│   ├── productManager.ts    # Main PM agent with user story templates
-│   ├── jiraIntegration.ts   # Jira ticket creation and management
-│   ├── slackIntegration.ts  # Slack messaging integration
-│   └── testSimple.ts        # Minimal test agent
+│   ├── transparentMultiAgent.ts  # Seamless multi-agent system
+│   ├── unifiedSquiddles.ts       # Single agent fallback
+│   └── [specialist agents]       # Jira, Confluence, Slack, Gmail agents
 ├── app/
 │   ├── api/         # Next.js API routes
 │   │   ├── session/route.ts     # WebRTC session endpoint
 │   │   ├── responses/route.ts   # Response handling
-│   │   ├── jira/               # ✅ PRODUCTION Jira API endpoints
-│   │   │   └── activity/route.ts    # Real mention detection (15+ active)
-│   │   ├── pinecone/           # Vector search endpoints
-│   │   └── dashboard/          # Dashboard data endpoints
+│   │   ├── jira/               # Jira API endpoints
+│   │   ├── confluence/         # Confluence endpoints
+│   │   ├── slack/              # Slack endpoints
+│   │   └── pinecone/           # Vector search endpoints
 │   ├── components/  # React components
-│   │   ├── Dashboard.tsx       # ✅ Real Jira data integration
-│   │   ├── BottomToolbar.tsx   # Voice controls
-│   │   ├── Events.tsx          # Real-time events display
-│   │   └── Transcript.tsx      # Conversation display
-│   ├── contexts/    # React contexts (EventContext, TranscriptContext, UserContext)
+│   │   ├── Dashboard.tsx       # Glass-themed PM dashboard
+│   │   ├── VoiceInterface.tsx  # Voice conversation UI
+│   │   ├── Transcript.tsx      # Real-time conversation display
+│   │   ├── Events.tsx          # Debug events panel
+│   │   └── BottomToolbar.tsx   # Voice controls
+│   ├── contexts/    # React contexts (TranscriptContext, EventContext, etc.)
 │   ├── lib/         # Client utilities
-│   │   ├── jira-utils.ts       # ✅ ADF parsing (12/14 content types)
-│   │   └── realtimeClient.ts   # WebRTC client
-│   ├── services/    # Service integrations
-│   │   └── jiraService.ts      # ✅ React hooks for real Jira data
-│   └── types/       # TypeScript definitions
-│       └── jira-models.ts      # ✅ Complete Jira data models
+│   │   ├── realtimeClient.ts   # OpenAI Realtime API client
+│   │   ├── guardrails.ts       # Content moderation
+│   │   └── utils.ts            # Utility functions
+│   └── services/    # Service integrations
+│       ├── jiraService.ts      # React hooks for Jira data
+│       └── slackService.ts     # Slack integration hooks
 ├── lib/             # Shared service integrations
-│   ├── jira/        # Jira client and API wrapper
-│   ├── pinecone/    # Vector database service
-│   ├── auth.ts      # Authentication utilities
-│   └── validation/  # Schema validation
-├── development-archive/
-│   └── integrations/jira/      # ✅ Production Jira client
-│       └── jiraClient.ts       # ExtendTV integration
-└── testing-framework/  # Isolated voice testing system
+│   ├── jira/jiraClient.ts      # Jira API wrapper
+│   ├── confluence/             # Confluence integration
+│   ├── slack/                  # Slack integration
+│   └── pinecone/               # Vector database service
+└── development-archive/        # Experimental features ready for integration
+    ├── experimental/           # Advanced components and APIs
+    ├── integrations/           # Service libraries
+    ├── planning/               # Project management materials
+    └── reference/              # Design materials & research
 ```
 
 ## Current Implementation Status
 
 **Phase 1 COMPLETED**: Technical Product Manager voice interface with real Jira integration
-- ✅ Voice-driven template completion
-- ✅ Real-time Jira comment mention detection
-- ✅ Comprehensive ADF (Atlassian Document Format) parsing
-- ✅ Live dashboard with 15+ active mentions from ExtendTV Jira instance
-- ✅ Priority-based urgency classification and rich content detection
-- ✅ Production-ready mention detection supporting all Jira comment formats
-- Target user: Antoine Dubuc (Technical Product Manager)
+- ✅ Voice-driven interface with real-time conversation
+- ✅ Multi-agent system with transparent handoffs  
+- ✅ Real Jira integration with live mention detection
+- ✅ Glass-themed dashboard with activity feeds
+- ✅ Comprehensive ADF parsing for Jira comments
+- ✅ Production-ready mention detection and urgency classification
 
-The system follows the OpenAI Advanced Agent Example architecture found in `research/openai_advanced_agent_example/` which serves as the technical foundation.
-
-### Jira Integration Status
-**PRODUCTION READY** - Successfully integrated with ExtendTV Jira instance:
-- Real-time mention detection across 50+ tickets from last 30 days
-- ADF parsing with 12/14 content types supported (based on `JIRA_COMMENT_PARSING_REFERENCE.md`)
-- Comprehensive mention pattern detection including legacy formats and account IDs
-- Server-side API routes for secure credential handling
-- Dashboard displays real mentions with urgency classification and rich content indicators
-
-## Testing Strategy
-
-The project includes a comprehensive automated voice testing framework in `testing-framework/`:
-
-### Voice Testing Framework Architecture
-- **Isolated System**: Completely separate from production code with its own dependencies
-- **Black-Box Testing**: External browser automation testing actual user experience
-- **Real Audio Testing**: TTS-generated WAV files injected into WebRTC streams
-- **End-to-End Validation**: Tests complete voice → AI → response → UI pipeline
-
-### Key Testing Patterns
-- **Audio Generation**: `npm run generate-audio` creates realistic test audio using OpenAI TTS
-- **Browser Automation**: Playwright controls real browser sessions with audio injection
-- **Performance Measurement**: Measures actual response latency and streaming validation
-- **Comprehensive Reporting**: Detailed test reports with screenshots and network logs
-
-### Testing Commands
-```bash
-# From testing-framework/ directory
-npm run test:voice        # Voice interaction validation
-npm run test:integration  # UI integration testing
-npm run test:performance  # Latency and streaming tests
-npm run test:all         # Complete test suite
-./scripts/run-all-tests.sh  # Automated end-to-end testing
-```
+The system follows the OpenAI Advanced Agent Example architecture found in `development-archive/reference/research/openai_advanced_agent_example/` which serves as the technical foundation.
 
 ## Environment Requirements
 
-- `OPENAI_API_KEY` with Realtime API access
-- Pinecone configuration for vector search
-- Jira API credentials for ticket integration
-- Confluence API credentials for documentation integration
+### Core AI Models
+- `OPENAI_API_KEY` with Realtime API access (fallback for both voice and text)
+- `NEXT_PUBLIC_AWS_REGION`, `NEXT_PUBLIC_AWS_ACCESS_KEY_ID`, `NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY` for AWS Nova models
+
+### Voice Model Configuration (Nova Sonic)
+- `USE_NOVA_SONIC=true` or `VOICE_MODEL=nova-sonic` to enable Nova Sonic for voice
+- `NEXT_PUBLIC_NOVA_SONIC_VOICE_ID` (default: 'matthew')
+- `NEXT_PUBLIC_NOVA_SONIC_SAMPLE_RATE` (default: '24000')
+- `NEXT_PUBLIC_NOVA_SONIC_SESSION_TIMEOUT` (default: '480000')
+
+### Text Model Configuration (Nova Pro)
+- `USE_NOVA_PRO=true` or `TEXT_MODEL=nova-pro` to enable Nova Pro for text
+- `NEXT_PUBLIC_NOVA_PRO_MODEL_ID` (default: 'amazon.nova-pro-v1:0')
+- `NEXT_PUBLIC_NOVA_PRO_MAX_TOKENS` (default: '4096')
+- `NEXT_PUBLIC_NOVA_PRO_TEMPERATURE` (default: '0.7')
+- `NEXT_PUBLIC_NOVA_PRO_TOP_P` (default: '0.9')
+
+### Model Selection Control
+- `AUTO_DETECT_INPUT=true` to enable smart input type detection (default: enabled)
+- `PREFERRED_INPUT_TYPE=auto|voice|text` to set preferred input type (default: 'auto')
+- `VOICE_FALLBACK_ENABLED=true` to enable voice model fallback (default: enabled)
+- `TEXT_FALLBACK_ENABLED=true` to enable text model fallback (default: enabled)
+
+### Service Integrations
+- `JIRA_HOST`, `JIRA_EMAIL`, `JIRA_API_TOKEN` for ticket integration
+- `PINECONE_API_KEY` for vector search
+- `SLACK_BOT_TOKEN` for Slack integration
+- `CONFLUENCE_HOST`, `CONFLUENCE_EMAIL`, `CONFLUENCE_API_TOKEN` for documentation
+
+### Technical Requirements
 - HTTPS required for WebRTC in production
 
-### Confluence Configuration
-- `CONFLUENCE_HOST` or `CONFLUENCE_BASE_URL` - Your Confluence instance URL
-- `CONFLUENCE_EMAIL` - User email for authentication (can reuse JIRA_USER_EMAIL)
-- `CONFLUENCE_API_TOKEN` - Confluence API token (can reuse JIRA_API_TOKEN if same Atlassian account)
-
 ### Configuration Specifics
-- **Next.js Config**: `serverExternalPackages: ['@openai/agents']` required for OpenAI agents
+- **Next.js Config**: `serverExternalPackages: ['@openai/agents', '@aws-sdk/client-bedrock-runtime']` required
 - **TypeScript**: Path alias `@/*` maps to `src/*` for clean imports
-- **Port Configuration**: Development server runs on port 8888 to avoid conflicts
+- **Port Configuration**: Development server runs on port 3002
 - **Model**: Uses `gpt-4o-realtime-preview-2024-12-17` for realtime API
 - **Voice**: Consistently uses 'sage' voice across all agents
 
 ### Service Integration Patterns
-- **Jira Client**: Exported from `src/lib/jira/` with TypeScript interfaces
-- **Pinecone Service**: Exported from `src/lib/pinecone/` with vector search utilities
 - **Agent Registry**: Centralized in `src/agents/index.ts` following OpenAI example pattern
 - **Agent Handoffs**: Configured with bidirectional handoffs between PM, Jira, and Slack agents
+- **Tool Execution**: Strongly-typed function calls with conversation context access
+- **Context Management**: Dashboard state passed to agents for context-aware responses
+
+## Development Patterns
+
+### Agent Development Pattern
+```typescript
+const agent = new RealtimeAgent({
+  name: 'agentName',
+  voice: 'sage',                    // Consistent voice across agents
+  instructions: 'Agent behavior',   // Natural language instructions
+  tools: [tool1, tool2],           // Available actions
+  handoffs: [otherAgent],          // Agent transfer capabilities
+});
+```
+
+### Tool Implementation Pattern
+```typescript
+const tool = tool({
+  name: 'toolName',
+  description: 'What it does',
+  parameters: { /* JSON Schema */ },
+  execute: async (input, details) => {
+    const context = details?.context;
+    // Implementation with context access
+    return { success: true, result: 'Done!' };
+  }
+});
+```
+
+### Context Management Pattern
+```typescript
+// Pass dashboard state to agents
+const client = new RealtimeClient({
+  extraContext: {
+    addTranscriptMessage,
+    selectedMention: replyState.selectedMention,
+    dashboardState: { mentions, tickets },
+    apiClients: { jira, confluence, slack }
+  }
+});
+```
+
+## Testing Strategy
+
+The project includes a comprehensive automated voice testing framework in `development-archive/planning/testing-framework/`:
+
+### Voice Testing Framework Architecture
+- **Isolated System**: Completely separate from production code with its own dependencies
+- **Real Audio Testing**: TTS-generated WAV files injected into WebRTC streams
+- **End-to-End Validation**: Tests complete voice → AI → response → UI pipeline
+- **Browser Automation**: Playwright controls real browser sessions with audio injection
+
+### Testing Commands
+```bash
+# From development-archive/planning/testing-framework/ directory
+npm install                   # Install isolated test dependencies
+npm run generate-audio        # Generate test audio files
+npm run test:voice           # Voice interaction tests
+npm run test:integration     # UI integration tests
+npm run test:performance     # Performance validation
+./scripts/run-all-tests.sh   # Complete automated test suite
+```

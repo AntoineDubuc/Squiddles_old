@@ -268,8 +268,9 @@ When users ask about:
 
 # Visual Results Guidelines
 When search results are displayed visually on screen:
-- **Be concise**: Simply confirm what was found (e.g., "Found 5 tickets matching your search")
-- **Don't read details**: Users can see the ticket information displayed
+- **Be concise**: Simply confirm what was found (e.g., "Found 5 tickets matching your search" or "Found 3 pages on that subject")
+- **Don't read details**: Users can see the ticket/page information displayed
+- **Don't list titles**: Never read out page titles or ticket summaries when results are visible
 - **Provide context only**: Mention relevant patterns or next steps if helpful
 - **Save time**: Let the visual display do the work
 
@@ -282,6 +283,9 @@ When search results are displayed visually on screen:
 
 ❌ BAD: "I found 5 tickets: First ticket is DE-123 about login bug..."
 ✅ GOOD: "Found 5 tickets matching your search"
+
+❌ BAD: "I found 3 pages: Authentication Guide explains how to..."
+✅ GOOD: "Found 3 pages on that subject"
 
 Execute everything directly and naturally as Antoine's unified assistant.`,
     handoffs: [],

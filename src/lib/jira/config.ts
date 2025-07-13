@@ -20,5 +20,9 @@ export function validateJiraConfig(): JiraConfig {
     apiToken: process.env.JIRA_API_TOKEN || '',
   };
 
-  return JiraConfigSchema.parse(config);
+  try {
+    return JiraConfigSchema.parse(config);
+  } catch (error) {
+    throw new Error('Jira configuration is incomplete. Please set JIRA_HOST, JIRA_EMAIL, and JIRA_API_TOKEN environment variables.');
+  }
 }

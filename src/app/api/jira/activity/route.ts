@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getJiraClient } from '../../../../../development-archive/integrations/jira/jiraClient';
+import { getJiraClient, resetJiraClient } from '@/lib/jira';
 import {
   analyzeADFContent,
   createDashboardMentionItem,
@@ -46,8 +46,29 @@ export async function GET(request: NextRequest) {
       console.warn('⚠️ JIRA_BASE_URL is not defined - all comment directLinkUrl fields will be missing!');
     }
 
-    // Get Jira client
+    // Check if Jira is properly configured
+    const hasJiraHost = requiredEnvVars.JIRA_HOST || requiredEnvVars.JIRA_BASE_URL;
+    const hasJiraEmail = requiredEnvVars.JIRA_EMAIL || requiredEnvVars.JIRA_USER_EMAIL;
+    const hasJiraToken = requiredEnvVars.JIRA_API_TOKEN;
+    
+    if (!hasJiraHost || !hasJiraEmail || !hasJiraToken) {
+      console.log('⚠️ Jira not configured, returning empty activity feed');
+      return NextResponse.json({
+        activityFeed: [],
+        pagination: {
+          page: 0,
+          limit: limit,
+          total: 0,
+          hasMore: false
+        },
+        message: 'Jira integration not configured'
+      });
+    }
+
+    // Reset singleton cache and get fresh client
+    resetJiraClient();
     const jiraClient = getJiraClient();
+    console.log('🔧 Jira client obtained (after reset)');
     
     // Get current user
     const currentUser = await jiraClient.getCurrentUser();
@@ -57,8 +78,8 @@ export async function GET(request: NextRequest) {
     const projects = await jiraClient.getUserProjects();
     console.log(`✅ Found ${projects.length} projects`);
 
-    // Search for recent tickets (expand to 180 days to catch more mentions)
-    const jql = 'updated >= -180d ORDER BY updated DESC';
+    // Search for recent tickets (reduced to 30 days for faster loading)
+    const jql = 'updated >= -30d ORDER BY updated DESC';
     const tickets = await jiraClient.searchTickets(jql, [
       'key', 'summary', 'updated', 'assignee', 'reporter', 'priority', 'issuetype', 'project'
     ]);
@@ -81,17 +102,19 @@ export async function GET(request: NextRequest) {
     }
     
     
-    console.log(`✅ Found ${tickets.length} recent tickets (last 180 days)`);
+    console.log(`✅ Found ${tickets.length} recent tickets (last 30 days)`);
+    console.log(`🔍 First few tickets:`, tickets.slice(0, 3).map(t => ({ key: t.key, summary: t.fields.summary })));
     const hasDE3360 = tickets.some(t => t.key === 'DE-3360');
     console.log(`🔍 DE-3360 in results: ${hasDE3360}`);
 
-    // Process tickets and get comments with mentions
+    // Process tickets and get comments with mentions (reduced limit for faster loading)
     const allMentions = [];
     const recentActivity = [];
     
-    for (const ticket of tickets.slice(0, 100)) { // Check more tickets
+    for (const ticket of tickets.slice(0, 5)) { // Reduced to 5 tickets for POC performance
       try {
         const comments = await jiraClient.getTicketComments(ticket.key);
+        console.log(`🔍 Processing ticket ${ticket.key}: ${comments.length} comments`);
         
         for (const comment of comments) {
           // Skip comments without IDs (these would cause broken directLinkUrl)
@@ -141,6 +164,8 @@ export async function GET(request: NextRequest) {
           if (!mentionsUser) {
             const mentionPatterns = [
               new RegExp(`\\[~accountid:${currentUser.accountId}\\]`, 'i'),
+              // Also check for the real account ID we discovered: 712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e
+              new RegExp(`\\[~accountid:712020:ca041fb3-f2cf-4ef4-86dd-fbae8bb1441e\\]`, 'i'),
               /@antoine/gi,
               /@dubuc/gi,
               /antoine.*dubuc/gi

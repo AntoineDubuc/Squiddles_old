@@ -5,7 +5,15 @@ import type { JiraTicket } from '@/lib/jira/jiraClient';
 
 export async function POST(request: NextRequest) {
   try {
-    const config = validateJiraConfig();
+    let config;
+    try {
+      config = validateJiraConfig();
+    } catch (configError) {
+      return NextResponse.json(
+        { error: 'Jira is not configured. Please set JIRA_HOST, JIRA_EMAIL, and JIRA_API_TOKEN environment variables.' },
+        { status: 503 }
+      );
+    }
     const body = await request.json();
     
     const { 

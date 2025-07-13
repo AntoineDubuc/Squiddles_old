@@ -56,6 +56,9 @@ export default function TicketList({ tickets, totalCount, voiceMessage, onTicket
     if (t === 'bug') return '🐛';
     if (t === 'task') return '📋';
     if (t === 'epic') return '🎯';
+    if (t === 'page') return '📄';
+    if (t === 'story') return '📖';
+    if (t === 'subtask') return '📝';
     return '✨';
   };
 
@@ -125,9 +128,9 @@ export default function TicketList({ tickets, totalCount, voiceMessage, onTicket
                     <span>{ticket.type.toUpperCase()}</span>
                   </div>
                   <h3 className="ticket-title">{ticket.summary}</h3>
-                  {ticket.description && (
-                    <p className="ticket-description">{ticket.description}</p>
-                  )}
+                  <p className="ticket-description">
+                    {ticket.description || (ticket.type === 'Page' ? 'No content preview available' : 'No description provided')}
+                  </p>
                 </div>
                 <div className="ticket-footer">
                   <div className="ticket-reporter">

@@ -217,11 +217,49 @@ export async function GET(request: NextRequest) {
       results = await confluenceClient.getRecentlyUpdated(spaceKey || undefined, limit);
     }
 
+    // Helper function to extract and truncate page content for preview
+    const extractExcerpt = (page: any): string => {
+      try {
+        // Try to get content from different possible fields
+        let content = '';
+        
+        if (page.body?.storage?.value) {
+          content = page.body.storage.value;
+        } else if (page.body?.view?.value) {
+          content = page.body.view.value;
+        } else if (page.excerpt) {
+          content = page.excerpt;
+        }
+        
+        if (!content) return 'No content preview available';
+        
+        // Strip HTML tags and clean up content
+        const textContent = content
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/&[^;]+;/g, ' ') // Remove HTML entities
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .trim();
+        
+        // Truncate at word boundary for clean display
+        if (textContent.length > 200) {
+          const truncated = textContent.substring(0, 200);
+          const lastSpace = truncated.lastIndexOf(' ');
+          return (lastSpace > 150 ? truncated.substring(0, lastSpace) : truncated) + '...';
+        }
+        
+        return textContent || 'No content preview available';
+      } catch (e) {
+        console.warn('Failed to extract page excerpt:', e);
+        return 'Content preview unavailable';
+      }
+    };
+
     return NextResponse.json({
       success: true,
       pages: results.map(page => ({
         id: page.id,
         title: page.title,
+        excerpt: extractExcerpt(page),
         spaceKey: page.space.key,
         spaceName: page.space.name,
         url: `${process.env.CONFLUENCE_HOST || process.env.CONFLUENCE_BASE_URL}/browse/${page.id}`,

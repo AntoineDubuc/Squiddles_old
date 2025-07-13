@@ -36,6 +36,7 @@ interface DashboardProps {
 export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, onPushToTalkStart, onPushToTalkStop, sessionStatus = 'DISCONNECTED', isListening = false, searchResults, onClearSearchResults }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activityExpanded, setActivityExpanded] = useState(true);
+  const [conversationExpanded, setConversationExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [textInput, setTextInput] = useState('');
   const [pendingTextInput, setPendingTextInput] = useState<string | null>(null);
@@ -150,6 +151,10 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
 
   const toggleActivity = () => {
     setActivityExpanded(!activityExpanded);
+  };
+
+  const toggleConversation = () => {
+    setConversationExpanded(!conversationExpanded);
   };
 
   // Utility function for relative time formatting
@@ -381,6 +386,63 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                 </div>
               </div>
 
+              {/* Search Results Section - Show search results above activity */}
+              {searchResults && searchResults.isVisible && (
+                <div className="search-results-section">
+                  <div className="search-results-header">
+                    <div className="search-results-title">
+                      <span>🔍</span>
+                      <span>Search Results</span>
+                      <div className="search-results-badge">{searchResults.totalCount} results</div>
+                    </div>
+                    <button 
+                      onClick={onClearSearchResults}
+                      className="search-results-close"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="search-results-content">
+                    {searchResults.voiceMessage && (
+                      <div className="search-results-message">
+                        {searchResults.voiceMessage}
+                      </div>
+                    )}
+                    <div className="search-results-list">
+                      {searchResults.tickets.map((ticket, index) => (
+                        <div key={ticket.id || index} className="search-result-item" onClick={() => window.open(ticket.url, '_blank')} style={{ cursor: 'pointer' }}>
+                          <div className="search-result-header">
+                            <span className="search-result-key">{ticket.key}</span>
+                            <span className={`search-result-priority priority-${(ticket.priority?.name || ticket.priority || 'medium').toLowerCase()}`}>
+                              {ticket.priority?.name || ticket.priority || 'Medium'}
+                            </span>
+                          </div>
+                          <div className="search-result-summary">
+                            {ticket.summary}
+                          </div>
+                          <div className="search-result-meta">
+                            <span className="search-result-status">{ticket.status?.name || ticket.status || 'Unknown'}</span>
+                            <span className="search-result-assignee">
+                              {ticket.assignee?.displayName || ticket.assignee || 'Unassigned'}
+                            </span>
+                            {ticket.created && (
+                              <span className="search-result-created">
+                                Created: {new Date(ticket.created).toLocaleDateString()}
+                              </span>
+                            )}
+                            {ticket.type === 'Page' && ticket.updated && (
+                              <span className="search-result-updated">
+                                Updated: {new Date(ticket.updated).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Enhanced Activity Section - Recent Mentions and Updates */}
               <div className="activity-section">
                 <div className="activity-header" onClick={toggleActivity}>
@@ -550,76 +612,27 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                 )}
               </div>
 
-              {/* Search Results Section - Show search results inline */}
-              {searchResults && searchResults.isVisible && (
-                <div className="search-results-section">
-                  <div className="search-results-header">
-                    <div className="search-results-title">
-                      <span>🔍</span>
-                      <span>Search Results</span>
-                      <div className="search-results-badge">{searchResults.totalCount} results</div>
-                    </div>
-                    <button 
-                      onClick={onClearSearchResults}
-                      className="search-results-close"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="search-results-content">
-                    {searchResults.voiceMessage && (
-                      <div className="search-results-message">
-                        {searchResults.voiceMessage}
-                      </div>
-                    )}
-                    <div className="search-results-list">
-                      {searchResults.tickets.map((ticket, index) => (
-                        <div key={ticket.id || index} className="search-result-item">
-                          <div className="search-result-header">
-                            <span className="search-result-key">{ticket.key}</span>
-                            <span className={`search-result-priority priority-${(ticket.priority?.name || ticket.priority || 'medium').toLowerCase()}`}>
-                              {ticket.priority?.name || ticket.priority || 'Medium'}
-                            </span>
-                          </div>
-                          <div className="search-result-summary">
-                            {ticket.summary}
-                          </div>
-                          <div className="search-result-meta">
-                            <span className="search-result-status">{ticket.status?.name || ticket.status || 'Unknown'}</span>
-                            <span className="search-result-assignee">
-                              {ticket.assignee?.displayName || ticket.assignee || 'Unassigned'}
-                            </span>
-                          </div>
-                          <div className="search-result-actions">
-                            <button 
-                              onClick={() => window.open(ticket.url, '_blank')}
-                              className="search-result-action"
-                            >
-                              Open
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Conversation Section - Show when there are transcript items */}
               {transcriptItems.length > 0 && (
                 <div className="conversation-section">
-                  <div className="conversation-header">
+                  <div className="conversation-header" onClick={toggleConversation}>
                     <div className="conversation-title">
                       <span>💬</span>
                       <span>Conversation</span>
                       <div className="conversation-badge">{transcriptItems.length} messages</div>
                     </div>
+                    <div className="conversation-header-actions">
+                      <div className="expand-icon">{conversationExpanded ? '▲' : '▼'}</div>
+                    </div>
                   </div>
-                  <div className="conversation-content">
-                    <Transcript items={transcriptItems} />
-                  </div>
+                  {conversationExpanded && (
+                    <div className="conversation-content">
+                      <Transcript items={transcriptItems} />
+                    </div>
+                  )}
                 </div>
               )}
+
 
               {/* Try These Commands Section - Bottom of page */}
               {sessionStatus === 'DISCONNECTED' && (

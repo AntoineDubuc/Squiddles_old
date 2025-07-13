@@ -120,6 +120,14 @@ export default function BottomToolbar({
       {/* Text Input Alternative */}
       {sessionStatus === "CONNECTED" && (
         <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs text-gray-500">
+              Text input (uses Nova Pro)
+            </div>
+            <div className="text-xs text-gray-500">
+              Voice input (uses Nova Sonic)
+            </div>
+          </div>
           <form onSubmit={handleTextSubmit} className="flex items-center space-x-3">
             <div className="flex-1 relative">
               <input
@@ -156,7 +164,10 @@ export default function BottomToolbar({
       {sessionStatus === "CONNECTED" && (
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <div className="text-sm text-blue-800">
-            <strong>Try saying or typing:</strong> "Search for authentication docs" • "Create a ticket for user login" • "Document the API endpoints"
+            <strong>Smart AI Routing:</strong> Voice uses Nova Sonic for natural conversation • Text uses Nova Pro for cost-effective responses
+          </div>
+          <div className="text-xs text-blue-600 mt-1">
+            <strong>Try:</strong> "Search for authentication docs" • "Create a ticket for user login" • "Document the API endpoints"
           </div>
         </div>
       )}

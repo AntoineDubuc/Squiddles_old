@@ -66,10 +66,44 @@ export async function GET(request: NextRequest) {
     
     console.log(`✅ Found ${data.total} tickets matching: ${jql}`);
 
+    // Helper function to extract and truncate description text
+    const extractDescription = (description: any): string => {
+      if (!description) return '';
+      
+      // If description is ADF (Atlassian Document Format)
+      if (typeof description === 'object' && description.content) {
+        try {
+          // Extract text from ADF content
+          const extractText = (nodes: any[]): string => {
+            return nodes.map(node => {
+              if (node.type === 'text') return node.text || '';
+              if (node.content) return extractText(node.content);
+              return '';
+            }).join('');
+          };
+          
+          const text = extractText(description.content).trim();
+          return text.length > 200 ? text.substring(0, 200).trim() + '...' : text;
+        } catch (e) {
+          console.warn('Failed to parse ADF description:', e);
+          return '';
+        }
+      }
+      
+      // If description is plain text
+      if (typeof description === 'string') {
+        const text = description.trim();
+        return text.length > 200 ? text.substring(0, 200).trim() + '...' : text;
+      }
+      
+      return '';
+    };
+
     // Format the response for better readability
     const formattedIssues = data.issues?.map((issue: any) => ({
       key: issue.key,
       summary: issue.fields.summary,
+      description: extractDescription(issue.fields.description),
       status: issue.fields.status?.name,
       priority: issue.fields.priority?.name,
       assignee: issue.fields.assignee?.displayName || 'Unassigned',

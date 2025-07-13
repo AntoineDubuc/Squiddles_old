@@ -25,6 +25,7 @@ import { useTicketDisplay } from "./contexts/TicketDisplayContext";
 import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
 import { UnifiedVoiceClient, UnifiedVoiceClientOptions } from "../lib/unifiedVoiceClient";
 import { getCurrentUser } from "../lib/auth";
+import { getVoiceProviderConfig, isFallbackEnabled } from "../config/voiceProvider";
 
 // Agent configs - Following OpenAI Advanced Agent Example pattern
 import { allAgentSets, defaultAgentSetKey, createFreshAgentSets } from "../agents";
@@ -53,6 +54,7 @@ export default function Home() {
 
   // Check authentication on mount
   useEffect(() => {
+    console.log('🚀 Page mounting, setting up user and dashboard');
     // For now, default directly to dashboard to show the new UI
     // Users can log in later or we can add authentication flow
     setCurrentView('dashboard');
@@ -62,6 +64,7 @@ export default function Home() {
       email: 'test@squiddles.dev',
       role: 'pm'
     });
+    console.log('✅ Dashboard view set, user configured');
   }, []);
 
   // Safety fallback - never stay in loading state for more than 5 seconds
@@ -293,7 +296,7 @@ export default function Home() {
           selectedMention: replyState.selectedMention,
           setReplyStatus,
           setLastPostedComment,
-          fallbackEnabled: true,
+          fallbackEnabled: isFallbackEnabled(),
           refreshDashboard: () => {
             // Trigger dashboard refresh if needed
             console.log('🔄 Dashboard refresh requested from voice agent');
@@ -676,12 +679,12 @@ export default function Home() {
                   const pages = result.pages.map((page: any) => ({
                     key: page.id,
                     summary: page.title,
-                    description: page.excerpt || 'No excerpt available',
+                    description: page.excerpt || 'No content preview available',
                     status: 'Published',
                     priority: 'Medium',
-                    assignee: page.author || 'Unknown',
-                    reporter: page.author || 'Unknown',
-                    created: page.created,
+                    assignee: page.author?.displayName || page.lastUpdatedBy?.displayName || 'Unknown',
+                    reporter: page.author?.displayName || 'Unknown',
+                    created: page.createdDate || page.lastModified,
                     type: 'Page',
                     url: page.url
                   }));
@@ -706,6 +709,17 @@ export default function Home() {
     } catch (error) {
       console.error("❌ Failed to start session:", error);
       setSessionStatus("DISCONNECTED");
+      
+      // Show user-friendly error message for common issues
+      if (error instanceof Error) {
+        if (error.message.includes('credentials') || error.message.includes('Access')) {
+          console.warn("⚠️ Voice service unavailable: AWS credentials not configured");
+        } else if (error.message.includes('EPHEMERAL_KEY')) {
+          console.warn("⚠️ Voice service unavailable: OpenAI API key not configured");
+        } else {
+          console.warn("⚠️ Voice service unavailable:", error.message);
+        }
+      }
     }
   };
 

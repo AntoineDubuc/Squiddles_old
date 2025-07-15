@@ -25,20 +25,35 @@ import { useTicketDisplay } from "./contexts/TicketDisplayContext";
 import { RealtimeClient, RealtimeClientOptions } from "./lib/realtimeClient";
 import { UnifiedVoiceClient, UnifiedVoiceClientOptions } from "../lib/unifiedVoiceClient";
 import { getCurrentUser } from "../lib/auth";
-import { getVoiceProviderConfig, isFallbackEnabled } from "../config/voiceProvider";
+import { getVoiceProvider, getVoiceProviderConfig, isFallbackEnabled } from "../config/voiceProvider";
 
 // Agent configs - Following OpenAI Advanced Agent Example pattern
 import { allAgentSets, defaultAgentSetKey, createFreshAgentSets } from "../agents";
 
 export default function Home() {
-  // App state
-  const [currentView, setCurrentView] = useState<'dashboard' | 'voice' | 'tickets' | 'settings' | 'integrations' | 'templates' | 'loading'>('loading');
-  const [user, setUser] = useState<any>(null);
+  // App state - start with dashboard instead of loading to avoid hydration issues
+  const [currentView, setCurrentView] = useState<'dashboard' | 'voice' | 'tickets' | 'settings' | 'integrations' | 'templates' | 'loading'>('dashboard');
+  const [user, setUser] = useState<any>({
+    id: 'user_001',
+    name: 'Test User',
+    email: 'test@squiddles.dev',
+    role: 'pm'
+  });
   
   // Session state (for voice interface)
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>("DISCONNECTED");
   const [selectedAgentSet, setSelectedAgentSet] = useState<string>(defaultAgentSetKey);
   const [isListening, setIsListening] = useState(false);
+  
+  // Provider error state
+  const [providerError, setProviderError] = useState<{
+    message: string;
+    provider: string;
+    redirectToSettings: boolean;
+  } | null>(null);
+  
+  // Current voice provider state
+  const [currentVoiceProvider, setCurrentVoiceProvider] = useState<'openai' | 'nova-sonic' | null>(null);
   
   // Context hooks
   const { 
@@ -52,27 +67,17 @@ export default function Home() {
   const { replyState, setReplyStatus, setLastPostedComment, clearSelectedMention } = useReply();
   const { ticketDisplay, showTickets, hideTickets, clearTickets } = useTicketDisplay();
 
-  // Check authentication on mount
-  useEffect(() => {
-    console.log('🚀 Page mounting, setting up user and dashboard');
-    // For now, default directly to dashboard to show the new UI
-    // Users can log in later or we can add authentication flow
-    setCurrentView('dashboard');
-    setUser({
-      id: 'user_001',
-      name: 'Test User',
-      email: 'test@squiddles.dev',
-      role: 'pm'
-    });
-    console.log('✅ Dashboard view set, user configured');
-  }, []);
+  // Authentication setup - now using initial state instead of useEffect
+  // This avoids hydration mismatch issues with server/client state differences
 
   // Safety fallback - never stay in loading state for more than 5 seconds
   useEffect(() => {
+    console.log('🔍 Safety fallback useEffect triggered, currentView:', currentView);
     const timeout = setTimeout(() => {
+      console.log('⏰ 5 second timeout reached, checking currentView:', currentView);
       if (currentView === 'loading') {
-        console.log('⚠️ Fallback: Still in loading state after 5s, defaulting to voice');
-        setCurrentView('voice');
+        console.log('⚠️ Fallback: Still in loading state after 5s, defaulting to dashboard');
+        setCurrentView('dashboard');
       }
     }, 5000);
     
@@ -254,13 +259,28 @@ export default function Home() {
         return;
       }
 
-      console.log("🔑 Fetching ephemeral key...");
-      const EPHEMERAL_KEY = await fetchEphemeralKey();
-      if (!EPHEMERAL_KEY) {
-        console.error("❌ Failed to get ephemeral key");
-        return;
+      // Fetch ephemeral key for OpenAI (needed for agents even when using Nova Sonic)
+      let EPHEMERAL_KEY = null;
+      const voiceProvider = getVoiceProvider();
+      console.log("🎙️ Voice provider detected:", voiceProvider);
+      
+      if (voiceProvider === 'openai') {
+        console.log("🔑 Fetching OpenAI ephemeral key...");
+        EPHEMERAL_KEY = await fetchEphemeralKey();
+        if (!EPHEMERAL_KEY) {
+          console.error("❌ Failed to get OpenAI ephemeral key");
+          return;
+        }
+        console.log("✅ Got OpenAI ephemeral key:", EPHEMERAL_KEY.slice(0, 10) + "...");
+      } else if (voiceProvider === 'nova-sonic') {
+        console.log("🔊 Using Nova Sonic for voice, but also fetching OpenAI key for agent processing...");
+        EPHEMERAL_KEY = await fetchEphemeralKey();
+        if (!EPHEMERAL_KEY) {
+          console.error("❌ Failed to get OpenAI ephemeral key for agent processing");
+          return;
+        }
+        console.log("✅ Got OpenAI ephemeral key for agents:", EPHEMERAL_KEY.slice(0, 10) + "...");
       }
-      console.log("✅ Got ephemeral key:", EPHEMERAL_KEY.slice(0, 10) + "...");
 
       console.log("🤖 Setting up agents...");
       console.log("🤖 Current selectedAgentSet:", selectedAgentSet);
@@ -287,8 +307,8 @@ export default function Home() {
       });
       
       const client = new UnifiedVoiceClient({
-        // OpenAI options
-        getEphemeralKey: async () => EPHEMERAL_KEY,
+        // OpenAI options (only when using OpenAI)
+        getEphemeralKey: EPHEMERAL_KEY ? async () => EPHEMERAL_KEY : undefined,
         initialAgents: agents,
         audioElement: sdkAudioElement,
         extraContext: {
@@ -320,20 +340,45 @@ export default function Home() {
 
       client.on("connection_change", (status) => {
         console.log("🔌 Connection status changed:", status);
+        console.log("🔌 Before update - sessionStatus:", sessionStatus, "isListening:", isListening);
+        
         if (status === "connected") {
           setSessionStatus("CONNECTED");
           setIsListening(true); // Set listening to true when connected
+          
+          // Update current provider when connected
+          const provider = client.getCurrentProvider();
+          setCurrentVoiceProvider(provider);
+          console.log("🔌 Current voice provider:", provider);
+          
+          console.log("🔌 After update - should be CONNECTED and listening:true");
         } else if (status === "connecting") {
           setSessionStatus("CONNECTING");
+          console.log("🔌 After update - should be CONNECTING");
         } else {
           setSessionStatus("DISCONNECTED");
           setIsListening(false); // Set listening to false when disconnected
+          
+          // Clear provider when disconnected
+          setCurrentVoiceProvider(null);
+          
+          console.log("🔌 After update - should be DISCONNECTED and listening:false");
         }
       });
 
       // Handle errors like connection failures
       client.on("error", (event) => {
         console.error("❌ Realtime client error:", event);
+        
+        // Handle provider failure errors specifically
+        if (event.type === 'provider_failed') {
+          setProviderError({
+            message: event.message,
+            provider: event.provider,
+            redirectToSettings: event.redirectToSettings
+          });
+        }
+        
         addEvent({
           id: uuidv4(),
           type: 'error.realtime_client',
@@ -368,6 +413,19 @@ export default function Home() {
         // Log tool calls (simplified)
         if (ev.type === 'response.function_call_arguments.done') {
           console.log('🔧 Tool executed:', (ev as any).name);
+        }
+
+        // Handle Nova Sonic transcription - send to agent system for processing
+        if (ev.type === 'input_audio_buffer.speech_stopped' && (ev as any).transcript) {
+          const transcript = (ev as any).transcript;
+          console.log('🎤 Nova Sonic transcribed speech, sending to agents:', transcript);
+          
+          // Send the transcribed text to the agent system for processing
+          if (client) {
+            client.sendUserText(transcript);
+          } else {
+            console.error('❌ No client available to send transcribed speech to agents');
+          }
         }
 
         // Handle function call outputs for ticket display
@@ -766,7 +824,7 @@ export default function Home() {
     clientRef.current.pushToTalkStop();
   };
 
-  // Toggle listening - when red (listening), clicking should end the session
+  // Toggle listening - handle all microphone states including yellow (connecting)
   const toggleListening = async () => {
     if (sessionStatus === "CONNECTED" && isListening) {
       // If we're currently listening (red microphone), end the session completely
@@ -776,6 +834,10 @@ export default function Home() {
       // If connected but not listening, start listening again
       console.log("🎤 Starting to listen");
       setIsListening(true);
+    } else if (sessionStatus === "CONNECTING") {
+      // If connecting (yellow microphone), cancel the connection and revert to disconnected
+      console.log("🎤 Canceling connection attempt - reverting to disconnected");
+      await endSession(); // This will properly disconnect and cleanup
     } else if (sessionStatus === "DISCONNECTED") {
       // If disconnected, start a new session
       console.log("🎤 Starting session");
@@ -841,12 +903,16 @@ export default function Home() {
   };
 
   // Render based on current view
+  console.log('🎨 Rendering with currentView:', currentView);
+  
   if (currentView === 'loading') {
+    console.log('🔄 Showing loading screen...');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           <p className="text-gray-600">Initializing Squiddles...</p>
+          <p className="text-xs text-gray-400">Debug: currentView = {currentView}</p>
         </div>
       </div>
     );
@@ -870,26 +936,105 @@ export default function Home() {
           isListening={isListening}
           searchResults={ticketDisplay}
           onClearSearchResults={hideTickets}
+          currentVoiceProvider={currentVoiceProvider}
         />
+        
+        {/* Provider Error Modal */}
+        {providerError && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-red-600 text-xl">⚠️</span>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">Voice Provider Error</h3>
+              </div>
+              
+              <p className="text-gray-700 mb-6">
+                {providerError.message}
+              </p>
+              
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setProviderError(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Dismiss
+                </button>
+                {providerError.redirectToSettings && (
+                  <button
+                    onClick={() => {
+                      setProviderError(null);
+                      handleNavigateToSettings();
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Go to Settings
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </>
     );
   }
 
   if (currentView === 'voice') {
     return (
-      <VoiceInterface
-        sessionStatus={sessionStatus}
-        selectedAgentSet={selectedAgentSet}
-        setSelectedAgentSet={setSelectedAgentSet}
-        isListening={isListening}
-        transcriptItems={transcriptItems}
-        events={events}
-        onStartSession={startSession}
-        onEndSession={endSession}
-        onToggleListening={toggleListening}
-        onTextInput={handleTextInput}
-        onNavigateToDashboard={handleNavigateToDashboard}
-      />
+      <>
+        <VoiceInterface
+          sessionStatus={sessionStatus}
+          selectedAgentSet={selectedAgentSet}
+          setSelectedAgentSet={setSelectedAgentSet}
+          isListening={isListening}
+          transcriptItems={transcriptItems}
+          events={events}
+          onStartSession={startSession}
+          onEndSession={endSession}
+          onToggleListening={toggleListening}
+          onTextInput={handleTextInput}
+          onNavigateToDashboard={handleNavigateToDashboard}
+        />
+        
+        {/* Provider Error Modal */}
+        {providerError && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-red-600 text-xl">⚠️</span>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">Voice Provider Error</h3>
+              </div>
+              
+              <p className="text-gray-700 mb-6">
+                {providerError.message}
+              </p>
+              
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setProviderError(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Dismiss
+                </button>
+                {providerError.redirectToSettings && (
+                  <button
+                    onClick={() => {
+                      setProviderError(null);
+                      handleNavigateToSettings();
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Go to Settings
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 

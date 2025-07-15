@@ -62,6 +62,16 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  
+  // Connection testing state
+  const [connectionTesting, setConnectionTesting] = useState({
+    openai: false,
+    novaSonic: false
+  });
+  const [connectionTestResults, setConnectionTestResults] = useState<{
+    openai?: { success: boolean; message: string } | null;
+    novaSonic?: { success: boolean; message: string } | null;
+  }>({});
 
   // Sync testing speed with global speed when it changes
   React.useEffect(() => {
@@ -306,6 +316,44 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
     }
   };
 
+  // Test connection function
+  const testConnection = async (provider: 'openai' | 'nova-sonic') => {
+    const providerKey = provider === 'nova-sonic' ? 'novaSonic' : 'openai';
+    
+    setConnectionTesting(prev => ({ ...prev, [providerKey]: true }));
+    setConnectionTestResults(prev => ({ ...prev, [providerKey]: null }));
+    
+    try {
+      // Test the connection by making a simple API call
+      const response = await fetch('/api/test-voice-provider', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider })
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        setConnectionTestResults(prev => ({ 
+          ...prev, 
+          [providerKey]: { success: true, message: result.message || 'Connection successful' }
+        }));
+      } else {
+        setConnectionTestResults(prev => ({ 
+          ...prev, 
+          [providerKey]: { success: false, message: result.message || 'Connection failed' }
+        }));
+      }
+    } catch (error) {
+      setConnectionTestResults(prev => ({ 
+        ...prev, 
+        [providerKey]: { success: false, message: 'Network error or service unavailable' }
+      }));
+    } finally {
+      setConnectionTesting(prev => ({ ...prev, [providerKey]: false }));
+    }
+  };
+
   return (
     <>
       <div className="background-gradient"></div>
@@ -414,20 +462,52 @@ export default function Settings({ onNavigateBack }: SettingsProps) {
                       </div>
                       <div className="provider-status-grid">
                         <div className={`provider-status ${providerStatus.openaiAvailable ? 'available' : 'unavailable'}`}>
-                          <span className="provider-icon">🤖</span>
-                          <span className="provider-name">OpenAI</span>
-                          <span className={`status-indicator ${providerStatus.openaiAvailable ? 'green' : 'red'}`}>
-                            {providerStatus.loading ? '⏳ Checking...' : 
-                             providerStatus.openaiAvailable ? '✅ Available' : '❌ Not configured'}
-                          </span>
+                          <div className="provider-info">
+                            <span className="provider-icon">🤖</span>
+                            <span className="provider-name">OpenAI</span>
+                            <span className={`status-indicator ${providerStatus.openaiAvailable ? 'green' : 'red'}`}>
+                              {providerStatus.loading ? '⏳ Checking...' : 
+                               providerStatus.openaiAvailable ? '✅ Available' : '❌ Not configured'}
+                            </span>
+                          </div>
+                          <div className="provider-actions">
+                            <button 
+                              className="test-connection-btn"
+                              onClick={() => testConnection('openai')}
+                              disabled={connectionTesting.openai}
+                            >
+                              {connectionTesting.openai ? '⏳ Testing...' : '🔧 Test'}
+                            </button>
+                          </div>
+                          {connectionTestResults.openai && (
+                            <div className={`connection-test-result ${connectionTestResults.openai.success ? 'success' : 'error'}`}>
+                              {connectionTestResults.openai.success ? '✅' : '❌'} {connectionTestResults.openai.message}
+                            </div>
+                          )}
                         </div>
                         <div className={`provider-status ${providerStatus.novaSonicAvailable ? 'available' : 'unavailable'}`}>
-                          <span className="provider-icon">🔊</span>
-                          <span className="provider-name">Nova Sonic</span>
-                          <span className={`status-indicator ${providerStatus.novaSonicAvailable ? 'green' : 'red'}`}>
-                            {providerStatus.loading ? '⏳ Checking...' : 
-                             providerStatus.novaSonicAvailable ? '✅ Available' : '❌ Not configured'}
-                          </span>
+                          <div className="provider-info">
+                            <span className="provider-icon">🔊</span>
+                            <span className="provider-name">Nova Sonic</span>
+                            <span className={`status-indicator ${providerStatus.novaSonicAvailable ? 'green' : 'red'}`}>
+                              {providerStatus.loading ? '⏳ Checking...' : 
+                               providerStatus.novaSonicAvailable ? '✅ Available' : '❌ Not configured'}
+                            </span>
+                          </div>
+                          <div className="provider-actions">
+                            <button 
+                              className="test-connection-btn"
+                              onClick={() => testConnection('nova-sonic')}
+                              disabled={connectionTesting.novaSonic}
+                            >
+                              {connectionTesting.novaSonic ? '⏳ Testing...' : '🔧 Test'}
+                            </button>
+                          </div>
+                          {connectionTestResults.novaSonic && (
+                            <div className={`connection-test-result ${connectionTestResults.novaSonic.success ? 'success' : 'error'}`}>
+                              {connectionTestResults.novaSonic.success ? '✅' : '❌'} {connectionTestResults.novaSonic.message}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

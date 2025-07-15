@@ -6,7 +6,7 @@
 import { RealtimeClient, RealtimeClientOptions } from '../app/lib/realtimeClient';
 import { NovaSonicClient, createNovaSonicClient } from './novaSonicClient';
 // import { NovaProClient, createNovaProClient } from './novaProClient';
-import { getVoiceProvider, validateProviderConfig, logProviderConfig, isFallbackEnabled } from '../config/voiceProvider';
+import { getVoiceProvider, validateProviderConfig, logProviderConfig } from '../config/voiceProvider';
 import { 
   getModelProviderConfig, 
   detectInputType, 
@@ -112,8 +112,7 @@ export class UnifiedVoiceClient {
     // Log provider configuration for debugging
     console.log('🔧 UnifiedVoiceClient Configuration:');
     console.log(`  Provider: ${getVoiceProvider()}`);
-    console.log(`  Fallback Enabled: ${isFallbackEnabled()}`);
-    console.log(`  ExtraContext Fallback: ${options.extraContext?.fallbackEnabled}`);
+    console.log(`  Fallback: Disabled (configured through Settings only)`);
     
     // Validate configuration
     const validation = validateProviderConfig();
@@ -140,17 +139,40 @@ export class UnifiedVoiceClient {
 
   // Connect using the configured provider
   async connect(): Promise<void> {
+    // Validate configuration before attempting connection
+    const validation = validateProviderConfig();
+    if (!validation.isValid) {
+      console.error('❌ Voice provider configuration is invalid:', validation.errors);
+      this.events.emit('connection_change', 'disconnected');
+      this.events.emit('error', {
+        type: 'configuration_invalid',
+        message: `Voice provider configuration is invalid: ${validation.errors.join(', ')}`,
+        errors: validation.errors,
+        redirectToSettings: true
+      });
+      return;
+    }
+
     const provider = getVoiceProvider();
     this.currentProvider = provider;
     
     console.log(`🎙️ Connecting using ${provider === 'openai' ? 'OpenAI' : 'Nova Sonic'} for voice`);
+    this.events.emit('connection_change', 'connecting');
     
     try {
-      // Connect voice client
-      if (provider === 'openai') {
-        await this.connectOpenAI();
-      } else if (provider === 'nova-sonic') {
+      // When using Nova Sonic, we need BOTH Nova Sonic for voice I/O AND OpenAI for agent processing
+      if (provider === 'nova-sonic') {
+        console.log('🔗 Nova Sonic mode: connecting both Nova Sonic (voice) and OpenAI (agents)');
         await this.connectNovaSonic();
+        // Also connect OpenAI for agent processing
+        if (this.options.getEphemeralKey && this.options.initialAgents) {
+          await this.connectOpenAI();
+          console.log('✅ Nova Sonic + OpenAI agent processing connected');
+        } else {
+          console.warn('⚠️ Nova Sonic connected but no OpenAI agent processing available');
+        }
+      } else if (provider === 'openai') {
+        await this.connectOpenAI();
       } else {
         throw new Error(`Unknown provider: ${provider}`);
       }
@@ -158,30 +180,33 @@ export class UnifiedVoiceClient {
       // Connect text client
       await this.connectTextClient();
       
+      console.log(`✅ Successfully connected to ${provider}`);
+      
     } catch (error) {
       console.error(`❌ Failed to connect with ${provider}:`, error);
       
-      // If it's an AWS credentials error or connection error, allow app to continue
-      if (error instanceof Error && (
-        error.message.includes('credentials') || 
-        error.message.includes('Access') ||
-        error.message.includes('connect') ||
-        error.name === 'CredentialsProviderError'
-      )) {
-        console.warn(`⚠️ Voice service unavailable (${provider}), app will continue in demo mode`);
-        this.events.emit('connection_change', 'disconnected');
-        return; // Allow app to continue without voice
-      }
+      // Enhanced error details
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorDetails = {
+        provider,
+        message: errorMessage,
+        timestamp: new Date().toISOString()
+      };
       
-      // Try fallback only if explicitly enabled in settings
-      const fallbackEnabled = this.options.extraContext?.fallbackEnabled ?? isFallbackEnabled();
-      if (fallbackEnabled === true) {
-        console.log(`🔄 Fallback is enabled in settings, attempting fallback to alternative provider`);
-        await this.tryFallback(provider, error);
-      } else {
-        console.warn(`⚠️ Voice connection failed, fallback disabled in settings - app will continue in demo mode`);
-        this.events.emit('connection_change', 'disconnected');
-      }
+      // No automatic fallback - emit error and direct user to Settings
+      console.warn(`⚠️ Voice provider ${provider} failed. Fallback disabled.`);
+      
+      this.events.emit('connection_change', 'disconnected');
+      this.events.emit('error', {
+        type: 'provider_failed',
+        message: `${provider === 'nova-sonic' ? 'Nova Sonic' : 'OpenAI'} connection failed. Go to Settings to change voice provider.`,
+        provider: provider,
+        redirectToSettings: true,
+        originalError: errorDetails,
+        troubleshooting: this.getTroubleshootingInfo(provider, error)
+      });
+      
+      return; // Allow app to continue without voice
     }
   }
 
@@ -194,7 +219,8 @@ export class UnifiedVoiceClient {
     const openAiOptions: RealtimeClientOptions = {
       getEphemeralKey: this.options.getEphemeralKey,
       initialAgents: this.options.initialAgents,
-      audioElement: this.options.audioElement,
+      // When using Nova Sonic, don't give OpenAI the audio element (Nova Sonic handles audio)
+      audioElement: this.currentProvider === 'nova-sonic' ? undefined : this.options.audioElement,
       extraContext: this.options.extraContext,
       vadConfig: this.options.vadConfig,
     };
@@ -233,9 +259,24 @@ export class UnifiedVoiceClient {
   private async connectNovaSonic(): Promise<void> {
     this.novaSonicClient = createNovaSonicClient(this.options.novaSonicConfig);
     
+    // Set system prompt from initial agents if available
+    if (this.options.initialAgents && this.options.initialAgents.length > 0) {
+      const systemPrompt = this.options.initialAgents.map(agent => 
+        `Agent: ${agent.name}\n${agent.instructions}`
+      ).join('\n\n');
+      
+      this.novaSonicClient.setSystemPrompt(systemPrompt);
+      console.log('📝 Set Nova Sonic system prompt from agents');
+    }
+    
     // Forward events and map Nova Sonic events to OpenAI format
     this.novaSonicClient.on('connection_change', (status) => {
-      this.events.emit('connection_change', status);
+      // Only forward Nova Sonic connection status if we don't have OpenAI for agents
+      if (!this.openAiClient) {
+        this.events.emit('connection_change', status);
+      } else {
+        console.log('🔊 Nova Sonic connection status:', status);
+      }
     });
     
     this.novaSonicClient.on('message', (message) => {
@@ -243,11 +284,33 @@ export class UnifiedVoiceClient {
     });
     
     this.novaSonicClient.on('audio_received', (audioData) => {
+      console.log('🔊 UnifiedVoiceClient received audio from Nova Sonic, size:', audioData.byteLength, 'bytes');
+      
       // Convert to OpenAI format
       this.events.emit('message', {
         type: 'response.audio.delta',
         delta: audioData,
       });
+      
+      // Play the audio response if we have an audio element
+      if (this.options.audioElement && this.novaSonicClient) {
+        console.log('🔊 Playing Nova Sonic audio through audio element');
+        this.novaSonicClient.playAudioResponse(audioData, this.options.audioElement);
+      } else {
+        console.warn('⚠️ No audio element available for Nova Sonic playback:', {
+          hasAudioElement: !!this.options.audioElement,
+          hasNovaSonicClient: !!this.novaSonicClient
+        });
+      }
+    });
+
+    this.novaSonicClient.on('audio_start', () => {
+      console.log('🎤 Nova Sonic: Voice activity started');
+      this.events.emit('audio_interrupted'); // Compatible with OpenAI events
+    });
+
+    this.novaSonicClient.on('audio_end', () => {
+      console.log('🔇 Nova Sonic: Voice activity ended');
     });
     
     this.novaSonicClient.on('error', (error) => {
@@ -337,37 +400,23 @@ export class UnifiedVoiceClient {
     }
   }
 
-  // Try fallback provider
-  private async tryFallback(failedProvider: 'openai' | 'nova-sonic', originalError: any): Promise<void> {
-    const fallbackProvider = failedProvider === 'openai' ? 'nova-sonic' : 'openai';
-    
-    console.log(`🔄 Attempting fallback to ${fallbackProvider}`);
-    
-    try {
-      if (fallbackProvider === 'openai') {
-        await this.connectOpenAI();
-      } else {
-        await this.connectNovaSonic();
-      }
-      
-      this.currentProvider = fallbackProvider;
-      console.log(`✅ Fallback to ${fallbackProvider} successful`);
-      
-    } catch (fallbackError) {
-      console.error(`❌ Fallback to ${fallbackProvider} also failed:`, fallbackError);
-      const fallbackErrorMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-      throw new Error(`Both ${failedProvider} and ${fallbackProvider} failed. Original error: ${originalError.message}, Fallback error: ${fallbackErrorMessage}`);
-    }
-  }
+  // Fallback functionality disabled - provider selection only through Settings
+  // private async tryFallback(failedProvider: 'openai' | 'nova-sonic', originalError: any): Promise<void> {
+  //   // Fallback logic removed - user must change provider in Settings manually
+  // }
 
   // Disconnect
   async disconnect(): Promise<void> {
+    console.log('🔌 UnifiedVoiceClient disconnecting...');
+    
     if (this.openAiClient) {
+      console.log('🔌 Disconnecting OpenAI client');
       this.openAiClient.disconnect();
       this.openAiClient = null;
     }
     
     if (this.novaSonicClient) {
+      console.log('🔌 Disconnecting Nova Sonic client');
       await this.novaSonicClient.disconnect();
       this.novaSonicClient = null;
     }
@@ -379,11 +428,20 @@ export class UnifiedVoiceClient {
     
     this.currentProvider = null;
     this.currentTextProvider = null;
+    
+    console.log('✅ UnifiedVoiceClient disconnected');
   }
 
   // Send user text with smart routing
   sendUserText(text: string, context?: { isVoiceInput?: boolean; isTextInput?: boolean; source?: string }): void {
-    // Detect input type
+    // Special case: When using Nova Sonic, transcribed speech should go to OpenAI agents
+    if (this.currentProvider === 'nova-sonic' && this.openAiClient) {
+      console.log('🎤 Nova Sonic transcribed speech → OpenAI agents:', text.substring(0, 50) + '...');
+      this.openAiClient.sendUserText(text);
+      return;
+    }
+    
+    // Normal routing for other cases
     const inputType = this.detectInputType(text, context);
     this.events.emit('input_type_detected', inputType);
     
@@ -538,6 +596,48 @@ export class UnifiedVoiceClient {
     }
     
     return 'disconnected';
+  }
+
+  // Get troubleshooting information for connection errors
+  private getTroubleshootingInfo(provider: 'openai' | 'nova-sonic', error: any): string[] {
+    const tips: string[] = [];
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    if (provider === 'openai') {
+      tips.push('Check if OPENAI_API_KEY environment variable is set');
+      tips.push('Verify OpenAI API key has Realtime API access');
+      tips.push('Ensure network connectivity to api.openai.com');
+      
+      if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
+        tips.push('API key is invalid or expired');
+      }
+      if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
+        tips.push('API key does not have access to Realtime API');
+      }
+      if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
+        tips.push('API quota or rate limit exceeded');
+      }
+    } else if (provider === 'nova-sonic') {
+      tips.push('Check AWS credentials: NEXT_PUBLIC_AWS_ACCESS_KEY_ID and NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY');
+      tips.push('Verify AWS region is set to us-east-1 (Nova Sonic requirement)');
+      tips.push('Ensure AWS account has Bedrock access');
+      tips.push('Check if Nova Sonic model is available in your region');
+      
+      if (errorMessage.includes('credentials')) {
+        tips.push('AWS credentials are missing or invalid');
+      }
+      if (errorMessage.includes('region')) {
+        tips.push('Try setting NEXT_PUBLIC_AWS_REGION=us-east-1');
+      }
+      if (errorMessage.includes('AccessDenied') || errorMessage.includes('403')) {
+        tips.push('AWS account may not have Bedrock permissions');
+      }
+    }
+    
+    tips.push('Check browser console for detailed error logs');
+    tips.push('Try testing the connection using the API test endpoint');
+    
+    return tips;
   }
 }
 

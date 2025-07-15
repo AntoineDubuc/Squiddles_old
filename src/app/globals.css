@@ -10,12 +10,12 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0A0A0A;
-    color: #FFFFFF;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background: #0A0A0A !important;
+    color: #FFFFFF !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    position: relative !important;
 }
 
 /* Main page background logo */

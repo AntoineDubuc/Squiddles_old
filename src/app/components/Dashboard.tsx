@@ -31,9 +31,10 @@ interface DashboardProps {
     voiceMessage?: string;
   };
   onClearSearchResults?: () => void;
+  currentVoiceProvider?: 'openai' | 'nova-sonic' | null;
 }
 
-export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, onPushToTalkStart, onPushToTalkStop, sessionStatus = 'DISCONNECTED', isListening = false, searchResults, onClearSearchResults }: DashboardProps) {
+export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNavigateToSettings, onNavigateToIntegrations, onNavigateToTemplates, onStartVoiceSession, onEndVoiceSession, onTextInput, onPushToTalkStart, onPushToTalkStop, sessionStatus = 'DISCONNECTED', isListening = false, searchResults, onClearSearchResults, currentVoiceProvider = null }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activityExpanded, setActivityExpanded] = useState(true);
   const [conversationExpanded, setConversationExpanded] = useState(false);
@@ -41,8 +42,16 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
   const [textInput, setTextInput] = useState('');
   const [pendingTextInput, setPendingTextInput] = useState<string | null>(null);
   
-  // Real Jira data integration with pagination
-  const { activityFeed, isLoading, error, currentPage, refresh, nextPage, prevPage, loadPage } = useJiraActivityFeed();
+  // Real Jira data integration with pagination - TEMPORARILY DISABLED FOR DEBUGGING
+  // const { activityFeed, isLoading, error, currentPage, refresh, nextPage, prevPage, loadPage } = useJiraActivityFeed();
+  const activityFeed = null;
+  const isLoading = false;
+  const error = null;
+  const currentPage = 0;
+  const refresh = () => {};
+  const nextPage = () => {};
+  const prevPage = () => {};
+  const loadPage = () => {};
   
   // Reply context for voice-enabled comment replies
   const { selectMentionForReply, clearSelectedMention, setVoiceReplyMode, replyState } = useReply();
@@ -298,6 +307,10 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                     undefined
                   }
                   style={{ cursor: 'pointer' }}
+                  onMouseEnter={() => {
+                    console.log("🎤 Microphone button debug - sessionStatus:", sessionStatus, "isListening:", isListening);
+                    console.log("🎤 Should be green?", sessionStatus === 'CONNECTED' && isListening);
+                  }}
                 >
                   <svg viewBox="0 0 160 160" className="microphone-svg">
                     {/* Microphone capsule */}
@@ -342,6 +355,23 @@ export default function Dashboard({ onNavigateToVoice, onNavigateToTickets, onNa
                     </>
                   )}
                 </div>
+                
+                {/* Provider Status Indicator */}
+                {currentVoiceProvider && (
+                  <div className="provider-status-indicator">
+                    <div className="provider-status-content">
+                      <span className="provider-icon">
+                        {currentVoiceProvider === 'nova-sonic' ? '🔊' : '🤖'}
+                      </span>
+                      <span className="provider-text">
+                        Using {currentVoiceProvider === 'nova-sonic' ? 'Nova Sonic' : 'OpenAI'}
+                      </span>
+                      {currentVoiceProvider === 'nova-sonic' && (
+                        <span className="provider-badge">Cost-effective</span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Text Input Alternative */}

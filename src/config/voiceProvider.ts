@@ -14,7 +14,7 @@ export interface VoiceProviderConfig {
 // Default configuration
 const DEFAULT_CONFIG: VoiceProviderConfig = {
   provider: 'nova-sonic',
-  fallbackEnabled: true,
+  fallbackEnabled: false,
   fallbackProvider: 'openai',
 };
 
@@ -25,9 +25,9 @@ export function getVoiceProvider(): VoiceProvider {
   return useNovaSonic ? 'nova-sonic' : 'openai';
 }
 
-// Check if fallback is enabled
+// Check if fallback is enabled (disabled by default)
 export function isFallbackEnabled(): boolean {
-  return process.env.ENABLE_VOICE_FALLBACK !== 'false';
+  return process.env.ENABLE_VOICE_FALLBACK === 'true';
 }
 
 // Get fallback provider

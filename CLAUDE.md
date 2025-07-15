@@ -27,6 +27,12 @@ npm test            # Run Jest tests
 # Service Testing
 npm run test:jira-api         # Test Jira API endpoints
 npm run test:pinecone         # Test Pinecone connection
+
+# Server Management (IMPORTANT SAFETY RULES)
+# ❌ NEVER use: pkill -f "next" (kills ALL Next.js processes system-wide)
+# ✅ ALWAYS use port-specific approach:
+lsof -ti:3002 | xargs kill     # Safely kill only this project's server
+# Alternative: Use Ctrl+C in the terminal where server is running
 ```
 
 ## Key Technical Patterns
